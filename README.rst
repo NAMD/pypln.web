@@ -7,7 +7,7 @@ our foundations. The goal of the project is to create an easy way to use NLTK
 for processing big corpora, with a Web interface.
 
 We don't have a production release yet, but it's scheduled on our
-`next milestone <https://github.com/namd/pypln/issues?milestone=1>`_.
+`next milestone <https://github.com/namd/pypln.web/issues?milestone=1>`_.
 
 PyPLN is sponsored by `Fundação Getulio Vargas <http://portal.fgv.br/>`_.
 
@@ -23,7 +23,7 @@ Documentation
 
 Our documentation is hosted using `GitHub Pages <http://pages.github.com/>`_:
 
-- `PyPLN Documentation <http://namd.github.com/pypln/>`_
+- `PyPLN Documentation <http://pypln.org/docs>`_
   (created using `Sphinx <http://sphinx.pocoo.org/>`_)
 - `Code reference <http://namd.github.com/pypln/reference/>`_
   (created using `epydoc <http://epydoc.sourceforge.net/>`_)
@@ -36,7 +36,7 @@ To install dependencies (on a Debian-like GNU/Linux distribution)::
 
     sudo apt-get install python-setuptools
     pip install virtualenv virtualenvwrapper
-    mkvirtualenv pypln
+    mkvirtualenv pypln.web
     pip install -r requirements/production.txt
 
 You will also need to install NLTK data. You can do so following the `NLTK
@@ -48,7 +48,7 @@ Developing
 
 To run tests::
 
-    workon pypln
+    workon pypln.web
     pip install -r requirements/development.txt
     make test
 
@@ -58,11 +58,8 @@ To run tests::
 
 To run the development webserver::
 
-    workon pypln
-    cd pypln/web/
+    workon pypln.web
     pip install -r requirements/project.txt
     PYTHONPATH="../../:$PYTHONPATH" ./manage.py runserver --settings=settings.development
 
-
-
-See our `code guidelines <https://github.com/namd/pypln/blob/develop/CONTRIBUTING.rst>`_.
+See our `code guidelines <https://github.com/namd/pypln.web/blob/develop/CONTRIBUTING.rst>`_.
