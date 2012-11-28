@@ -1,14 +1,8 @@
-# Common
+# common
 pypelinin
 mongodict
 
-# Backend
-psutil
-chromium_compact_language_detector
-numpy
-nltk
-
-# Web
+# pypln.web-specific
 Pinax
 flask
 jinja2
