@@ -1,6 +1,7 @@
 # common
 pypelinin
 mongodict
+nltk
 
 # pypln.web-specific
 Pinax
