@@ -26,7 +26,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.template.defaultfilters import slugify
+from django.contrib import messages
+from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -78,10 +79,8 @@ def corpora_list(request, as_json=False):
 def _process_form(request, files, corpus):
     form = DocumentForm(request.POST, files)
     if not form.is_valid():
-        #TODO: put messages to work
         #XXX: not selecting a file may not be the only invalid input
-        request.user.message_set.create(message=_('ERROR: you need to '
-                                                  'select a file!'))
+        messages.error(request, _('ERROR: you need to select a file!'))
     else:
         new_document = form.save(commit=False)
         new_document.slug = ''
@@ -98,8 +97,6 @@ def _process_form(request, files, corpus):
                 'id': new_document.id}
         create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
                         timeout=settings.ROUTER_TIMEOUT)
-        request.user.message_set.create(message=_('Document uploaded '
-                                                  'successfully!'))
 
 @login_required
 def corpus_page(request, corpus_slug):
@@ -111,6 +108,9 @@ def corpus_page(request, corpus_slug):
     if request.method == 'POST':
         for f in request.FILES.getlist('blob'):
             _process_form(request, {'blob': f}, corpus)
+        number_of_files = len(request.FILES.getlist('blob'))
+        messages.info(request, _('{} document{} uploaded successfully!').format(
+                    number_of_files, pluralize(number_of_files)))
         return HttpResponseRedirect(reverse('corpus_page',
                 kwargs={'corpus_slug': corpus_slug}))
     else:

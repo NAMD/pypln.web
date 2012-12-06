@@ -24,3 +24,14 @@ label {
 .right {
     text-align: right;
 }
+
+.messages {
+    list-style: none;
+}
+
+.messages>.info {
+    background-color: #72D42A;
+    color: #000;
+    padding: 10px;
+    padding-left: 20px;
+}
