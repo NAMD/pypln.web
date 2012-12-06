@@ -26,7 +26,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.template.defaultfilters import slugify
+from django.contrib import messages
+from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -72,6 +73,31 @@ def corpora_list(request, as_json=False):
     return render_to_response('core/corpora.html', data,
             context_instance=RequestContext(request))
 
+#TODO: accept (and uncompress) .tar.gz and .zip files
+#TODO: enforce document type
+#TODO: dot not permit to have documents with the same slug!
+def _process_form(request, files, corpus):
+    form = DocumentForm(request.POST, files)
+    if not form.is_valid():
+        #XXX: not selecting a file may not be the only invalid input
+        messages.error(request, _('ERROR: you need to select a file!'))
+    else:
+        new_document = form.save(commit=False)
+        new_document.slug = ''
+        new_document.owner = request.user
+        new_document.date_uploaded = datetime.datetime.now()
+        new_document.save()
+        new_document.slug = _slug(new_document.file_name())
+        new_document.corpus_set.add(corpus)
+        for corpus in new_document.corpus_set.all():
+            corpus.last_modified = datetime.datetime.now()
+            corpus.save()
+        new_document.save()
+        data = {'_id': str(new_document.blob.file._id),
+                'id': new_document.id}
+        create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
+                        timeout=settings.ROUTER_TIMEOUT)
+
 @login_required
 def corpus_page(request, corpus_slug):
     try:
@@ -80,37 +106,17 @@ def corpus_page(request, corpus_slug):
         return render_to_response('core/404.html', {},
                 context_instance=RequestContext(request))
     if request.method == 'POST':
-        #TODO: accept (and uncompress) .tar.gz and .zip files
-        #TODO: enforce document type
-        #TODO: dot not permit to have documents with the same slug!
-        form = DocumentForm(request.POST, request.FILES)
-        if not form.is_valid():
-            #TODO: put messages to work
-            request.user.message_set.create(message=_('ERROR: you need to '
-                                                      'select a file!'))
-        else:
-            new_document = form.save(commit=False)
-            new_document.slug = ''
-            new_document.owner = request.user
-            new_document.date_uploaded = datetime.datetime.now()
-            new_document.save()
-            new_document.slug = _slug(new_document.file_name())
-            new_document.corpus_set.add(corpus)
-            for corpus in new_document.corpus_set.all():
-                corpus.last_modified = datetime.datetime.now()
-                corpus.save()
-            new_document.save()
-            data = {'_id': str(new_document.blob.file._id),
-                    'id': new_document.id}
-            create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
-                            timeout=settings.ROUTER_TIMEOUT)
-            request.user.message_set.create(message=_('Document uploaded '
-                                                      'successfully!'))
-            return HttpResponseRedirect(reverse('corpus_page',
-                    kwargs={'corpus_slug': corpus_slug}))
+        for f in request.FILES.getlist('blob'):
+            _process_form(request, {'blob': f}, corpus)
+        number_of_files = len(request.FILES.getlist('blob'))
+        messages.info(request, _('{} document{} uploaded successfully!').format(
+                    number_of_files, pluralize(number_of_files)))
+        return HttpResponseRedirect(reverse('corpus_page',
+                kwargs={'corpus_slug': corpus_slug}))
     else:
         form = DocumentForm()
     form.fields['blob'].label = ''
+    form.fields['blob'].widget.attrs['multiple'] = "multiple"
     data = {'corpus': corpus, 'form': form}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
