@@ -19,4 +19,7 @@
 from django.contrib import admin
 from core.models import Corpus
 
-admin.site.register(Corpus)
+class CorpusAdmin(admin.ModelAdmin):
+    readonly_fields = ("documents", "slug", "last_modified")
+
+admin.site.register(Corpus, CorpusAdmin)
