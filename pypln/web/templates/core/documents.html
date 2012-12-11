@@ -38,8 +38,10 @@
           <td>{{ document.file_size }}</td>
           <td>{{ document.date_uploaded }}</td>
           <td><a href="{% url profile_detail username=document.owner.username %}">{{ document.owner }}</a></td>
-          <td> {{ document.corpus_set.all|join:", " }}
-            {# #TODO: put links on corpora names #}
+          <td>
+              {% for corpus in document.corpus_set.all %}
+                  <a href="{% url corpus_page corpus_slug=corpus.slug %}">{{ corpus.name }}</a>
+              {% endfor %}
           </td>
         </tr>
         {% endfor %}
