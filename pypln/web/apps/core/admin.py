@@ -17,9 +17,13 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib import admin
-from core.models import Corpus
+from core.models import Corpus, Document
 
 class CorpusAdmin(admin.ModelAdmin):
     readonly_fields = ("documents", "slug", "last_modified")
 
+class DocumentAdmin(admin.ModelAdmin):
+    readonly_fields = ("slug", )
+
 admin.site.register(Corpus, CorpusAdmin)
+admin.site.register(Document, DocumentAdmin)
