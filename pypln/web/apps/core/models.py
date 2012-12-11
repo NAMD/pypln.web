@@ -68,6 +68,7 @@ class Corpus(models.Model):
 
     class Meta:
         ordering = ('name', )
+        verbose_name_plural = "Corpora"
 
     def __unicode__(self):
         return self.name
