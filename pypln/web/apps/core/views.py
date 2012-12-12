@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
@@ -109,8 +110,12 @@ def corpus_page(request, corpus_slug):
         for f in request.FILES.getlist('blob'):
             _process_form(request, {'blob': f}, corpus)
         number_of_files = len(request.FILES.getlist('blob'))
-        messages.info(request, _('{} document{} uploaded successfully!').format(
-                    number_of_files, pluralize(number_of_files)))
+        # I know I should be using string.format, but gettext doesn't support
+        # it yet: https://savannah.gnu.org/bugs/?30854
+        message = ungettext('%(count)s document uploaded successfully!',
+                '%(count)s documents uploaded successfully!',
+                number_of_files) % {'count': number_of_files}
+        messages.info(request, message)
         return HttpResponseRedirect(reverse('corpus_page',
                 kwargs={'corpus_slug': corpus_slug}))
     else:
