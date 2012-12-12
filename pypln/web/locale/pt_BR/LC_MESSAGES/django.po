@@ -4,10 +4,9 @@
 #
 msgid ""
 msgstr ""
-
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-25 10:36-0300\n"
+"POT-Creation-Date: 2012-12-12 15:13-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -18,55 +17,56 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:36
+#: apps/core/views.py:56
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:45
+#: apps/core/views.py:65
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:70
+#: apps/core/views.py:83
 msgid "ERROR: you need to select a file!"
 msgstr "ERRO: é necessário selecionar um arquivo!"
 
-#: apps/core/views.py:88
-msgid "Document uploaded successfully!"
+#: apps/core/views.py:112
+#, fuzzy
+msgid "{} document{} uploaded successfully!"
 msgstr "Documento transferido com sucesso!"
 
-#: apps/core/visualizations.py:50
+#: apps/core/visualizations.py:75
 msgid "Plain text"
 msgstr "Somente texto"
 
-#: apps/core/visualizations.py:54
+#: apps/core/visualizations.py:79
 msgid "Part-of-speech"
 msgstr "Categorias morfossintáticas"
 
-#: apps/core/visualizations.py:59
+#: apps/core/visualizations.py:84
 msgid "Token frequency histogram"
 msgstr "Histograma de frequência de tokens"
 
-#: apps/core/visualizations.py:65
+#: apps/core/visualizations.py:90
 msgid "Statistics"
 msgstr "Estatísticas"
 
-#: apps/core/visualizations.py:72
+#: apps/core/visualizations.py:97
 msgid "Word cloud"
 msgstr "Word cloud"
 
-#: apps/profiles/models.py:8
+#: apps/profiles/models.py:26
 msgid "name"
 msgstr "nome"
 
-#: apps/profiles/models.py:9
+#: apps/profiles/models.py:27
 msgid "about"
 msgstr "sobre"
 
-#: apps/profiles/models.py:10
+#: apps/profiles/models.py:28
 msgid "location"
 msgstr "localização"
 
-#: apps/profiles/models.py:11
+#: apps/profiles/models.py:29
 msgid "website"
 msgstr "website"
 
@@ -301,13 +301,17 @@ msgstr ""
 "            e novos processamentos.\n"
 "            "
 
-#: templates/core/visualizations/pos-highlighter.html:2
+#: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"
 msgstr "Controles"
 
-#: templates/core/visualizations/pos-highlighter.html:5
+#: templates/core/visualizations/pos-highlighter.html:6
 msgid "Highlighted text"
 msgstr "Texto marcado"
+
+#: templates/core/visualizations/pos-highlighter.html:40
+msgid "We could not do the part-of-speech tagging for this language, sorry."
+msgstr ""
 
 #: templates/core/visualizations/statistics.html:4
 msgid "Number of unique/total tokens"
