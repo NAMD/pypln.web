@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-12 16:58-0200\n"
+"POT-Creation-Date: 2012-12-12 17:12-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -160,13 +160,21 @@ msgstr "Total de Documentos"
 msgid "Owner"
 msgstr "Proprietário"
 
-#: templates/core/corpus.html:4
+#: templates/core/corpus.html:4 templates/core/corpus.html.py:23
 msgid "Corpus"
 msgstr "Corpus"
+
+#: templates/core/corpus.html:17
+msgid "You are here:"
+msgstr "Você está aqui:"
 
 #: templates/core/corpus.html:18 templates/core/document.html:11
 msgid "Home"
 msgstr "Página inicial"
+
+#: templates/core/corpus.html:27
+msgid "Add a document"
+msgstr "Adicione documentos"
 
 #: templates/core/corpus.html:36 templates/core/document.html:40
 msgid "Metadata"

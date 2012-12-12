@@ -14,17 +14,17 @@
         } );
     </script>
 <div class="breadcrumb">
-You are here:
+{% trans "You are here:" %}
     <a href="{% url home %}">{% trans "Home" %}</a> &gt;
     <a href="{% url corpora_list %}">Corpora</a> &gt;
     <a href="{% url corpus_page corpus.slug %}">Corpus {{ corpus.name }}</a>
   </div>
 
-  <h2 class="brand">Corpus {{ corpus.name }}</h2>
+  <h2 class="brand">{% trans "Corpus" %} {{ corpus.name }}</h2>
   <p class="description"> {{ corpus.description }} </p>
     <div class="row">
         <div class="span8">
-            <h3>Add a document</h3>
+            <h3>{% trans "Add a document" %}</h3>
             <form class="well form-inline" method="POST"
               action="{% url corpus_page corpus.slug %}" enctype="multipart/form-data">
             {% csrf_token %}
