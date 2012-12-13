@@ -37,7 +37,7 @@ SERVE_MEDIA = True
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = "r9^6-zqrk-$uyu96z!$sakf%^ng!w&4^d8qj@t#taxtgi+a1p9"
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_DEBUG = True
 
 ROUTER_API = 'tcp://127.0.0.1:5555'
