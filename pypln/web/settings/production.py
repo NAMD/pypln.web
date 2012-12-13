@@ -29,6 +29,13 @@ SERVE_MEDIA = False
 
 pgpass_file_path = os.path.expanduser("~/.pgpass")
 secret_key_file_path = os.path.expanduser("~/.secret_key")
+smtp_config_file_path = os.path.expanduser("~/.smtp_config")
+
+if os.path.exists(smtp_config_file_path):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_USE_TLS = True
+    with open(smtp_config_file_path, 'r') as smtp_config_file:
+        EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = smtp_config_file.read().strip().split(':')
 
 with open(secret_key_file_path, 'r') as secret_key_file:
     SECRET_KEY = secret_key_file.read().strip()
