@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 14:49-0200\n"
+"POT-Creation-Date: 2012-12-13 14:53-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -213,7 +213,7 @@ msgstr "Tamanho"
 msgid "Uploaded on"
 msgstr "Transferido em"
 
-#: templates/core/document.html:4
+#: templates/core/document.html:4 templates/core/document.html.py:15
 msgid "Document"
 msgstr "Documento"
 
@@ -228,6 +228,10 @@ msgstr "Tamanho:"
 #: templates/core/document.html:54
 msgid "Upload date:"
 msgstr "Data da transferência:"
+
+#: templates/core/document.html:66
+msgid "Download the original file"
+msgstr "Fazer download do arquivo original"
 
 #: templates/core/documents.html:4 templates/core/documents.html.py:20
 #: templates/core/documents.html:22
