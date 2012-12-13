@@ -59,7 +59,7 @@ $(document).ready(function() {
   $('#controls').html(html.join("\n"));
 
   function reloadHighlight(e) {
-    var element = $(e.srcElement);
+    var element = $(e.target);
     var color = element.attr('data-color');
     var showElement = element.attr('checked') == 'checked';
     var tokens = $('#text div.' + color);
