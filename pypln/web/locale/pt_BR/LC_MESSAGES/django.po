@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 14:53-0200\n"
+"POT-Creation-Date: 2012-12-13 14:56-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -119,6 +119,20 @@ msgstr "Comece em <a href=\"%(login_url)s\">autenticação</a>."
 #: templates/core/404.html:4
 msgid "Error 404 - Page not found"
 msgstr "Erro 404 - Página não encontrada"
+
+#: templates/core/404.html:10
+msgid "ERROR 404"
+msgstr "Erro 404"
+
+#: templates/core/404.html:11
+msgid ""
+"\n"
+"  The page you are trying to access does not exist.\n"
+"  "
+msgstr ""
+"\n"
+"  A página que você está procurando não existe.\n"
+"  "
 
 #: templates/core/corpora.html:4
 msgid "Corpora List"
