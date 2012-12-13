@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 14:56-0200\n"
+"POT-Creation-Date: 2012-12-13 15:07-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -72,6 +72,24 @@ msgstr "localização"
 msgid "website"
 msgstr "website"
 
+#: templates/404.html:4
+msgid "Error 404 - Page not found"
+msgstr "Erro 404 - Página não encontrada"
+
+#: templates/404.html:10
+msgid "ERROR 404"
+msgstr "Erro 404"
+
+#: templates/404.html:11
+msgid ""
+"\n"
+"  The page you are trying to access does not exist.\n"
+"  "
+msgstr ""
+"\n"
+"  A página que você está procurando não existe.\n"
+"  "
+
 #: templates/site_base.html:8 templates/core/corpora.html:20
 #: templates/core/corpora.html.py:22 templates/core/document.html:69
 #: templates/core/documents.html:31
@@ -115,24 +133,6 @@ msgstr ""
 #, python-format
 msgid "Start by <a href=\"%(login_url)s\">logging in</a>."
 msgstr "Comece em <a href=\"%(login_url)s\">autenticação</a>."
-
-#: templates/core/404.html:4
-msgid "Error 404 - Page not found"
-msgstr "Erro 404 - Página não encontrada"
-
-#: templates/core/404.html:10
-msgid "ERROR 404"
-msgstr "Erro 404"
-
-#: templates/core/404.html:11
-msgid ""
-"\n"
-"  The page you are trying to access does not exist.\n"
-"  "
-msgstr ""
-"\n"
-"  A página que você está procurando não existe.\n"
-"  "
 
 #: templates/core/corpora.html:4
 msgid "Corpora List"
@@ -286,6 +286,10 @@ msgstr ""
 "            PyPLN é software livre e escalável, de acordo com a demanda.\n"
 "            "
 
+#: templates/core/homepage.html:30
+msgid "Start using it!"
+msgstr ""
+
 #: templates/core/homepage.html:32
 #, python-format
 msgid ""
@@ -307,6 +311,10 @@ msgstr ""
 "análises\n"
 "            \n"
 "            "
+
+#: templates/core/homepage.html:40
+msgid "How to use it"
+msgstr ""
 
 #: templates/core/homepage.html:42
 #, python-format
@@ -330,6 +338,33 @@ msgstr ""
 "visualização\n"
 "            e novos processamentos.\n"
 "            "
+
+#: templates/core/homepage.html:57
+#, fuzzy
+msgid "Document analysis"
+msgstr "Relação de Documentos"
+
+#: templates/core/homepage.html:58
+msgid ""
+"\n"
+"                <p>As PyPLN's main feature, you can visualize things like\n"
+"                  part-of-speech tags, word frequency statistics and other\n"
+"                  analysis in your documents.</p>\n"
+"                "
+msgstr ""
+
+#: templates/core/homepage.html:65
+msgid "Searching"
+msgstr ""
+
+#: templates/core/homepage.html:66
+msgid ""
+"\n"
+"                <p>PyPLN offers full-text search on your corpora so you can\n"
+"                  easily find information and then visualize its analysis.</"
+"p>\n"
+"                "
+msgstr ""
 
 #: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"

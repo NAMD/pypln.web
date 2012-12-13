@@ -27,7 +27,7 @@
           </p>
 
           {% if user.is_authenticated %}
-          <h2>Start using it!</h2>
+          <h2>{% trans "Start using it!" %}</h2>
           <p>
             {% blocktrans %}
             Go to <a href="{{ corpora_list_url }}">corpora list</a> page to see
@@ -37,7 +37,7 @@
             {% endblocktrans %}
           </p>
           {% else %}
-          <h2>How to use it</h2>
+          <h2>{% trans "How to use it" %}</h2>
           <p>
             {% blocktrans %}
             You just need to <a href="{{ signup_url }}">create an account</a>,
@@ -54,15 +54,19 @@
 
         <div class="row">
             <div class="span8">
-                <h2>Document analysis</h2>
+                <h2>{% trans "Document analysis" %}</h2>
+                {% blocktrans %}
                 <p>As PyPLN's main feature, you can visualize things like
                   part-of-speech tags, word frequency statistics and other
                   analysis in your documents.</p>
+                {% endblocktrans %}
             </div>
             <div class="span7">
-                <h2>Searching</h2>
+                <h2>{% trans "Searching" %}</h2>
+                {% blocktrans %}
                 <p>PyPLN offers full-text search on your corpora so you can
                   easily find information and then visualize its analysis.</p>
+                {% endblocktrans %}
             </div>
         </div>
     </div>
