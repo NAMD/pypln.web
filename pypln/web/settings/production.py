@@ -20,7 +20,7 @@ from base import *
 import os
 
 ADMINS = [
-    #TODO: define admin e-mail
+    ("pypln", "pyplnproject@gmail.com"),
 ]
 
 MANAGERS = ADMINS
