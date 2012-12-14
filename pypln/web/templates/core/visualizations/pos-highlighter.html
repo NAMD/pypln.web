@@ -1,6 +1,7 @@
 {% load i18n %}
 <div id="pos">
   <h3>{% trans "Controls" %}</h3>
+  <a href="#" id="checkall">select all</a> <a href="#" id="uncheckall">unselect all</a>
   <div id="controls"></div>
 
   <h3>{% trans "Highlighted text" %}</h3>
@@ -59,7 +60,7 @@ $(document).ready(function() {
   $('#controls').html(html.join("\n"));
 
   function reloadHighlight(e) {
-    var element = $(e.srcElement);
+    var element = $(e.target);
     var color = element.attr('data-color');
     var showElement = element.attr('checked') == 'checked';
     var tokens = $('#text div.' + color);
@@ -76,6 +77,21 @@ $(document).ready(function() {
     element.attr('checked', 'checked');
     element.click(reloadHighlight);
   }
+
+  function checkAll(e) {
+    e.preventDefault();
+    $('#controls').find(':checkbox').attr('checked', 'checked');
+    $('#text').find('div').css('background-color', '');
+  }
+
+  function uncheckAll(e) {
+    e.preventDefault();
+    $('#controls').find(':checkbox').removeAttr('checked');
+    $('#text').find('div').css('background-color', 'white');
+  }
+
+  $('#checkall').click(checkAll);
+  $('#uncheckall').click(uncheckAll);
 
   var content = [
   {% for info in pos %}
