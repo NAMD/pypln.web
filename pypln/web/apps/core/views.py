@@ -173,7 +173,7 @@ def document_visualization(request, document_slug, visualization, fmt):
             not VISUALIZATIONS[visualization]['requires'].issubset(properties):
         return HttpResponse('Visualization not found', status=404)
 
-    data = {"document": document}
+    data = {}
     for key in VISUALIZATIONS[visualization]['requires']:
         data[key] = store['id:{}:{}'.format(document.id, key)]
     template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
@@ -183,6 +183,7 @@ def document_visualization(request, document_slug, visualization, fmt):
         raise Http404("Visualization is not available in this format.")
     if 'process' in VISUALIZATIONS[visualization]:
         data = VISUALIZATIONS[visualization]['process'](data)
+    data['document'] = document
     response = render_to_response(template_name, data,
             context_instance=RequestContext(request))
     if fmt != "html":
