@@ -173,7 +173,7 @@ def document_visualization(request, document_slug, visualization, fmt):
             not VISUALIZATIONS[visualization]['requires'].issubset(properties):
         return HttpResponse('Visualization not found', status=404)
 
-    data = {}
+    data = {"document": document}
     for key in VISUALIZATIONS[visualization]['requires']:
         data[key] = store['id:{}:{}'.format(document.id, key)]
     template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
