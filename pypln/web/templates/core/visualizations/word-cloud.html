@@ -6,7 +6,7 @@
 <script type="text/javascript">
 var word_list = [
   {% for word, weight in freqdist %}
-  {text: "{{ word }}", weight: {{ weight }} },
+  {text: "{{ word|escapejs }}", weight: {{ weight }} },
   {% endfor %}
 ];
 $(document).ready(function() {

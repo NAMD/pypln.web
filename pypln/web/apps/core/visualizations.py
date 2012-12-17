@@ -66,7 +66,7 @@ def _wordcloud(data):
     document_language = LANGUAGES[data['language']].lower()
     if document_language in stopwords.fileids():
         stopwords_list += stopwords.words(document_language)
-    data['freqdist'] = [[repr(x[0])[2:-1], x[1]] for x in data['freqdist'] \
+    data['freqdist'] = [[x[0], x[1]] for x in data['freqdist'] \
                                                  if x[0] not in stopwords_list]
     return data
 
