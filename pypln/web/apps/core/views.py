@@ -183,8 +183,12 @@ def document_visualization(request, document_slug, visualization, fmt):
         raise Http404("Visualization is not available in this format.")
     if 'process' in VISUALIZATIONS[visualization]:
         data = VISUALIZATIONS[visualization]['process'](data)
-    return render_to_response(template_name, data,
+    response = render_to_response(template_name, data,
             context_instance=RequestContext(request))
+    if fmt != "html":
+        response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
+        response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
+    return response
 
 @login_required
 def document_list(request):
