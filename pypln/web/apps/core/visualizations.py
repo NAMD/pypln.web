@@ -40,10 +40,14 @@ def _token_frequency_histogram(data):
 
 def _pos_highlighter(data):
     pos = []
+    token_list = []
     if data['pos'] is not None:
-        for item in data['pos']:
+        for idx, item in enumerate(data['pos']):
             pos.append({'slug': TAGSET[item[1]]['slug'], 'token': item[0]})
-    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20]}
+            token_list.append((idx, item[0], item[1]))
+
+    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
+            'token_list': token_list}
 
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)

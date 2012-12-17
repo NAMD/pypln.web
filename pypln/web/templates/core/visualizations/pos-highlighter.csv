@@ -1,0 +1,3 @@
+"token_index","token","tag"
+{% for idx, token, tag in token_list %}"{{ idx }}","{{ token|addslashes }}","{{ tag|addslashes }}"
+{% endfor %}
