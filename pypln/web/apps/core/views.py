@@ -22,9 +22,10 @@ import json
 
 from mimetypes import guess_type
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.template import RequestContext, TemplateDoesNotExist
+from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
@@ -151,7 +152,7 @@ def document_page(request, document_slug):
         context_instance=RequestContext(request))
 
 @login_required
-def document_visualization(request, document_slug, visualization):
+def document_visualization(request, document_slug, visualization, fmt):
     try:
         document = Document.objects.get(slug=document_slug,
                 owner=request.user.id)
@@ -175,10 +176,14 @@ def document_visualization(request, document_slug, visualization):
     data = {}
     for key in VISUALIZATIONS[visualization]['requires']:
         data[key] = store['id:{}:{}'.format(document.id, key)]
-    view_name = 'core/visualizations/{}.html'.format(visualization)
+    template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
+    try:
+        template = get_template(template_name)
+    except TemplateDoesNotExist:
+        raise Http404("Visualization is not available in this format.")
     if 'process' in VISUALIZATIONS[visualization]:
         data = VISUALIZATIONS[visualization]['process'](data)
-    return render_to_response(view_name, data,
+    return render_to_response(template_name, data,
             context_instance=RequestContext(request))
 
 @login_required
