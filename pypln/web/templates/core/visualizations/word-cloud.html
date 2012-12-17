@@ -1,6 +1,9 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqcloud-1.0.1.min.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jqcloud.css" />
 
+<a href="{% url document_visualization document.slug "word-cloud" "csv" %}">download as csv</a>
+<br />
+
 <div id="wordcloud" style="width: 480px; height: 350px"></div>
 
 <script type="text/javascript">
