@@ -55,6 +55,13 @@
         &nbsp;
         <span class="label"> {{ document.date_uploaded }} </span>
       </div>
+      <div>
+        <span class="label label-info"> {% trans "Indexed:" %} </span>
+        &nbsp;
+        <span class="label">
+          {% if document.indexed %}{% trans "Yes" %}{% else %}{% trans "No" %}{%endif %}
+        </span>
+      </div>
       {% for key, value in metadata.items %}
       <div>
         <span class="label label-info"> {{ key }} </span>
