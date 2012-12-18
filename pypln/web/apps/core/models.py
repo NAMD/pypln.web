@@ -24,6 +24,8 @@ from django.forms import ModelForm
 from django.conf import settings
 from .storage import GridFSStorage
 
+from whoosh.fields import Schema, ID, TEXT
+
 
 gridfs_storage = GridFSStorage(location='/',
                                host=settings.MONGODB_CONFIG['host'],
@@ -82,3 +84,5 @@ class DocumentForm(ModelForm):
     class Meta:
         model = Document
         fields = ('blob', )
+
+index_schema = Schema(id=ID(stored=True), filename=TEXT, content=TEXT)
