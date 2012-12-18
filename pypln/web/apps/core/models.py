@@ -38,6 +38,7 @@ class Document(models.Model):
     slug = models.SlugField()
     date_uploaded = models.DateTimeField()
     owner = models.ForeignKey(User)
+    indexed = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('blob', )
