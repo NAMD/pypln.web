@@ -184,6 +184,9 @@ INSTALLED_APPS = [
 
     # PyPLN
     'core',
+
+    # South - migrations
+    'south',
 ]
 
 FIXTURE_DIRS = [
