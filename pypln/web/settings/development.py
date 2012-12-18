@@ -34,6 +34,8 @@ TEMPLATE_DEBUG = True
 # tells Pinax to serve media through the staticfiles app.
 SERVE_MEDIA = True
 
+TEMPLATE_STRING_IF_INVALID = "INVALID_CONTEXT_VARIABLE"
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = "r9^6-zqrk-$uyu96z!$sakf%^ng!w&4^d8qj@t#taxtgi+a1p9"
 
