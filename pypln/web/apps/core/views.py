@@ -111,11 +111,7 @@ def upload_documents(request, corpus_slug):
 
 @login_required
 def list_corpus_documents(request, corpus_slug):
-    try:
-        corpus = Corpus.objects.get(slug=corpus_slug, owner=request.user.id)
-    except ObjectDoesNotExist:
-        return render_to_response('core/404.html', {},
-                context_instance=RequestContext(request))
+    corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
     form = DocumentForm()
     form.fields['blob'].label = ''
     form.fields['blob'].widget.attrs['multiple'] = "multiple"
