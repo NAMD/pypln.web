@@ -23,7 +23,7 @@ import json
 from mimetypes import guess_type
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -99,27 +99,36 @@ def _process_form(request, files, corpus):
                         timeout=settings.ROUTER_TIMEOUT)
 
 @login_required
-def corpus_page(request, corpus_slug):
+def upload_documents(request, corpus_slug):
+    corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
+    for f in request.FILES.getlist('blob'):
+        _process_form(request, {'blob': f}, corpus)
+    number_of_files = len(request.FILES.getlist('blob'))
+    messages.info(request, _('{} document{} uploaded successfully!').format(
+                number_of_files, pluralize(number_of_files)))
+    return HttpResponseRedirect(reverse('corpus_page',
+            kwargs={'corpus_slug': corpus_slug}))
+
+@login_required
+def list_corpus_documents(request, corpus_slug):
     try:
         corpus = Corpus.objects.get(slug=corpus_slug, owner=request.user.id)
     except ObjectDoesNotExist:
         return render_to_response('core/404.html', {},
                 context_instance=RequestContext(request))
-    if request.method == 'POST':
-        for f in request.FILES.getlist('blob'):
-            _process_form(request, {'blob': f}, corpus)
-        number_of_files = len(request.FILES.getlist('blob'))
-        messages.info(request, _('{} document{} uploaded successfully!').format(
-                    number_of_files, pluralize(number_of_files)))
-        return HttpResponseRedirect(reverse('corpus_page',
-                kwargs={'corpus_slug': corpus_slug}))
-    else:
-        form = DocumentForm()
+    form = DocumentForm()
     form.fields['blob'].label = ''
     form.fields['blob'].widget.attrs['multiple'] = "multiple"
     data = {'corpus': corpus, 'form': form}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
+
+@login_required
+def corpus_page(request, corpus_slug):
+    if request.method == 'POST':
+        return upload_documents(request, corpus_slug)
+    else:
+        return list_corpus_documents(request, corpus_slug)
 
 @login_required
 def document_page(request, document_slug):
