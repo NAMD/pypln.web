@@ -76,6 +76,12 @@ class UploadDocumentTest(TestCase):
             kwargs={'corpus_slug': 'corpus-that-isnt-there'}))
         self.assertEqual(response.status_code, 404)
 
+    def test_error_uploading_no_files(self):
+        self.client.login(username="admin", password="admin")
+
+        response = self.client.post(self.url, {'blob': []}, follow=True)
+        self.assertFormError(response, "form", "blob", ["This field is required."])
+
     def test_uploads_a_single_file(self):
         self.client.login(username="admin", password="admin")
 

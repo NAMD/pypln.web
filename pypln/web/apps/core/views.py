@@ -104,6 +104,14 @@ def upload_documents(request, corpus_slug):
     for f in request.FILES.getlist('blob'):
         _process_form(request, {'blob': f}, corpus)
     number_of_files = len(request.FILES.getlist('blob'))
+    if not number_of_files:
+        form = DocumentForm(request.POST, request.FILES)
+        if not form.is_valid():
+            form.fields['blob'].label = ''
+            form.fields['blob'].widget.attrs['multiple'] = "multiple"
+            data = {'corpus': corpus, 'form': form}
+            return render_to_response('core/corpus.html', data,
+                                      context_instance=RequestContext(request))
     messages.info(request, _('{} document{} uploaded successfully!').format(
                 number_of_files, pluralize(number_of_files)))
     return HttpResponseRedirect(reverse('corpus_page',
