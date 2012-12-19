@@ -42,7 +42,19 @@ def _pos_highlighter(data):
     pos = []
     if data['pos'] is not None:
         for item in data['pos']:
-            pos.append({'slug': TAGSET[item[1]]['slug'], 'token': item[0]})
+            try:
+                tag = TAGSET[item[1]]
+                pos.append({'slug': tag['slug'], 'token': item[0]})
+            except KeyError as e:
+                import traceback
+                from django.core.mail import mail_admins
+
+                tb = traceback.format_exc(e)
+                subject = "Tag {} not in tagset".format(item[1])
+                message = ("Tag {} was extracted from document, but was not"
+                           "found in TAGSET.\n\n{}".format(item[1], tb)
+                mail_admins(subject, message)
+
     return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20]}
 
 def _statistics(data):
