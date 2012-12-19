@@ -78,7 +78,7 @@ def corpora_list(request, as_json=False):
 #TODO: enforce document type
 #TODO: dot not permit to have documents with the same slug!
 def _process_form(request, files, corpus):
-    form = DocumentForm(request.POST, files)
+    form = DocumentForm(request.user, request.POST, files)
     if not form.is_valid():
         #XXX: not selecting a file may not be the only invalid input
         messages.error(request, _('ERROR: you need to select a file!'))
@@ -105,7 +105,7 @@ def upload_documents(request, corpus_slug):
         _process_form(request, {'blob': f}, corpus)
     number_of_files = len(request.FILES.getlist('blob'))
     if not number_of_files:
-        form = DocumentForm(request.POST, request.FILES)
+        form = DocumentForm(request.user, request.POST, request.FILES)
         if not form.is_valid():
             form.fields['blob'].label = ''
             form.fields['blob'].widget.attrs['multiple'] = "multiple"
@@ -120,7 +120,7 @@ def upload_documents(request, corpus_slug):
 @login_required
 def list_corpus_documents(request, corpus_slug):
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
-    form = DocumentForm()
+    form = DocumentForm(request.user)
     form.fields['blob'].label = ''
     form.fields['blob'].widget.attrs['multiple'] = "multiple"
     data = {'corpus': corpus, 'form': form}

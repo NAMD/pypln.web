@@ -25,6 +25,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
+from django.contrib.auth.models import User
+
 from core.models import Corpus, Document
 from core.forms import DocumentForm
 
@@ -133,6 +135,8 @@ class DocumentFormTest(TestCase):
     def setUp(self):
         self.url = reverse('corpus_page',
             kwargs={'corpus_slug': 'test-corpus'})
+        self.user = User.objects.all()[0]
+
         self.fp = StringIO("Bring us a shrubbery!!")
         self.fp.name = "42.txt"
 
@@ -147,16 +151,32 @@ class DocumentFormTest(TestCase):
 
     def test_form_is_valid_with_one_file(self):
         request = self.request_factory.post(self.url, {"blob": self.fp})
-        form = DocumentForm(request.POST, request.FILES)
+        form = DocumentForm(self.user, request.POST, request.FILES)
         self.assertTrue(form.is_valid())
 
     def test_at_least_one_file_is_required(self):
         request = self.request_factory.post(self.url, {"blob": []})
-        form = DocumentForm(request.POST, request.FILES)
+        form = DocumentForm(self.user, request.POST, request.FILES)
         self.assertFalse(form.is_valid())
 
     def test_form_is_valid_with_multiple_files(self):
         request = self.request_factory.post(self.url,
                                             {"blob": [self.fp, self.fp2]})
-        form = DocumentForm(request.POST, request.FILES)
+        form = DocumentForm(self.user, request.POST, request.FILES)
         self.assertTrue(form.is_valid())
+
+    def test_form_saves_document_with_correct_user(self):
+        self.assertEqual(len(Document.objects.all()), 1)
+        request = self.request_factory.post(self.url, {"blob": self.fp})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        doc = form.save()
+        self.assertEqual(doc.owner, self.user)
+        self.assertEqual(len(Document.objects.all()), 2)
+
+    def test_form_only_returns_document_if_commit_is_false(self):
+        self.assertEqual(len(Document.objects.all()), 1)
+        request = self.request_factory.post(self.url, {"blob": self.fp})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        doc = form.save(commit=False)
+        self.assertEqual(doc.owner, self.user)
+        self.assertEqual(len(Document.objects.all()), 1)

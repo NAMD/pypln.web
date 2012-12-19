@@ -29,3 +29,15 @@ class DocumentForm(ModelForm):
     class Meta:
         model = Document
         fields = ('blob', )
+
+    def __init__(self, owner, *args, **kwargs):
+        self.owner = owner
+        return super(DocumentForm, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        commit = kwargs.pop('commit', True)
+        doc = super(DocumentForm, self).save(*args, commit=False, **kwargs)
+        doc.owner = self.owner
+        if commit:
+            doc.save()
+        return doc
