@@ -33,7 +33,7 @@ gridfs_storage = GridFSStorage(location='/',
 class Document(models.Model):
     blob = models.FileField(upload_to='/', storage=gridfs_storage)
     slug = models.SlugField()
-    date_uploaded = models.DateTimeField()
+    date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
 
     class Meta:

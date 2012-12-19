@@ -86,7 +86,6 @@ def _process_form(request, files, corpus):
         new_document = form.save(commit=False)
         new_document.slug = ''
         new_document.owner = request.user
-        new_document.date_uploaded = datetime.datetime.now()
         new_document.save()
         new_document.slug = _slug(new_document.file_name())
         new_document.corpus_set.add(corpus)
