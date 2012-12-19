@@ -20,6 +20,7 @@
 from StringIO import StringIO
 
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -125,3 +126,27 @@ class UploadDocumentTest(TestCase):
         message = list(response.context["messages"])[0].message
         self.assertEqual("2 documents uploaded successfully!", message)
         self.assertEqual(len(Document.objects.all()), 3)
+
+class DocumentFormTest(TestCase):
+    fixtures = ['corpus']
+
+    def setUp(self):
+        self.url = reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'})
+        self.fp = StringIO("Bring us a shrubbery!!")
+        self.fp.name = "42.txt"
+
+        self.request_factory = RequestFactory()
+
+    def tearDown(self):
+        self.fp.close()
+
+    def test_form_is_valid_with_one_file(self):
+        request = self.request_factory.post(self.url, {"blob": self.fp})
+        form = DocumentForm(request.POST, request.FILES)
+        self.assertTrue(form.is_valid())
+
+    def test_at_least_one_file_is_required(self):
+        request = self.request_factory.post(self.url, {"blob": []})
+        form = DocumentForm(request.POST, request.FILES)
+        self.assertFalse(form.is_valid())
