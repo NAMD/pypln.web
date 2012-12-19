@@ -180,3 +180,9 @@ class DocumentFormTest(TestCase):
         doc = form.save(commit=False)
         self.assertEqual(doc.owner, self.user)
         self.assertEqual(len(Document.objects.all()), 1)
+
+    def test_blob_widget_has_multiple_attr(self):
+        request = self.request_factory.post(self.url, {"blob": self.fp})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        self.assertEqual(form.fields['blob'].widget.attrs['multiple'],
+                         'multiple')

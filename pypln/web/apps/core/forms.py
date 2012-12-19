@@ -19,13 +19,20 @@
 
 from django.forms import ModelForm
 from core.models import Corpus, Document
+from django.forms import FileField
+from django.forms.widgets import ClearableFileInput
 
 class CorpusForm(ModelForm):
     class Meta:
         model = Corpus
         fields = ('name', 'description')
 
+class MultipleFileField(FileField):
+    widget = ClearableFileInput(attrs={'multiple': 'multiple'})
+
 class DocumentForm(ModelForm):
+    blob = MultipleFileField()
+
     class Meta:
         model = Document
         fields = ('blob', )

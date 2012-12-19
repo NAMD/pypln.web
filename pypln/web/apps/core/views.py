@@ -108,7 +108,6 @@ def upload_documents(request, corpus_slug):
         form = DocumentForm(request.user, request.POST, request.FILES)
         if not form.is_valid():
             form.fields['blob'].label = ''
-            form.fields['blob'].widget.attrs['multiple'] = "multiple"
             data = {'corpus': corpus, 'form': form}
             return render_to_response('core/corpus.html', data,
                                       context_instance=RequestContext(request))
