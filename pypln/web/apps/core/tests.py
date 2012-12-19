@@ -12,7 +12,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from core.models import Corpus, Document, DocumentForm
+from core.models import Corpus, Document
+from core.forms import DocumentForm
 
 
 class CorpusViewTest(TestCase):

@@ -32,7 +32,8 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from .models import Corpus, Document, CorpusForm, DocumentForm
+from core.models import Corpus, Document
+from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
 from apps.core.visualizations import VISUALIZATIONS
 

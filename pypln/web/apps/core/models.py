@@ -20,7 +20,6 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ModelForm
 from django.conf import settings
 from .storage import GridFSStorage
 
@@ -72,13 +71,3 @@ class Corpus(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class CorpusForm(ModelForm):
-    class Meta:
-        model = Corpus
-        fields = ('name', 'description')
-
-class DocumentForm(ModelForm):
-    class Meta:
-        model = Document
-        fields = ('blob', )
