@@ -136,10 +136,14 @@ class DocumentFormTest(TestCase):
         self.fp = StringIO("Bring us a shrubbery!!")
         self.fp.name = "42.txt"
 
+        self.fp2 = StringIO("Bring us another shrubbery!!")
+        self.fp2.name = "43.txt"
+
         self.request_factory = RequestFactory()
 
     def tearDown(self):
         self.fp.close()
+        self.fp2.close()
 
     def test_form_is_valid_with_one_file(self):
         request = self.request_factory.post(self.url, {"blob": self.fp})
@@ -150,3 +154,9 @@ class DocumentFormTest(TestCase):
         request = self.request_factory.post(self.url, {"blob": []})
         form = DocumentForm(request.POST, request.FILES)
         self.assertFalse(form.is_valid())
+
+    def test_form_is_valid_with_multiple_files(self):
+        request = self.request_factory.post(self.url,
+                                            {"blob": [self.fp, self.fp2]})
+        form = DocumentForm(request.POST, request.FILES)
+        self.assertTrue(form.is_valid())
