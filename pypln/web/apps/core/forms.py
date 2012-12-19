@@ -31,7 +31,7 @@ class MultipleFileField(FileField):
     widget = ClearableFileInput(attrs={'multiple': 'multiple'})
 
 class DocumentForm(ModelForm):
-    blob = MultipleFileField()
+    blob = MultipleFileField(label="")
 
     class Meta:
         model = Document
