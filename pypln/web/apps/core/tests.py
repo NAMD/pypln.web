@@ -177,6 +177,15 @@ class DocumentFormTest(TestCase):
         self.assertEqual(docs[0].owner, self.user)
         self.assertEqual(len(Document.objects.all()), 1)
 
+    def test_form_saves_document_with_correct_content(self):
+        self.assertEqual(len(Document.objects.all()), 0)
+        request = self.request_factory.post(self.url, {"blob": self.fp})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        docs = form.save()
+        self.assertEqual(len(Document.objects.all()), 1)
+        doc = Document.objects.all()[0]
+        self.assertEqual(doc.blob.read(), "Bring us a shrubbery!!")
+
     def test_save_raises_ValueError_if_data_isnt_valid(self):
         self.assertEqual(len(Document.objects.all()), 0)
         request = self.request_factory.post(self.url, {"blob": []})
@@ -204,3 +213,6 @@ class DocumentFormTest(TestCase):
         form.is_valid()
         form.save()
         self.assertEqual(len(Document.objects.all()), 2)
+        doc1, doc2 = Document.objects.all()
+        self.assertEqual(doc1.blob.read(), "Bring us a shrubbery!!")
+        self.assertEqual(doc2.blob.read(), "Bring us another shrubbery!!")

@@ -52,8 +52,9 @@ class DocumentForm(ModelForm):
         if self.errors:
             raise ValueError("Could not save documents because form data didn't validate.")
 
-        for file in self.files.getlist('blob'):
-            doc = Document(owner=self.owner)
-            instances.append(save_instance(self, doc, fields="blob", commit=commit))
+        for f in self.files.getlist('blob'):
+            doc = Document(owner=self.owner, blob=f)
+            instances.append(save_instance(self, doc, commit=commit,
+                                           construct=False))
 
         return instances
