@@ -41,7 +41,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_DEBUG = True
 
 ROUTER_API = 'tcp://127.0.0.1:5555'
-ROUTER_BROADCAST = 'tcp://127.0.0.1:5555'
+ROUTER_BROADCAST = 'tcp://127.0.0.1:5556'
 ROUTER_TIMEOUT = 5
 
 CONFIGURATION = get_config_from_router(ROUTER_API)

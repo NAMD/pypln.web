@@ -21,11 +21,13 @@
 
 import os.path
 import posixpath
-from utils import get_config_from_router
+from pypln.web.apps.utils import get_config_from_router
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 os.path.pardir))
+INDEX_PATH = os.path.join(PROJECT_ROOT, 'index')
+INDEX_RUNNING = INDEX_PATH + '.pid' # name of the 'pid file' of the indexer
 
 # django-compressor is turned off by default due to deployment overhead for
 # most users. See <URL> for more information

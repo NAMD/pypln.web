@@ -12,3 +12,5 @@ MANIFEST
 .directory
 *.db
 .env
+pypln/web/index/
+pypln/web/index.pid
