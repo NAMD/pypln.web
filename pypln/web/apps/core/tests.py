@@ -79,6 +79,19 @@ class UploadDocumentTest(TestCase):
     def setUp(self):
         self.url = reverse('corpus_page',
             kwargs={'corpus_slug': 'test-corpus'})
+        self.user = User.objects.all()[0]
+
+        self.fp = StringIO("Bring us a shrubbery!!")
+        self.fp.name = "42.txt"
+
+        self.fp2 = StringIO("Bring us another shrubbery!!")
+        self.fp2.name = "43.txt"
+
+        self.request_factory = RequestFactory()
+
+    def tearDown(self):
+        self.fp.close()
+        self.fp2.close()
 
     def test_requires_login(self):
         response = self.client.post(self.url)
@@ -103,10 +116,7 @@ class UploadDocumentTest(TestCase):
 
         self.assertEqual(len(Document.objects.all()), 1)
 
-        fp = StringIO("Bring us a shrubbery!!")
-        fp.name = "42.txt"
-        response = self.client.post(self.url, {'blob': fp}, follow=True)
-        fp.close()
+        response = self.client.post(self.url, {'blob': self.fp}, follow=True)
 
         message = list(response.context["messages"])[0].message
         self.assertEqual("1 document uploaded successfully!", message)
@@ -117,13 +127,7 @@ class UploadDocumentTest(TestCase):
 
         self.assertEqual(len(Document.objects.all()), 1)
 
-        fp = StringIO("Bring us a shrubbery!!")
-        fp.name = "42.txt"
-        fp2 = StringIO("Bring us another shrubbery!!")
-        fp2.name = "43.txt"
-        response = self.client.post(self.url, {'blob': [fp, fp2]}, follow=True)
-        fp.close()
-        fp2.close()
+        response = self.client.post(self.url, {'blob': [self.fp, self.fp2]}, follow=True)
 
         message = list(response.context["messages"])[0].message
         self.assertEqual("2 documents uploaded successfully!", message)
