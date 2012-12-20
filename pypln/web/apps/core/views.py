@@ -74,46 +74,37 @@ def corpora_list(request, as_json=False):
     return render_to_response('core/corpora.html', data,
             context_instance=RequestContext(request))
 
-#TODO: accept (and uncompress) .tar.gz and .zip files
-#TODO: enforce document type
-#TODO: dot not permit to have documents with the same slug!
-def _process_form(request, files, corpus):
-    form = DocumentForm(request.user, request.POST, files)
-    if not form.is_valid():
-        #XXX: not selecting a file may not be the only invalid input
-        messages.error(request, _('ERROR: you need to select a file!'))
-    else:
-        new_document = form.save(commit=False)
-        new_document.slug = ''
-        new_document.owner = request.user
-        new_document.save()
-        new_document.slug = _slug(new_document.file_name())
-        new_document.corpus_set.add(corpus)
-        for corpus in new_document.corpus_set.all():
-            corpus.last_modified = datetime.datetime.now()
-            corpus.save()
-        new_document.save()
-        data = {'_id': str(new_document.blob.file._id),
-                'id': new_document.id}
-        create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
-                        timeout=settings.ROUTER_TIMEOUT)
-
 @login_required
 def upload_documents(request, corpus_slug):
+    #TODO: accept (and uncompress) .tar.gz and .zip files
+    #TODO: enforce document type
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
-    for f in request.FILES.getlist('blob'):
-        _process_form(request, {'blob': f}, corpus)
-    number_of_files = len(request.FILES.getlist('blob'))
-    if not number_of_files:
-        form = DocumentForm(request.user, request.POST, request.FILES)
-        if not form.is_valid():
-            data = {'corpus': corpus, 'form': form}
-            return render_to_response('core/corpus.html', data,
-                                      context_instance=RequestContext(request))
-    messages.info(request, _('{} document{} uploaded successfully!').format(
-                number_of_files, pluralize(number_of_files)))
-    return HttpResponseRedirect(reverse('corpus_page',
-            kwargs={'corpus_slug': corpus_slug}))
+    form = DocumentForm(request.user, request.POST, request.FILES)
+    if form.is_valid():
+        docs = form.save(commit=False)
+        for doc in docs:
+            doc.slug = ''
+            doc.owner = request.user
+            doc.save()
+            doc.slug = _slug(doc.file_name())
+            doc.corpus_set.add(corpus)
+            for corpus in doc.corpus_set.all():
+                corpus.last_modified = datetime.datetime.now()
+                corpus.save()
+            doc.save()
+            data = {'_id': str(doc.blob.file._id), 'id': doc.id}
+            create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
+                            timeout=settings.ROUTER_TIMEOUT)
+
+        number_of_uploaded_docs = len(docs)
+        messages.info(request, _('{} document{} uploaded successfully!').format(
+                number_of_uploaded_docs, pluralize(number_of_uploaded_docs)))
+        return HttpResponseRedirect(reverse('corpus_page',
+                                            kwargs={'corpus_slug': corpus_slug}))
+    else:
+        data = {'corpus': corpus, 'form': form}
+        return render_to_response('core/corpus.html', data,
+                                  context_instance=RequestContext(request))
 
 @login_required
 def list_corpus_documents(request, corpus_slug):
