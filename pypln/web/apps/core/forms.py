@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.forms import ModelForm
+from django.forms import ModelForm, FileField
+from django.forms.models import save_instance
 from core.models import Corpus, Document
-from django.forms import FileField
 from django.forms.widgets import ClearableFileInput
 
 class CorpusForm(ModelForm):
@@ -31,6 +31,11 @@ class MultipleFileField(FileField):
     widget = ClearableFileInput(attrs={'multiple': 'multiple'})
 
 class DocumentForm(ModelForm):
+    """
+    This is not fully compatible with ModelForm, so expect
+    differences. But the point is to be able to deal with more than
+    one file uploaded.
+    """
     blob = MultipleFileField(label="")
 
     class Meta:
@@ -43,8 +48,12 @@ class DocumentForm(ModelForm):
 
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)
-        doc = super(DocumentForm, self).save(*args, commit=False, **kwargs)
-        doc.owner = self.owner
-        if commit:
-            doc.save()
-        return doc
+        instances = []
+        if self.errors:
+            raise ValueError("Could not save documents because form data didn't validate.")
+
+        for file in self.files.getlist('blob'):
+            doc = Document(owner=self.owner)
+            instances.append(save_instance(self, doc, fields="blob", commit=commit))
+
+        return instances

@@ -169,16 +169,22 @@ class DocumentFormTest(TestCase):
         self.assertEqual(len(Document.objects.all()), 1)
         request = self.request_factory.post(self.url, {"blob": self.fp})
         form = DocumentForm(self.user, request.POST, request.FILES)
-        doc = form.save()
-        self.assertEqual(doc.owner, self.user)
+        docs = form.save()
+        self.assertEqual(docs[0].owner, self.user)
         self.assertEqual(len(Document.objects.all()), 2)
+
+    def test_save_raises_ValueError_if_data_isnt_valid(self):
+        self.assertEqual(len(Document.objects.all()), 1)
+        request = self.request_factory.post(self.url, {"blob": []})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        self.assertRaises(ValueError, form.save)
 
     def test_form_only_returns_document_if_commit_is_false(self):
         self.assertEqual(len(Document.objects.all()), 1)
         request = self.request_factory.post(self.url, {"blob": self.fp})
         form = DocumentForm(self.user, request.POST, request.FILES)
-        doc = form.save(commit=False)
-        self.assertEqual(doc.owner, self.user)
+        docs = form.save(commit=False)
+        self.assertEqual(docs[0].owner, self.user)
         self.assertEqual(len(Document.objects.all()), 1)
 
     def test_blob_widget_has_multiple_attr(self):
@@ -186,3 +192,11 @@ class DocumentFormTest(TestCase):
         form = DocumentForm(self.user, request.POST, request.FILES)
         self.assertEqual(form.fields['blob'].widget.attrs['multiple'],
                          'multiple')
+
+    def test_form_saves_more_than_one_document(self):
+        self.assertEqual(len(Document.objects.all()), 1)
+        request = self.request_factory.post(self.url, {"blob": [self.fp, self.fp2]})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        form.is_valid()
+        form.save()
+        self.assertEqual(len(Document.objects.all()), 3)
