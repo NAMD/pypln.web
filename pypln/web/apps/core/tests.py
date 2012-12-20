@@ -114,24 +114,24 @@ class UploadDocumentTest(TestCase):
     def test_uploads_a_single_file(self):
         self.client.login(username="admin", password="admin")
 
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
 
         response = self.client.post(self.url, {'blob': self.fp}, follow=True)
 
         message = list(response.context["messages"])[0].message
         self.assertEqual("1 document uploaded successfully!", message)
-        self.assertEqual(len(Document.objects.all()), 2)
+        self.assertEqual(len(Document.objects.all()), 1)
 
     def test_uploads_multiple_files(self):
         self.client.login(username="admin", password="admin")
 
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
 
         response = self.client.post(self.url, {'blob': [self.fp, self.fp2]}, follow=True)
 
         message = list(response.context["messages"])[0].message
         self.assertEqual("2 documents uploaded successfully!", message)
-        self.assertEqual(len(Document.objects.all()), 3)
+        self.assertEqual(len(Document.objects.all()), 2)
 
 class DocumentFormTest(TestCase):
     fixtures = ['corpus']
@@ -170,26 +170,26 @@ class DocumentFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_form_saves_document_with_correct_user(self):
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
         request = self.request_factory.post(self.url, {"blob": self.fp})
         form = DocumentForm(self.user, request.POST, request.FILES)
         docs = form.save()
         self.assertEqual(docs[0].owner, self.user)
-        self.assertEqual(len(Document.objects.all()), 2)
+        self.assertEqual(len(Document.objects.all()), 1)
 
     def test_save_raises_ValueError_if_data_isnt_valid(self):
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
         request = self.request_factory.post(self.url, {"blob": []})
         form = DocumentForm(self.user, request.POST, request.FILES)
         self.assertRaises(ValueError, form.save)
 
     def test_form_only_returns_document_if_commit_is_false(self):
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
         request = self.request_factory.post(self.url, {"blob": self.fp})
         form = DocumentForm(self.user, request.POST, request.FILES)
         docs = form.save(commit=False)
         self.assertEqual(docs[0].owner, self.user)
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
 
     def test_blob_widget_has_multiple_attr(self):
         request = self.request_factory.post(self.url, {"blob": self.fp})
@@ -198,9 +198,9 @@ class DocumentFormTest(TestCase):
                          'multiple')
 
     def test_form_saves_more_than_one_document(self):
-        self.assertEqual(len(Document.objects.all()), 1)
+        self.assertEqual(len(Document.objects.all()), 0)
         request = self.request_factory.post(self.url, {"blob": [self.fp, self.fp2]})
         form = DocumentForm(self.user, request.POST, request.FILES)
         form.is_valid()
         form.save()
-        self.assertEqual(len(Document.objects.all()), 3)
+        self.assertEqual(len(Document.objects.all()), 2)

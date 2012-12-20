@@ -1,21 +1,9 @@
 [
     {
         "pk": 1,
-        "model": "core.document",
-        "fields": {
-            "owner": 1,
-            "blob": "/0010070.pdf",
-            "date_uploaded": "2012-12-11 13:05:05",
-            "slug": "0010070.pdf"
-        }
-    },
-    {
-        "pk": 1,
         "model": "core.corpus",
         "fields": {
-            "documents": [
-                1
-            ],
+            "documents": [],
             "description": "test corpus",
             "last_modified": "2012-12-18 12:34:59",
             "owner": 1,
