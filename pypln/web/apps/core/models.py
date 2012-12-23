@@ -56,6 +56,12 @@ class Document(models.Model):
         else:
             return '{:.2f} GiB'.format(size / (1024.0 ** 3))
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = self.blob.storage.get_available_name(self.blob.name)
+        return super(Document, self).save(*args, **kwargs)
+
+
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
     slug = models.SlugField(max_length=60)

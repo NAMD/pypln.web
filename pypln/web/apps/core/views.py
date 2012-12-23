@@ -83,15 +83,11 @@ def upload_documents(request, corpus_slug):
     if form.is_valid():
         docs = form.save(commit=False)
         for doc in docs:
-            doc.slug = ''
-            doc.owner = request.user
             doc.save()
-            doc.slug = _slug(doc.file_name())
             doc.corpus_set.add(corpus)
             for corpus in doc.corpus_set.all():
                 corpus.last_modified = datetime.datetime.now()
                 corpus.save()
-            doc.save()
             data = {'_id': str(doc.blob.file._id), 'id': doc.id}
             create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
                             timeout=settings.ROUTER_TIMEOUT)
