@@ -84,6 +84,10 @@ def upload_documents(request, corpus_slug):
         docs = form.save(commit=False)
         for doc in docs:
             doc.save()
+            # XXX: updating the corpus_set should probably be done in
+            # the model, but we'll keep it here since the model might
+            # change a bit, and maybe take care of this in a better
+            # way.
             doc.corpus_set.add(corpus)
             for corpus in doc.corpus_set.all():
                 corpus.last_modified = datetime.datetime.now()

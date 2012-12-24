@@ -135,6 +135,23 @@ class UploadDocumentTest(TestCase):
         self.assertEqual("2 documents uploaded successfully!", message)
         self.assertEqual(len(Document.objects.all()), 2)
 
+    def test_corpus_is_associated_to_document_after_upload(self):
+        self.client.login(username="admin", password="admin")
+
+        response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
+        corpus = Corpus.objects.get(slug="test-corpus")
+        document = Document.objects.all()[0]
+        self.assertIn(corpus, document.corpus_set.all())
+
+    def test_corpus_last_modified_date_is_updated(self):
+        self.client.login(username="admin", password="admin")
+        start_time = datetime.now()
+        corpus = Corpus.objects.get(slug="test-corpus")
+        self.assertLess(corpus.last_modified, start_time)
+        response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
+        corpus = Corpus.objects.get(slug="test-corpus")
+        self.assertGreater(corpus.last_modified, start_time)
+
 class DocumentFormTest(TestCase):
     fixtures = ['corpus']
 
