@@ -17,6 +17,9 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from base import *
+ADMINS = [
+    ("Admin", "admin@example.com"),
+]
 
 DATABASES = {
     "default": {
