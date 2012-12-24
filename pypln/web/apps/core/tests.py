@@ -19,6 +19,7 @@
 
 from StringIO import StringIO
 from datetime import datetime
+from mock import patch
 
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -31,7 +32,7 @@ from django.contrib.auth.models import User
 
 from core.models import gridfs_storage, Corpus, Document
 from core.forms import DocumentForm
-
+from core import views
 
 class CorpusViewTest(TestCase):
     fixtures = ['corpus']
@@ -151,6 +152,16 @@ class UploadDocumentTest(TestCase):
         response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
         corpus = Corpus.objects.get(slug="test-corpus")
         self.assertGreater(corpus.last_modified, start_time)
+
+    @patch('core.views.create_pipeline')
+    def test_pipeline_is_created(self, create_pipeline_mock):
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
+        document = Document.objects.all()[0]
+        expected_data = {'_id': str(document.blob.file._id), 'id': document.id}
+
+        self.assertTrue(create_pipeline_mock.called)
+        self.assertIn(expected_data, create_pipeline_mock.call_args[0])
 
 class DocumentFormTest(TestCase):
     fixtures = ['corpus']
