@@ -51,7 +51,7 @@ CONFIGURATION = get_config_from_router(ROUTER_API)
 if CONFIGURATION is None:
     MONGODB_CONFIG = {'host': 'localhost',
                       'port': 27017,
-                      'database': 'pypln',
+                      'database': 'pypln_dev',
                       'gridfs_collection': 'files',
                       'analysis_collection': 'analysis',
                       'monitoring_collection': 'monitoring',

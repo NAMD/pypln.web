@@ -17,21 +17,77 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from io import StringIO
+import pymongo
 
+from datetime import datetime
+from StringIO import StringIO
+
+from django.core import management
+from django.core.files import File
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
+from mongodict import MongoDict
+
+from pypln.web.apps.core.models import Corpus, Document, index_schema
 
 
 USERNAME = 'testuser'
 PASSWORD = 'toostrong'
 EMAIL = 'test@user.com'
 
+def _create_document(filename, contents, owner):
+    fp = StringIO()
+    fp.write(contents)
+    fp.name = filename
+    fp.size = len(contents.encode('utf-8'))
+
+    document = Document(slug=filename, owner=owner,
+            date_uploaded=datetime.now(), indexed=False)
+    document.blob.save(filename, File(fp))
+    document.save()
+    return document
+
+def _create_corpus_and_documents(owner):
+    document_1_text = u'this is the first test.\n'
+    document_2_text = u'this is the second test.\n'
+    document_1 = _create_document(filename='/doc-1.txt', owner=owner,
+            contents=document_1_text)
+    document_2 = _create_document(filename='/doc-2.txt', owner=owner,
+            contents=document_2_text)
+
+    now = datetime.now()
+    corpus = Corpus(name='Test', slug='test', owner=owner,
+            date_created=now, last_modified=now)
+    corpus.save()
+    corpus.documents.add(document_1)
+    corpus.documents.add(document_2)
+    corpus.save()
+
+def _update_documents_text_property(owner, store):
+    for document in Document.objects.filter(owner=owner):
+        text = document.blob.read()
+        store['id:{}:text'.format(document.id)] = text
+        store['id:{}:_properties'.format(document.id)] = ['text']
+
 class TestSearchPage(TestCase):
     def setUp(self):
+        settings.MONGODB_CONFIG = {'host': 'localhost',
+                                   'port': 27017,
+                                   'database': 'pypln_test',
+                                   'gridfs_collection': 'files',
+                                   'analysis_collection': 'analysis',
+                                   'monitoring_collection': 'monitoring',
+        }
+        connection = pymongo.Connection(host=settings.MONGODB_CONFIG['host'],
+                                        port=settings.MONGODB_CONFIG['port'])
+        connection.drop_database(settings.MONGODB_CONFIG['database'])
+        self.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
+                               port=settings.MONGODB_CONFIG['port'],
+                               database=settings.MONGODB_CONFIG['database'],
+                               collection=settings.MONGODB_CONFIG['analysis_collection'])
         self.user = User(username=USERNAME, email=EMAIL, password=PASSWORD)
         self.user.set_password(PASSWORD) #XXX: WTF, Pinax?
         self.user.save()
@@ -47,3 +103,16 @@ class TestSearchPage(TestCase):
         self.client.login(username=USERNAME, password=PASSWORD)
         response = self.client.get(self.search_url)
         self.assertEqual(response.status_code, 200)
+
+    def test_management_command_update_index(self):
+        _create_corpus_and_documents(owner=self.user)
+
+        management.call_command('update_index')
+        # should not index since there is no 'text' for these documents
+        for document in Document.objects.all():
+            self.assertFalse(document.indexed)
+
+        _update_documents_text_property(owner=self.user, store=self.store)
+        management.call_command('update_index') # now will index
+        for document in Document.objects.all():
+            self.assertTrue(document.indexed)
