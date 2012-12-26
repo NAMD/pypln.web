@@ -52,7 +52,7 @@ def _pos_highlighter(data):
                 tb = traceback.format_exc(e)
                 subject = "Tag {} not in tagset".format(item[1])
                 message = ("Tag {} was extracted from document, but was not"
-                           "found in TAGSET.\n\n{}".format(item[1], tb)
+                           "found in TAGSET.\n\n{}").format(item[1], tb)
                 mail_admins(subject, message)
 
     return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20]}
