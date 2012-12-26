@@ -19,6 +19,8 @@
 
 import os
 
+from optparse import make_option
+
 from django.core.management.base import BaseCommand
 from mongodict import MongoDict
 
@@ -54,22 +56,30 @@ def write_pid_file(filename):
         pid_file.write('{}\n'.format(my_pid))
 
 class Command(BaseCommand):
-    args = '' #TODO: add '--quiet|--verbose'
+    args = ''
+    option_list = BaseCommand.option_list + (
+        make_option('--verbose', action='store_true', dest='verbose',
+                    default=False, help='Show log information'),
+    )
     help = 'Update the index with new documents'
     can_import_settings = True
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
         from django.conf import settings
 
 
+        verbose = options['verbose']
         if clone_of_me_running(pid_filename=settings.INDEX_RUNNING):
-            self.stdout.write('Another indexing process is running. Exiting.\n')
+            if verbose:
+                self.stdout.write('Another indexing process is running. '
+                                  'Exiting.\n')
         else:
             write_pid_file(filename=settings.INDEX_RUNNING)
             not_indexed_count = Document.objects.filter(indexed=False).count()
             if not_indexed_count:
-                self.stdout.write('Documents to be indexed: {}\n'\
-                                  .format(not_indexed_count))
+                if verbose:
+                    self.stdout.write('Documents to be indexed: {}\n'\
+                                      .format(not_indexed_count))
                 index = WhooshIndex(settings.INDEX_PATH, index_schema)
                 store = MongoDict(host=settings.MONGODB_CONFIG['host'],
                                   port=settings.MONGODB_CONFIG['port'],
@@ -86,12 +96,17 @@ class Command(BaseCommand):
                                            content=text)
                         document.indexed = True
                         document.save()
-                        self.stdout.write('  Indexed id={}, filename={}\n'\
-                                          .format(document.id, document.slug))
+                        if verbose:
+                            self.stdout.write('  Indexed id={}, filename={}\n'\
+                                              .format(document.id,
+                                                      document.slug))
                     else:
-                        self.stdout.write('  Not indexed (text not ready) '
-                                          'id={}, filename={}\n'\
-                                          .format(document.id, document.slug))
+                        if verbose:
+                            self.stdout.write('  Not indexed (text not ready) '
+                                              'id={}, filename={}\n'\
+                                              .format(document.id,
+                                                      document.slug))
             else:
-                self.stdout.write('All documents are already indexed.\n')
+                if verbose:
+                    self.stdout.write('All documents are already indexed.\n')
             os.unlink(settings.INDEX_RUNNING)
