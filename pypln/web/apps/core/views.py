@@ -210,6 +210,7 @@ def search(request):
         index = WhooshIndex(settings.INDEX_PATH, index_schema)
         found_documents = index.search(query, 'content')
         ids = [document[u'id'] for document in found_documents]
-        data['results'] = Document.objects.filter(id__in=ids)
+        data['results'] = Document.objects.filter(owner=request.user,
+                                                  id__in=ids)
     return render_to_response('core/search.html', data,
                               context_instance=RequestContext(request))

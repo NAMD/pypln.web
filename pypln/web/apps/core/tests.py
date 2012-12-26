@@ -71,8 +71,8 @@ def _create_corpus_and_documents(owner):
 
     return corpus, document_1, document_2
 
-def _update_documents_text_property(owner, store):
-    for document in Document.objects.filter(owner=owner):
+def _update_documents_text_property(store):
+    for document in Document.objects.all():
         text = document.blob.read()
         store['id:{}:text'.format(document.id)] = text
         store['id:{}:_properties'.format(document.id)] = ['text']
@@ -133,14 +133,14 @@ class TestSearchPage(TestCase):
         for document in Document.objects.all():
             self.assertFalse(document.indexed)
 
-        _update_documents_text_property(owner=self.user, store=self.store)
+        _update_documents_text_property(store=self.store)
         management.call_command('update_index') # now will index
         for document in Document.objects.all():
             self.assertTrue(document.indexed)
 
     def test_search_should_work(self):
         corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
-        _update_documents_text_property(owner=self.user, store=self.store)
+        _update_documents_text_property(store=self.store)
         management.call_command('update_index')
 
         self.client.login(username=USERNAME, password=PASSWORD)
@@ -162,3 +162,39 @@ class TestSearchPage(TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], doc_1)
         self.assertEqual(results[1], doc_2)
+
+    def test_search_should_only_return_documents_owned_by_this_user(self):
+        other_user = User(username=USERNAME + '2', email='some@email.com',
+                          password=PASSWORD + '2')
+        other_user.set_password(PASSWORD + '2') #XXX: WTF, Pinax?
+        other_user.save()
+        corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
+        corpus, doc_3, doc_4 = _create_corpus_and_documents(owner=other_user)
+        _update_documents_text_property(store=self.store)
+        management.call_command('update_index')
+
+        self.client.login(username=USERNAME, password=PASSWORD)
+        response = self.client.get(self.search_url, data={'query': 'first'})
+        results = response.context['results']
+        self.assertEqual(results[0], doc_1)
+        response = self.client.get(self.search_url, data={'query': 'second'})
+        results = response.context['results']
+        self.assertEqual(results[0], doc_2)
+        response = self.client.get(self.search_url, data={'query': 'test'})
+        results = response.context['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], doc_1)
+        self.assertEqual(results[1], doc_2)
+
+        self.client.login(username=USERNAME + '2', password=PASSWORD + '2')
+        response = self.client.get(self.search_url, data={'query': 'first'})
+        results = response.context['results']
+        self.assertEqual(results[0], doc_3)
+        response = self.client.get(self.search_url, data={'query': 'second'})
+        results = response.context['results']
+        self.assertEqual(results[0], doc_4)
+        response = self.client.get(self.search_url, data={'query': 'test'})
+        results = response.context['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], doc_3)
+        self.assertEqual(results[1], doc_4)
