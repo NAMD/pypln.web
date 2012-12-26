@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
+import shutil
+
 import pymongo
 
 from datetime import datetime
@@ -41,8 +43,9 @@ EMAIL = 'test@user.com'
 def _create_document(filename, contents, owner):
     fp = StringIO()
     fp.write(contents)
+    fp.seek(0)
     fp.name = filename
-    fp.size = len(contents.encode('utf-8'))
+    fp.size = len(contents.encode('utf-8')) # seriously, Django?
 
     document = Document(slug=filename, owner=owner,
             date_uploaded=datetime.now(), indexed=False)
@@ -73,7 +76,9 @@ def _update_documents_text_property(owner, store):
         store['id:{}:_properties'.format(document.id)] = ['text']
 
 class TestSearchPage(TestCase):
-    def setUp(self):
+
+    @classmethod
+    def setUpClass(cls):
         settings.MONGODB_CONFIG = {'host': 'localhost',
                                    'port': 27017,
                                    'database': 'pypln_test',
@@ -81,17 +86,31 @@ class TestSearchPage(TestCase):
                                    'analysis_collection': 'analysis',
                                    'monitoring_collection': 'monitoring',
         }
-        connection = pymongo.Connection(host=settings.MONGODB_CONFIG['host'],
-                                        port=settings.MONGODB_CONFIG['port'])
-        connection.drop_database(settings.MONGODB_CONFIG['database'])
-        self.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                               port=settings.MONGODB_CONFIG['port'],
-                               database=settings.MONGODB_CONFIG['database'],
-                               collection=settings.MONGODB_CONFIG['analysis_collection'])
+        settings.INDEX_PATH += '_test'
+        cls.connection = pymongo.Connection(host=settings.MONGODB_CONFIG['host'],
+                port=settings.MONGODB_CONFIG['port'])
+        cls.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
+                              port=settings.MONGODB_CONFIG['port'],
+                              database=settings.MONGODB_CONFIG['database'],
+                              collection=settings.MONGODB_CONFIG['analysis_collection'])
+
+    def setUp(self):
+        self.connection.drop_database(settings.MONGODB_CONFIG['database'])
         self.user = User(username=USERNAME, email=EMAIL, password=PASSWORD)
         self.user.set_password(PASSWORD) #XXX: WTF, Pinax?
         self.user.save()
         self.search_url = reverse('search')
+        try:
+            shutil.rmtree(settings.INDEX_PATH)
+        except OSError:
+            pass
+
+    def tearDown(self):
+        self.connection.drop_database(settings.MONGODB_CONFIG['database'])
+        try:
+            shutil.rmtree(settings.INDEX_PATH)
+        except OSError:
+            pass
 
     def test_requires_login(self):
         response = self.client.get(self.search_url)
