@@ -204,5 +204,12 @@ def document_download(request, document_slug):
 
 @login_required
 def search(request):
-    data = {}
-    return HttpResponse(data)
+    query = request.GET.get('query', '')
+    data = {'results': []}
+    if query:
+        index = WhooshIndex(settings.INDEX_PATH, index_schema)
+        found_documents = index.search(query, 'content')
+        ids = [document[u'id'] for document in found_documents]
+        data['results'] = Document.objects.filter(id__in=ids)
+    return render_to_response('core/search.html', data,
+                              context_instance=RequestContext(request))

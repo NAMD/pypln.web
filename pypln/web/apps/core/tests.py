@@ -69,6 +69,8 @@ def _create_corpus_and_documents(owner):
     corpus.documents.add(document_2)
     corpus.save()
 
+    return corpus, document_1, document_2
+
 def _update_documents_text_property(owner, store):
     for document in Document.objects.filter(owner=owner):
         text = document.blob.read()
@@ -135,3 +137,28 @@ class TestSearchPage(TestCase):
         management.call_command('update_index') # now will index
         for document in Document.objects.all():
             self.assertTrue(document.indexed)
+
+    def test_search_should_work(self):
+        corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
+        _update_documents_text_property(owner=self.user, store=self.store)
+        management.call_command('update_index')
+
+        self.client.login(username=USERNAME, password=PASSWORD)
+        response = self.client.get(self.search_url, data={'query': 'first'})
+        self.assertTrue('results' in response.context)
+        results = response.context['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], doc_1)
+
+        response = self.client.get(self.search_url, data={'query': 'second'})
+        self.assertTrue('results' in response.context)
+        results = response.context['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], doc_2)
+
+        response = self.client.get(self.search_url, data={'query': 'test'})
+        self.assertTrue('results' in response.context)
+        results = response.context['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], doc_1)
+        self.assertEqual(results[1], doc_2)
