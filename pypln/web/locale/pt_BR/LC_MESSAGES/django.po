@@ -4,10 +4,9 @@
 #
 msgid ""
 msgstr ""
-
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-25 10:36-0300\n"
+"POT-Creation-Date: 2012-12-13 15:20-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -18,60 +17,82 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:36
+#: apps/core/views.py:57
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:45
+#: apps/core/views.py:66
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:70
+#: apps/core/views.py:84
 msgid "ERROR: you need to select a file!"
 msgstr "ERRO: é necessário selecionar um arquivo!"
 
-#: apps/core/views.py:88
-msgid "Document uploaded successfully!"
-msgstr "Documento transferido com sucesso!"
+#: apps/core/views.py:115
+#, python-format
+msgid "%(count)s document uploaded successfully!"
+msgid_plural "%(count)s documents uploaded successfully!"
+msgstr[0] "%(count)s documento transferido com sucesso!"
+msgstr[1] "%(count)s documentos transferidos com sucesso!"
 
-#: apps/core/visualizations.py:50
+#: apps/core/visualizations.py:75
 msgid "Plain text"
 msgstr "Somente texto"
 
-#: apps/core/visualizations.py:54
+#: apps/core/visualizations.py:79
 msgid "Part-of-speech"
 msgstr "Categorias morfossintáticas"
 
-#: apps/core/visualizations.py:59
+#: apps/core/visualizations.py:84
 msgid "Token frequency histogram"
 msgstr "Histograma de frequência de tokens"
 
-#: apps/core/visualizations.py:65
+#: apps/core/visualizations.py:90
 msgid "Statistics"
 msgstr "Estatísticas"
 
-#: apps/core/visualizations.py:72
+#: apps/core/visualizations.py:97
 msgid "Word cloud"
 msgstr "Word cloud"
 
-#: apps/profiles/models.py:8
+#: apps/profiles/models.py:26
 msgid "name"
 msgstr "nome"
 
-#: apps/profiles/models.py:9
+#: apps/profiles/models.py:27
 msgid "about"
 msgstr "sobre"
 
-#: apps/profiles/models.py:10
+#: apps/profiles/models.py:28
 msgid "location"
 msgstr "localização"
 
-#: apps/profiles/models.py:11
+#: apps/profiles/models.py:29
 msgid "website"
 msgstr "website"
 
+#: templates/404.html:4
+msgid "Error 404 - Page not found"
+msgstr "Erro 404 - Página não encontrada"
+
+#: templates/404.html:10
+msgid "ERROR 404"
+msgstr "Erro 404"
+
+#: templates/404.html:11
+msgid ""
+"\n"
+"  The page you are trying to access does not exist.\n"
+"  "
+msgstr ""
+"\n"
+"  A página que você está procurando não existe.\n"
+"  "
+
 #: templates/site_base.html:8 templates/core/corpora.html:20
-#: templates/core/document.html:69 templates/core/documents.html:31
+#: templates/core/corpora.html.py:22 templates/core/document.html:69
+#: templates/core/documents.html:31
 msgid "Corpora"
 msgstr "Corpora"
 
@@ -99,6 +120,45 @@ msgstr "Termos de Uso"
 msgid "What Next?"
 msgstr "O que deseja fazer agora?"
 
+#: templates/about/what_next.html:15
+msgid "verify an email address"
+msgstr ""
+
+#: templates/about/what_next.html:16
+msgid ""
+"so you can receive notifications, reset your password and so people can find "
+"you more easily."
+msgstr ""
+
+#: templates/about/what_next.html:18
+msgid "fill out your profile"
+msgstr ""
+
+#: templates/about/what_next.html:19
+msgid "to tell the world a little about yourself."
+msgstr ""
+
+#: templates/about/what_next.html:21
+#, fuzzy
+msgid "add a corpus"
+msgstr "Adicionar Corpus"
+
+#: templates/about/what_next.html:22
+msgid "to start analyzing your documents."
+msgstr ""
+
+#: templates/about/what_next.html:27
+msgid "invite more people to the site"
+msgstr ""
+
+#: templates/about/what_next.html:27
+msgid "[admin only]"
+msgstr ""
+
+#: templates/about/what_next.html:28
+msgid "so more people can share in the fun."
+msgstr ""
+
 #: templates/about/what_next.html:38
 #, python-format
 msgid ""
@@ -112,10 +172,6 @@ msgstr ""
 #, python-format
 msgid "Start by <a href=\"%(login_url)s\">logging in</a>."
 msgstr "Comece em <a href=\"%(login_url)s\">autenticação</a>."
-
-#: templates/core/404.html:4
-msgid "Error 404 - Page not found"
-msgstr "Erro 404 - Página não encontrada"
 
 #: templates/core/corpora.html:4
 msgid "Corpora List"
@@ -158,13 +214,21 @@ msgstr "Total de Documentos"
 msgid "Owner"
 msgstr "Proprietário"
 
-#: templates/core/corpus.html:4
+#: templates/core/corpus.html:4 templates/core/corpus.html.py:23
 msgid "Corpus"
 msgstr "Corpus"
+
+#: templates/core/corpus.html:17
+msgid "You are here:"
+msgstr "Você está aqui:"
 
 #: templates/core/corpus.html:18 templates/core/document.html:11
 msgid "Home"
 msgstr "Página inicial"
+
+#: templates/core/corpus.html:27
+msgid "Add a document"
+msgstr "Adicione documentos"
 
 #: templates/core/corpus.html:36 templates/core/document.html:40
 msgid "Metadata"
@@ -202,7 +266,7 @@ msgstr "Tamanho"
 msgid "Uploaded on"
 msgstr "Transferido em"
 
-#: templates/core/document.html:4
+#: templates/core/document.html:4 templates/core/document.html.py:15
 msgid "Document"
 msgstr "Documento"
 
@@ -218,7 +282,12 @@ msgstr "Tamanho:"
 msgid "Upload date:"
 msgstr "Data da transferência:"
 
+#: templates/core/document.html:66
+msgid "Download the original file"
+msgstr "Fazer download do arquivo original"
+
 #: templates/core/documents.html:4 templates/core/documents.html.py:20
+#: templates/core/documents.html:22
 msgid "Document List"
 msgstr "Relação de Documentos"
 
@@ -256,6 +325,10 @@ msgstr ""
 "            PyPLN é software livre e escalável, de acordo com a demanda.\n"
 "            "
 
+#: templates/core/homepage.html:30
+msgid "Start using it!"
+msgstr ""
+
 #: templates/core/homepage.html:32
 #, python-format
 msgid ""
@@ -277,6 +350,10 @@ msgstr ""
 "análises\n"
 "            \n"
 "            "
+
+#: templates/core/homepage.html:40
+msgid "How to use it"
+msgstr ""
 
 #: templates/core/homepage.html:42
 #, python-format
@@ -301,13 +378,44 @@ msgstr ""
 "            e novos processamentos.\n"
 "            "
 
-#: templates/core/visualizations/pos-highlighter.html:2
+#: templates/core/homepage.html:57
+#, fuzzy
+msgid "Document analysis"
+msgstr "Relação de Documentos"
+
+#: templates/core/homepage.html:58
+msgid ""
+"\n"
+"                <p>As PyPLN's main feature, you can visualize things like\n"
+"                  part-of-speech tags, word frequency statistics and other\n"
+"                  analysis in your documents.</p>\n"
+"                "
+msgstr ""
+
+#: templates/core/homepage.html:65
+msgid "Searching"
+msgstr ""
+
+#: templates/core/homepage.html:66
+msgid ""
+"\n"
+"                <p>PyPLN offers full-text search on your corpora so you can\n"
+"                  easily find information and then visualize its analysis.</"
+"p>\n"
+"                "
+msgstr ""
+
+#: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"
 msgstr "Controles"
 
-#: templates/core/visualizations/pos-highlighter.html:5
+#: templates/core/visualizations/pos-highlighter.html:6
 msgid "Highlighted text"
 msgstr "Texto marcado"
+
+#: templates/core/visualizations/pos-highlighter.html:40
+msgid "We could not do the part-of-speech tagging for this language, sorry."
+msgstr ""
 
 #: templates/core/visualizations/statistics.html:4
 msgid "Number of unique/total tokens"
@@ -328,6 +436,27 @@ msgstr "Repertório"
 #: templates/core/visualizations/statistics.html:22
 msgid "Average sentence repertoire"
 msgstr "Repertório médio das sentenças"
+
+#: templates/core/visualizations/token-frequency-histogram.html:7
+#, fuzzy
+msgid "Statistical data:"
+msgstr "Estatísticas"
+
+#: templates/core/visualizations/token-frequency-histogram.html:10
+msgid "Mean (token distribution):"
+msgstr ""
+
+#: templates/core/visualizations/token-frequency-histogram.html:14
+msgid "Variance (token distribution):"
+msgstr ""
+
+#: templates/core/visualizations/token-frequency-histogram.html:18
+msgid "Skewness (token distribution):"
+msgstr ""
+
+#: templates/core/visualizations/token-frequency-histogram.html:22
+msgid "Kurtosis (token distribution):"
+msgstr ""
 
 #: templates/profiles/_profile_info.html:4
 msgid "About"

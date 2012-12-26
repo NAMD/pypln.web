@@ -12,7 +12,7 @@
     <a href="{% url document_page document.slug %}">Document {{ document.file_name }}</a>
   </div>
 
-  <h2 class="brand">Document {{ document.file_name }}</h2>
+  <h2 class="brand">{% trans "Document" %} {{ document.file_name }}</h2>
   <div class="row">
 
     <div class="span11">
@@ -63,7 +63,7 @@
       </div>
       {% endfor %}
       <div>
-        <a href="{% url document_download document.slug %}">Download the original file</a>
+          <a href="{% url document_download document.slug %}">{% trans "Download the original file" %}</a>
       </div>
 
       <h4>{% trans "Corpora" %}</h4>

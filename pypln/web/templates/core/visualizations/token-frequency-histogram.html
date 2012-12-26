@@ -1,24 +1,25 @@
+{% load i18n %}
 <div align="center">
   <div style="width: 480px; height: 400px" id="plot"></div>
 </div>
 
 <div>
-  Statistical data:
+  {% trans "Statistical data:" %}
   <table>
   <tr>
-    <th>Mean (token distribution):</th>
+    <th>{% trans "Mean (token distribution):" %}</th>
     <td class="right">{{ momentum_1 }}</td>
   </tr>
   <tr>
-    <th>Variance (token distribution):</th>
+    <th>{% trans "Variance (token distribution):" %}</th>
     <td class="right">{{ momentum_2 }}</td>
   </tr>
   <tr>
-    <th>Skewness (token distribution):</th>
+    <th>{% trans "Skewness (token distribution):" %}</th>
     <td class="right">{{ momentum_3 }}</td>
   </tr>
   <tr>
-    <th>Kurtosis (token distribution):</th>
+    <th>{% trans "Kurtosis (token distribution):" %}</th>
     <td class="right">{{ momentum_4 }}</td>
   </tr>
   </table>
