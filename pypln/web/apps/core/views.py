@@ -22,22 +22,23 @@ import json
 
 from mimetypes import guess_type
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
-
-from .models import Corpus, Document, CorpusForm, DocumentForm
-from django.conf import settings
-from apps.core.visualizations import VISUALIZATIONS
-
-from utils import LANGUAGES, create_pipeline
 from mongodict import MongoDict
+
+from pypln.web.apps.core.models import (Corpus, Document, CorpusForm,
+                                        DocumentForm, index_schema)
+from pypln.web.apps.core.search import WhooshIndex
+from pypln.web.apps.core.visualizations import VISUALIZATIONS
+from pypln.web.apps.utils import LANGUAGES, create_pipeline
 
 
 def _slug(filename):
@@ -201,5 +202,7 @@ def document_download(request, document_slug):
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
     return response
 
-def search(request, query):
-    pass
+@login_required
+def search(request):
+    data = {}
+    return HttpResponse(data)
