@@ -110,8 +110,6 @@ def upload_documents(request, corpus_slug):
 def list_corpus_documents(request, corpus_slug):
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
     form = DocumentForm(request.user)
-    form.fields['blob'].label = ''
-    form.fields['blob'].widget.attrs['multiple'] = "multiple"
     data = {'corpus': corpus, 'form': form}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
