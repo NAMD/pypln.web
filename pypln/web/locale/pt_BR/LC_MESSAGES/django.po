@@ -4,10 +4,9 @@
 #
 msgid ""
 msgstr ""
-
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-25 10:36-0300\n"
+"POT-Creation-Date: 2013-01-02 18:13-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -18,55 +17,56 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:36
+#: apps/core/views.py:57
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:45
+#: apps/core/views.py:66
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:70
+#: apps/core/views.py:84
 msgid "ERROR: you need to select a file!"
 msgstr "ERRO: é necessário selecionar um arquivo!"
 
-#: apps/core/views.py:88
-msgid "Document uploaded successfully!"
-msgstr "Documento transferido com sucesso!"
+#: apps/core/views.py:113
+#, fuzzy
+msgid "{} document{} uploaded successfully!"
+msgstr "{} documento{} transferido(s) com sucesso!"
 
-#: apps/core/visualizations.py:50
+#: apps/core/visualizations.py:79
 msgid "Plain text"
 msgstr "Somente texto"
 
-#: apps/core/visualizations.py:54
+#: apps/core/visualizations.py:83
 msgid "Part-of-speech"
 msgstr "Categorias morfossintáticas"
 
-#: apps/core/visualizations.py:59
+#: apps/core/visualizations.py:88
 msgid "Token frequency histogram"
 msgstr "Histograma de frequência de tokens"
 
-#: apps/core/visualizations.py:65
+#: apps/core/visualizations.py:94
 msgid "Statistics"
 msgstr "Estatísticas"
 
-#: apps/core/visualizations.py:72
+#: apps/core/visualizations.py:101
 msgid "Word cloud"
 msgstr "Word cloud"
 
-#: apps/profiles/models.py:8
+#: apps/profiles/models.py:26
 msgid "name"
 msgstr "nome"
 
-#: apps/profiles/models.py:9
+#: apps/profiles/models.py:27
 msgid "about"
 msgstr "sobre"
 
-#: apps/profiles/models.py:10
+#: apps/profiles/models.py:28
 msgid "location"
 msgstr "localização"
 
-#: apps/profiles/models.py:11
+#: apps/profiles/models.py:29
 msgid "website"
 msgstr "website"
 
@@ -301,33 +301,50 @@ msgstr ""
 "            e novos processamentos.\n"
 "            "
 
-#: templates/core/visualizations/pos-highlighter.html:2
+#: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"
 msgstr "Controles"
 
-#: templates/core/visualizations/pos-highlighter.html:5
+#: templates/core/visualizations/pos-highlighter.html:4
+#: templates/core/visualizations/statistics.html:2
+#: templates/core/visualizations/token-frequency-histogram.html:2
+#: templates/core/visualizations/word-cloud.html:5
+msgid "Download data as CSV"
+msgstr "Baixar dados em formato CSV"
+
+#: templates/core/visualizations/pos-highlighter.html:9
 msgid "Highlighted text"
 msgstr "Texto marcado"
 
-#: templates/core/visualizations/statistics.html:4
+#: templates/core/visualizations/pos-highlighter.html:43
+msgid "We could not do the part-of-speech tagging for this language, sorry."
+msgstr "Desculpe-nos, não conseguimos fazer a marcação morfossintática para"
+"esta língua."
+
+#: templates/core/visualizations/statistics.html:6
 msgid "Number of unique/total tokens"
 msgstr "Quantidade de tokens únicos/total de tokens"
 
-#: templates/core/visualizations/statistics.html:9
+#: templates/core/visualizations/statistics.html:11
 msgid "Number of unique/total sentences"
 msgstr "Quantidade de sentenças únicas/total de sentenças"
 
-#: templates/core/visualizations/statistics.html:14
+#: templates/core/visualizations/statistics.html:16
 msgid "Average sentence length (in tokens)"
 msgstr "Tamanho médio das sentenças (tokens)"
 
-#: templates/core/visualizations/statistics.html:18
+#: templates/core/visualizations/statistics.html:20
 msgid "Repertoire"
 msgstr "Repertório"
 
-#: templates/core/visualizations/statistics.html:22
+#: templates/core/visualizations/statistics.html:24
 msgid "Average sentence repertoire"
 msgstr "Repertório médio das sentenças"
+
+#: templates/core/visualizations/text.html:2
+#, fuzzy
+msgid "Download plain text"
+msgstr "Baixar em formato somente texto"
 
 #: templates/profiles/_profile_info.html:4
 msgid "About"
