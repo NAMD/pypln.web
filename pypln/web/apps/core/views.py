@@ -23,7 +23,7 @@ import json
 from mimetypes import guess_type
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, TemplateDoesNotExist
 from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
@@ -34,16 +34,14 @@ from django.utils.translation import ungettext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from .models import Corpus, Document, CorpusForm, DocumentForm
+from core.models import Corpus, Document
+from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
 from apps.core.visualizations import VISUALIZATIONS
 
 from utils import LANGUAGES, create_pipeline
 from mongodict import MongoDict
 
-
-def _slug(filename):
-    return '.'.join([slugify(x) for x in filename.split('.')])
 
 def index(request):
     return render_to_response('core/homepage.html', {},
@@ -75,57 +73,52 @@ def corpora_list(request, as_json=False):
     return render_to_response('core/corpora.html', data,
             context_instance=RequestContext(request))
 
-#TODO: accept (and uncompress) .tar.gz and .zip files
-#TODO: enforce document type
-#TODO: dot not permit to have documents with the same slug!
-def _process_form(request, files, corpus):
-    form = DocumentForm(request.POST, files)
-    if not form.is_valid():
-        #XXX: not selecting a file may not be the only invalid input
-        messages.error(request, _('ERROR: you need to select a file!'))
+@login_required
+def upload_documents(request, corpus_slug):
+    #TODO: accept (and uncompress) .tar.gz and .zip files
+    #TODO: enforce document type
+    corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
+    form = DocumentForm(request.user, request.POST, request.FILES)
+    if form.is_valid():
+        docs = form.save(commit=False)
+        for doc in docs:
+            doc.save()
+            # XXX: updating the corpus_set should probably be done in
+            # the model, but we'll keep it here since the model might
+            # change a bit, and maybe take care of this in a better
+            # way.
+            doc.corpus_set.add(corpus)
+            for corpus in doc.corpus_set.all():
+                corpus.last_modified = datetime.datetime.now()
+                corpus.save()
+            data = {'_id': str(doc.blob.file._id), 'id': doc.id}
+            create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
+                            timeout=settings.ROUTER_TIMEOUT)
+
+        number_of_uploaded_docs = len(docs)
+        messages.info(request, _('{} document{} uploaded successfully!').format(
+                number_of_uploaded_docs, pluralize(number_of_uploaded_docs)))
+        return HttpResponseRedirect(reverse('corpus_page',
+                                            kwargs={'corpus_slug': corpus_slug}))
     else:
-        new_document = form.save(commit=False)
-        new_document.slug = ''
-        new_document.owner = request.user
-        new_document.date_uploaded = datetime.datetime.now()
-        new_document.save()
-        new_document.slug = _slug(new_document.file_name())
-        new_document.corpus_set.add(corpus)
-        for corpus in new_document.corpus_set.all():
-            corpus.last_modified = datetime.datetime.now()
-            corpus.save()
-        new_document.save()
-        data = {'_id': str(new_document.blob.file._id),
-                'id': new_document.id}
-        create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
-                        timeout=settings.ROUTER_TIMEOUT)
+        data = {'corpus': corpus, 'form': form}
+        return render_to_response('core/corpus.html', data,
+                                  context_instance=RequestContext(request))
 
 @login_required
-def corpus_page(request, corpus_slug):
-    try:
-        corpus = Corpus.objects.get(slug=corpus_slug, owner=request.user.id)
-    except ObjectDoesNotExist:
-        return render_to_response('core/404.html', {},
-                context_instance=RequestContext(request))
-    if request.method == 'POST':
-        for f in request.FILES.getlist('blob'):
-            _process_form(request, {'blob': f}, corpus)
-        number_of_files = len(request.FILES.getlist('blob'))
-        # I know I should be using string.format, but gettext doesn't support
-        # it yet: https://savannah.gnu.org/bugs/?30854
-        message = ungettext('%(count)s document uploaded successfully!',
-                '%(count)s documents uploaded successfully!',
-                number_of_files) % {'count': number_of_files}
-        messages.info(request, message)
-        return HttpResponseRedirect(reverse('corpus_page',
-                kwargs={'corpus_slug': corpus_slug}))
-    else:
-        form = DocumentForm()
-    form.fields['blob'].label = ''
-    form.fields['blob'].widget.attrs['multiple'] = "multiple"
+def list_corpus_documents(request, corpus_slug):
+    corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
+    form = DocumentForm(request.user)
     data = {'corpus': corpus, 'form': form}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
+
+@login_required
+def corpus_page(request, corpus_slug):
+    if request.method == 'POST':
+        return upload_documents(request, corpus_slug)
+    else:
+        return list_corpus_documents(request, corpus_slug)
 
 @login_required
 def document_page(request, document_slug):

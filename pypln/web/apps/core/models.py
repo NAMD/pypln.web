@@ -20,7 +20,6 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ModelForm
 from django.conf import settings
 from .storage import GridFSStorage
 
@@ -33,8 +32,8 @@ gridfs_storage = GridFSStorage(location='/',
 
 class Document(models.Model):
     blob = models.FileField(upload_to='/', storage=gridfs_storage)
-    slug = models.SlugField()
-    date_uploaded = models.DateTimeField()
+    slug = models.SlugField(unique=True)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
 
     class Meta:
@@ -57,6 +56,12 @@ class Document(models.Model):
         else:
             return '{:.2f} GiB'.format(size / (1024.0 ** 3))
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = self.blob.storage.get_available_name(self.blob.name)
+        return super(Document, self).save(*args, **kwargs)
+
+
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
     slug = models.SlugField(max_length=60)
@@ -72,13 +77,3 @@ class Corpus(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class CorpusForm(ModelForm):
-    class Meta:
-        model = Corpus
-        fields = ('name', 'description')
-
-class DocumentForm(ModelForm):
-    class Meta:
-        model = Document
-        fields = ('blob', )
