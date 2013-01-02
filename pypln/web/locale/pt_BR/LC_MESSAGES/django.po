@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-13 15:20-0200\n"
+"POT-Creation-Date: 2013-01-02 18:26-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:57
+#: apps/core/views.py:58
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:66
+#: apps/core/views.py:67
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:84
+#: apps/core/views.py:85
 msgid "ERROR: you need to select a file!"
 msgstr "ERRO: é necessário selecionar um arquivo!"
 
-#: apps/core/views.py:115
-#, python-format
+#: apps/core/views.py:116
+#, fuzzy, python-format
 msgid "%(count)s document uploaded successfully!"
 msgid_plural "%(count)s documents uploaded successfully!"
 msgstr[0] "%(count)s documento transferido com sucesso!"
 msgstr[1] "%(count)s documentos transferidos com sucesso!"
 
-#: apps/core/visualizations.py:75
+#: apps/core/visualizations.py:90
 msgid "Plain text"
 msgstr "Somente texto"
 
-#: apps/core/visualizations.py:79
+#: apps/core/visualizations.py:94
 msgid "Part-of-speech"
 msgstr "Categorias morfossintáticas"
 
-#: apps/core/visualizations.py:84
+#: apps/core/visualizations.py:99
 msgid "Token frequency histogram"
 msgstr "Histograma de frequência de tokens"
 
-#: apps/core/visualizations.py:90
+#: apps/core/visualizations.py:105
 msgid "Statistics"
 msgstr "Estatísticas"
 
-#: apps/core/visualizations.py:97
+#: apps/core/visualizations.py:112
 msgid "Word cloud"
 msgstr "Word cloud"
 
@@ -192,6 +192,11 @@ msgstr "Criar novo corpus"
 #: templates/core/corpora.html:31
 msgid "Add Corpus"
 msgstr "Adicionar Corpus"
+
+#: templates/core/visualizations/text.html:2
+#, fuzzy
+msgid "Download plain text"
+msgstr "Baixar em formato somente texto"
 
 #: templates/core/corpora.html:39 templates/profiles/_profile_info.html:3
 msgid "Name"
@@ -409,54 +414,63 @@ msgstr ""
 msgid "Controls"
 msgstr "Controles"
 
-#: templates/core/visualizations/pos-highlighter.html:6
+#: templates/core/visualizations/pos-highlighter.html:4
+#: templates/core/visualizations/statistics.html:2
+#: templates/core/visualizations/token-frequency-histogram.html:2
+#: templates/core/visualizations/word-cloud.html:5
+msgid "Download data as CSV"
+msgstr "Baixar dados em formato CSV"
+
+#: templates/core/visualizations/pos-highlighter.html:9
 msgid "Highlighted text"
 msgstr "Texto marcado"
 
-#: templates/core/visualizations/pos-highlighter.html:40
+#: templates/core/visualizations/pos-highlighter.html:43
 msgid "We could not do the part-of-speech tagging for this language, sorry."
 msgstr ""
+"Desculpe-nos, não conseguimos fazer a marcação morfossintática paraesta "
+"língua."
 
-#: templates/core/visualizations/statistics.html:4
+#: templates/core/visualizations/statistics.html:6
 msgid "Number of unique/total tokens"
 msgstr "Quantidade de tokens únicos/total de tokens"
 
-#: templates/core/visualizations/statistics.html:9
+#: templates/core/visualizations/statistics.html:11
 msgid "Number of unique/total sentences"
 msgstr "Quantidade de sentenças únicas/total de sentenças"
 
-#: templates/core/visualizations/statistics.html:14
+#: templates/core/visualizations/statistics.html:16
 msgid "Average sentence length (in tokens)"
 msgstr "Tamanho médio das sentenças (tokens)"
 
-#: templates/core/visualizations/statistics.html:18
+#: templates/core/visualizations/statistics.html:20
 msgid "Repertoire"
 msgstr "Repertório"
 
-#: templates/core/visualizations/statistics.html:22
+#: templates/core/visualizations/statistics.html:24
 msgid "Average sentence repertoire"
 msgstr "Repertório médio das sentenças"
 
-#: templates/core/visualizations/token-frequency-histogram.html:7
+#: templates/core/visualizations/token-frequency-histogram.html:9
 #, fuzzy
 msgid "Statistical data:"
 msgstr "Estatísticas"
 
-#: templates/core/visualizations/token-frequency-histogram.html:10
+#: templates/core/visualizations/token-frequency-histogram.html:12
 msgid "Mean (token distribution):"
-msgstr ""
+msgstr "Média (distribuição de tokens):"
 
-#: templates/core/visualizations/token-frequency-histogram.html:14
+#: templates/core/visualizations/token-frequency-histogram.html:16
 msgid "Variance (token distribution):"
-msgstr ""
+msgstr "Variância (distribuição de tokens):"
 
-#: templates/core/visualizations/token-frequency-histogram.html:18
+#: templates/core/visualizations/token-frequency-histogram.html:20
 msgid "Skewness (token distribution):"
-msgstr ""
+msgstr "Obliquidade (distribuição de tokens):"
 
-#: templates/core/visualizations/token-frequency-histogram.html:22
+#: templates/core/visualizations/token-frequency-histogram.html:24
 msgid "Kurtosis (token distribution):"
-msgstr ""
+msgstr "Curtose (distribuição de tokens):"
 
 #: templates/profiles/_profile_info.html:4
 msgid "About"

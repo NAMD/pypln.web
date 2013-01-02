@@ -23,7 +23,7 @@
           {% for visualization in visualizations %}
           <li> <a data-visualization="{{ visualization.slug }}"
                   class="link-visualization"
-                  href="{% url document_visualization document.slug visualization.slug %}">{{ visualization.label }}</a> </li>
+                  href="{% url document_visualization document.slug visualization.slug "html" %}">{{ visualization.label }}</a> </li>
           {% endfor %}
         </ul>
         <div id="visualization"></div>

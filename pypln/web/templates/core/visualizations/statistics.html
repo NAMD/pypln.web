@@ -1,4 +1,6 @@
 {% load i18n %}
+<a href="{% url document_visualization document.slug "statistics" "csv" %}">{% trans "Download data as CSV" %}</a>
+<br />
 <table>
   <tr>
     <th>{% trans "Number of unique/total tokens" %}:</th>

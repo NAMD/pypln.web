@@ -1,4 +1,6 @@
 {% load i18n %}
+<a href="{% url document_visualization document.slug "token-frequency-histogram" "csv" %}">{% trans "Download data as CSV" %}</a>
+<br />
 <div align="center">
   <div style="width: 480px; height: 400px" id="plot"></div>
 </div>

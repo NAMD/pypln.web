@@ -1,0 +1,3 @@
+"word","weight"
+{% for word, weight in freqdist %}"{{ word|addslashes }}","{{ weight|addslashes }}"
+{% endfor %}

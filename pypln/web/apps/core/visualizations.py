@@ -40,11 +40,13 @@ def _token_frequency_histogram(data):
 
 def _pos_highlighter(data):
     pos = []
+    token_list = []
     if data['pos'] is not None:
-        for item in data['pos']:
+        for idx, item in enumerate(data['pos']):
             try:
                 tag = TAGSET[item[1]]
                 pos.append({'slug': tag['slug'], 'token': item[0]})
+                token_list.append((idx, item[0], item[1]))
             except KeyError as e:
                 import traceback
                 from django.core.mail import mail_admins
@@ -52,10 +54,11 @@ def _pos_highlighter(data):
                 tb = traceback.format_exc(e)
                 subject = "Tag {} not in tagset".format(item[1])
                 message = ("Tag {} was extracted from document, but was not"
-                           "found in TAGSET.\n\n{}".format(item[1], tb)
+                           "found in TAGSET.\n\n{}".format(item[1], tb))
                 mail_admins(subject, message)
 
-    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20]}
+    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
+            'token_list': token_list}
 
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
@@ -78,7 +81,7 @@ def _wordcloud(data):
     document_language = LANGUAGES[data['language']].lower()
     if document_language in stopwords.fileids():
         stopwords_list += stopwords.words(document_language)
-    data['freqdist'] = [[repr(x[0])[2:-1], x[1]] for x in data['freqdist'] \
+    data['freqdist'] = [[x[0], x[1]] for x in data['freqdist'] \
                                                  if x[0] not in stopwords_list]
     return data
 
