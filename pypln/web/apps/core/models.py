@@ -32,7 +32,7 @@ gridfs_storage = GridFSStorage(location='/',
 
 class Document(models.Model):
     blob = models.FileField(upload_to='/', storage=gridfs_storage)
-    slug = models.SlugField() #TODO: add unique=True. The logic of generating slugs must be here.
+    slug = models.SlugField(unique=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
 
