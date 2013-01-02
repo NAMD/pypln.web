@@ -30,7 +30,6 @@ msgid "ERROR: you need to select a file!"
 msgstr "ERRO: é necessário selecionar um arquivo!"
 
 #: apps/core/views.py:116
-#, fuzzy, python-format
 msgid "%(count)s document uploaded successfully!"
 msgid_plural "%(count)s documents uploaded successfully!"
 msgstr[0] "%(count)s documento transferido com sucesso!"
@@ -139,7 +138,6 @@ msgid "to tell the world a little about yourself."
 msgstr ""
 
 #: templates/about/what_next.html:21
-#, fuzzy
 msgid "add a corpus"
 msgstr "Adicionar Corpus"
 
@@ -194,7 +192,6 @@ msgid "Add Corpus"
 msgstr "Adicionar Corpus"
 
 #: templates/core/visualizations/text.html:2
-#, fuzzy
 msgid "Download plain text"
 msgstr "Baixar em formato somente texto"
 
@@ -384,7 +381,6 @@ msgstr ""
 "            "
 
 #: templates/core/homepage.html:57
-#, fuzzy
 msgid "Document analysis"
 msgstr "Relação de Documentos"
 
@@ -452,9 +448,8 @@ msgid "Average sentence repertoire"
 msgstr "Repertório médio das sentenças"
 
 #: templates/core/visualizations/token-frequency-histogram.html:9
-#, fuzzy
 msgid "Statistical data:"
-msgstr "Estatísticas"
+msgstr "Estatísticas:"
 
 #: templates/core/visualizations/token-frequency-histogram.html:12
 msgid "Mean (token distribution):"
