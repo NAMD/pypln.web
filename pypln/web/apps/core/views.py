@@ -100,7 +100,7 @@ def upload_documents(request, corpus_slug):
         # it yet: https://savannah.gnu.org/bugs/?30854
         message = ungettext('%(count)s document uploaded successfully!',
                 '%(count)s documents uploaded successfully!',
-                number_of_files) % {'count': number_of_files}
+                number_of_uploaded_docs) % {'count': number_of_uploaded_docs}
         messages.info(request, message)
         return HttpResponseRedirect(reverse('corpus_page',
                                             kwargs={'corpus_slug': corpus_slug}))
