@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-02 18:26-0200\n"
+"POT-Creation-Date: 2013-01-03 13:09-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -17,19 +17,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:58
+#: apps/core/views.py:56
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:67
+#: apps/core/views.py:65
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:85
-msgid "ERROR: you need to select a file!"
-msgstr "ERRO: é necessário selecionar um arquivo!"
-
-#: apps/core/views.py:116
+#: apps/core/views.py:101
 msgid "%(count)s document uploaded successfully!"
 msgid_plural "%(count)s documents uploaded successfully!"
 msgstr[0] "%(count)s documento transferido com sucesso!"
@@ -190,10 +186,6 @@ msgstr "Criar novo corpus"
 #: templates/core/corpora.html:31
 msgid "Add Corpus"
 msgstr "Adicionar Corpus"
-
-#: templates/core/visualizations/text.html:2
-msgid "Download plain text"
-msgstr "Baixar em formato somente texto"
 
 #: templates/core/corpora.html:39 templates/profiles/_profile_info.html:3
 msgid "Name"
@@ -447,6 +439,10 @@ msgstr "Repertório"
 msgid "Average sentence repertoire"
 msgstr "Repertório médio das sentenças"
 
+#: templates/core/visualizations/text.html:2
+msgid "Download plain text"
+msgstr "Baixar em formato somente texto"
+
 #: templates/core/visualizations/token-frequency-histogram.html:9
 msgid "Statistical data:"
 msgstr "Estatísticas:"
@@ -478,3 +474,6 @@ msgstr "Localidade"
 #: templates/profiles/_profile_info.html:6
 msgid "Website"
 msgstr "Website"
+
+#~ msgid "ERROR: you need to select a file!"
+#~ msgstr "ERRO: é necessário selecionar um arquivo!"

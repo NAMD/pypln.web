@@ -96,8 +96,12 @@ def upload_documents(request, corpus_slug):
                             timeout=settings.ROUTER_TIMEOUT)
 
         number_of_uploaded_docs = len(docs)
-        messages.info(request, _('{} document{} uploaded successfully!').format(
-                number_of_uploaded_docs, pluralize(number_of_uploaded_docs)))
+        # I know I should be using string.format, but gettext doesn't support
+        # it yet: https://savannah.gnu.org/bugs/?30854
+        message = ungettext('%(count)s document uploaded successfully!',
+                '%(count)s documents uploaded successfully!',
+                number_of_files) % {'count': number_of_files}
+        messages.info(request, message)
         return HttpResponseRedirect(reverse('corpus_page',
                                             kwargs={'corpus_slug': corpus_slug}))
     else:
