@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-03 13:09-0200\n"
+"POT-Creation-Date: 2013-01-03 13:11-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -66,6 +66,194 @@ msgstr "localização"
 #: apps/profiles/models.py:29
 msgid "website"
 msgstr "website"
+
+#: apps/utils/tagset.py:22
+msgid "Dollar"
+msgstr ""
+
+#: apps/utils/tagset.py:24
+msgid "Closing quotation mark"
+msgstr ""
+
+#: apps/utils/tagset.py:27 apps/utils/tagset.py:34
+msgid "Opening parenthesis"
+msgstr ""
+
+#: apps/utils/tagset.py:30 apps/utils/tagset.py:36
+msgid "Closing parenthesis"
+msgstr ""
+
+#: apps/utils/tagset.py:32
+msgid "Comma"
+msgstr ""
+
+#: apps/utils/tagset.py:33
+msgid "Dot"
+msgstr ""
+
+#: apps/utils/tagset.py:38
+msgid "Dash"
+msgstr ""
+
+#: apps/utils/tagset.py:40
+msgid "Sentence terminator"
+msgstr ""
+
+#: apps/utils/tagset.py:43
+msgid "Colon or ellipsis"
+msgstr ""
+
+#: apps/utils/tagset.py:46
+msgid "Conjunction, coordinating"
+msgstr ""
+
+#: apps/utils/tagset.py:49
+msgid "Numeral, cardinal"
+msgstr ""
+
+#: apps/utils/tagset.py:51
+msgid "Determiner"
+msgstr ""
+
+#: apps/utils/tagset.py:53
+msgid "Existential there"
+msgstr ""
+
+#: apps/utils/tagset.py:55
+msgid "Foreign word"
+msgstr ""
+
+#: apps/utils/tagset.py:57
+msgid "Preposition or conjunction, subordinating"
+msgstr ""
+
+#: apps/utils/tagset.py:60
+msgid "Adjective or numeral, ordinal"
+msgstr ""
+
+#: apps/utils/tagset.py:63
+msgid "Adjective, comparative"
+msgstr ""
+
+#: apps/utils/tagset.py:66
+msgid "Adjective, superlative"
+msgstr ""
+
+#: apps/utils/tagset.py:69
+msgid "List item marker"
+msgstr ""
+
+#: apps/utils/tagset.py:72
+msgid "Modal auxiliary"
+msgstr ""
+
+#: apps/utils/tagset.py:75
+msgid "Noun, common, singular or mass"
+msgstr ""
+
+#: apps/utils/tagset.py:78 apps/utils/tagset.py:87
+msgid "Noun, proper, singular"
+msgstr ""
+
+#: apps/utils/tagset.py:81 apps/utils/tagset.py:90
+msgid "Noun, proper, plural"
+msgstr ""
+
+#: apps/utils/tagset.py:84
+msgid "Noun, common, plural"
+msgstr ""
+
+#: apps/utils/tagset.py:93
+msgid "Pre-determiner"
+msgstr ""
+
+#: apps/utils/tagset.py:96
+msgid "Genitive marker"
+msgstr ""
+
+#: apps/utils/tagset.py:99 apps/utils/tagset.py:105
+msgid "Pronoun, personal"
+msgstr ""
+
+#: apps/utils/tagset.py:102 apps/utils/tagset.py:108
+msgid "Pronoun, possessive"
+msgstr ""
+
+#: apps/utils/tagset.py:110
+msgid "Adverb"
+msgstr ""
+
+#: apps/utils/tagset.py:112
+msgid "Adverb, comparative"
+msgstr ""
+
+#: apps/utils/tagset.py:115
+msgid "Adverb, superlative"
+msgstr ""
+
+#: apps/utils/tagset.py:117
+msgid "Particle"
+msgstr ""
+
+#: apps/utils/tagset.py:118
+msgid "Symbol"
+msgstr ""
+
+#: apps/utils/tagset.py:120
+msgid "\"to\" as preposition or infinitive marker"
+msgstr ""
+
+#: apps/utils/tagset.py:122
+msgid "Interjection"
+msgstr ""
+
+#: apps/utils/tagset.py:124
+msgid "Verb, base form"
+msgstr ""
+
+#: apps/utils/tagset.py:127
+msgid "Verb, past tense"
+msgstr ""
+
+#: apps/utils/tagset.py:130
+msgid "Verb, present participle or gerund"
+msgstr ""
+
+#: apps/utils/tagset.py:133
+msgid "Verb, past participle"
+msgstr ""
+
+#: apps/utils/tagset.py:136
+msgid "Verb, present tense, not 3rd person singular"
+msgstr ""
+
+#: apps/utils/tagset.py:139
+msgid "Verb, present tense, 3rd person singular"
+msgstr ""
+
+#: apps/utils/tagset.py:142
+msgid "Wh-determiner"
+msgstr ""
+
+#: apps/utils/tagset.py:144
+msgid "Wh-pronoun"
+msgstr ""
+
+#: apps/utils/tagset.py:146
+msgid "Wh-pronoun, possessive"
+msgstr ""
+
+#: apps/utils/tagset.py:148
+msgid "Wh-adverb"
+msgstr ""
+
+#: apps/utils/tagset.py:150
+msgid "Opening quotation mark"
+msgstr ""
+
+#: apps/utils/tagset.py:152
+msgid "Hash"
+msgstr ""
 
 #: templates/404.html:4
 msgid "Error 404 - Page not found"
