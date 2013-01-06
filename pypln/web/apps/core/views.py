@@ -44,6 +44,25 @@ from pypln.web.apps.utils import LANGUAGES, create_pipeline
 def _slug(filename):
     return '.'.join([slugify(x) for x in filename.split('.')])
 
+def _search_filtering_by_owner(index, query, owner):
+    permitted_documents = Document.objects.filter(owner=owner)
+    permitted_documents_by_id = {doc.id: doc for doc in permitted_documents}
+    permitted_ids = [doc.id for doc in permitted_documents]
+
+    found_documents = index.search(query, 'content')
+    found_documents_by_id = {int(doc[u'id']): doc for doc in found_documents}
+    found_ids = found_documents_by_id.keys()
+
+    result_ids = set(permitted_ids).intersection(set(found_ids))
+    results = []
+    for document_id in permitted_ids:
+        if document_id in result_ids:
+            found_document = found_documents_by_id[document_id]
+            document = permitted_documents_by_id[document_id]
+            document.concordance = found_document.highlights('content')
+            results.append(document)
+    return results
+
 def index(request):
     return render_to_response('core/homepage.html', {},
             context_instance=RequestContext(request))
@@ -204,13 +223,10 @@ def document_download(request, document_slug):
 
 @login_required
 def search(request):
-    query = request.GET.get('query', '')
-    data = {'results': []}
+    query = request.GET.get('query', '').strip()
+    data = {'results': [], 'query': query}
     if query:
         index = WhooshIndex(settings.INDEX_PATH, index_schema)
-        found_documents = index.search(query, 'content')
-        ids = [document[u'id'] for document in found_documents]
-        data['results'] = Document.objects.filter(owner=request.user,
-                                                  id__in=ids)
+        data['results'] = _search_filtering_by_owner(index, query, request.user)
     return render_to_response('core/search.html', data,
                               context_instance=RequestContext(request))
