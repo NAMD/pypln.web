@@ -1,0 +1,50 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+{% load ifsetting_tag %}
+{% block head_title %}{% trans "Search documents" %}{% endblock %}
+
+{% block body %}
+{% if not query %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#search_form > input[type=text]').focus();
+  });
+</script>
+{% endif %}
+<div class="breadcrumb">
+    {% trans "You are here: " %}
+    <a href="{% url home %}">{% trans "Main page" %}</a> &gt;
+    <a href="{% url search %}">{% trans "Search" %}</a>
+    {% if query %}
+    &gt; "<a href="{% url search %}?query={{ query }}">{{ query }}</a>"
+    {% endif %}
+</div>
+<h2>Search documents</h2>
+
+<form id="search_form" method="GET" action="{% url search %}">
+  <input type="text" name="query" value="{{ query }}" />
+  <input type="button" value="Submit" />
+</form>
+
+{% if query %}
+  {% if not results %}
+  {% trans "No results found for" %} "{{ query }}".
+  {% else %}
+  <h2>Results</h2>
+  <h3>{{ results|length }} {% trans "documents found" %}</h3>
+  {% for result in results %}
+  <div class="search_result">
+    <div>
+      <a href="{% url document_page result.slug %}">{{ result.file_name }}</a>
+      (Corpora: {% for corpus in result.corpus_set.all %}<a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+    </div>
+    <div>
+      {{ result.concordance|safe }}
+    </div>
+    <br />
+  </div>
+  {% endfor %}
+  {% endif %}
+{% endif %}
+
+{% endblock %}
