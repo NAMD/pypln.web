@@ -198,3 +198,5 @@ class TestSearchPage(TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], doc_3)
         self.assertEqual(results[1], doc_4)
+
+    #TODO: test all breadcrumbs

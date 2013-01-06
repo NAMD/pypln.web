@@ -86,4 +86,5 @@ class DocumentForm(ModelForm):
         model = Document
         fields = ('blob', )
 
-index_schema = Schema(id=ID(stored=True), filename=TEXT, content=TEXT)
+index_schema = Schema(id=ID(stored=True), filename=TEXT,
+                      content=TEXT(stored=True))
