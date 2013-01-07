@@ -28,4 +28,5 @@ urlpatterns = patterns('core.views',
             name='document_download'),
         url(r'^document/(?P<document_slug>.+)/?$', 'document_page',
             name='document_page'),
+        url(r'^search', 'search', name='search'),
 )

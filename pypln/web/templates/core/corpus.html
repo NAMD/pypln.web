@@ -23,14 +23,24 @@
   <h2 class="brand">{% trans "Corpus" %} {{ corpus.name }}</h2>
   <p class="description"> {{ corpus.description }} </p>
     <div class="row">
-        <div class="span8">
-            <h3>{% trans "Add a document" %}</h3>
+      <div class="span8">
+        <div>
+          <h3>{% trans "Add a document" %}</h3>
             <form class="well form-inline" method="POST"
               action="{% url corpus_page corpus.slug %}" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form }}
             <input type="submit" value="Add" class="btn" />
-            </form>
+          </form>
+        </div>
+        <div>
+          <h3>{% trans "Search this corpus" %}</h3>
+          <form method="GET" action="{% url search %}">
+            <input type="hidden" name="corpus" value="{{ corpus.slug }}">
+            <input type="text" name="query" />
+            <input type="submit" value="Search" />
+          </form>
+        </div>
         </div>
         <div class="span8">
           <h3>{% trans "Metadata" %}</h3>

@@ -23,6 +23,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from .storage import GridFSStorage
 
+from whoosh.fields import Schema, ID, TEXT
+
 
 gridfs_storage = GridFSStorage(location='/',
                                host=settings.MONGODB_CONFIG['host'],
@@ -35,6 +37,7 @@ class Document(models.Model):
     slug = models.SlugField(unique=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
+    indexed = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('blob', )
@@ -77,3 +80,6 @@ class Corpus(models.Model):
 
     def __unicode__(self):
         return self.name
+
+index_schema = Schema(id=ID(stored=True), filename=TEXT,
+                      content=TEXT(stored=True))

@@ -34,7 +34,7 @@ from django.utils.translation import ungettext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
-from core.models import Corpus, Document
+from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
 from apps.core.visualizations import VISUALIZATIONS
@@ -42,6 +42,33 @@ from apps.core.visualizations import VISUALIZATIONS
 from utils import LANGUAGES, create_pipeline
 from mongodict import MongoDict
 
+from pypln.web.apps.core.search import WhooshIndex
+from pypln.web.apps.core.visualizations import VISUALIZATIONS
+from pypln.web.apps.utils import LANGUAGES, create_pipeline
+
+
+def _search_filtering_by_owner(index, query, owner, corpus=None):
+    if corpus is not None:
+        permitted_documents = Document.objects.filter(owner=owner,
+                                                      corpus=corpus)
+    else:
+        permitted_documents = Document.objects.filter(owner=owner)
+    permitted_documents_by_id = {doc.id: doc for doc in permitted_documents}
+    permitted_ids = [doc.id for doc in permitted_documents]
+
+    found_documents = index.search(query, 'content')
+    found_documents_by_id = {int(doc[u'id']): doc for doc in found_documents}
+    found_ids = found_documents_by_id.keys()
+
+    result_ids = set(permitted_ids).intersection(set(found_ids))
+    results = []
+    for document_id in permitted_ids:
+        if document_id in result_ids:
+            found_document = found_documents_by_id[document_id]
+            document = permitted_documents_by_id[document_id]
+            document.concordance = found_document.highlights('content')
+            results.append(document)
+    return results
 
 def index(request):
     return render_to_response('core/homepage.html', {},
@@ -213,5 +240,18 @@ def document_download(request, document_slug):
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
     return response
 
-def search(request, query):
-    pass
+@login_required
+def search(request):
+    query = request.GET.get('query', '').strip()
+    corpus_slug = request.GET.get('corpus', '').strip()
+    corpus = None
+    if corpus_slug:
+        corpus = Corpus.objects.filter(slug=corpus_slug)
+    data = {'results': [], 'query': query}
+    if query:
+        index = WhooshIndex(settings.INDEX_PATH, index_schema)
+        data['results'] = _search_filtering_by_owner(index=index, query=query,
+                                                     owner=request.user,
+                                                     corpus=corpus)
+    return render_to_response('core/search.html', data,
+                              context_instance=RequestContext(request))

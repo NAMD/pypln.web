@@ -46,14 +46,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_DEBUG = True
 
 ROUTER_API = 'tcp://127.0.0.1:5555'
-ROUTER_BROADCAST = 'tcp://127.0.0.1:5555'
+ROUTER_BROADCAST = 'tcp://127.0.0.1:5556'
 ROUTER_TIMEOUT = 5
 
 CONFIGURATION = get_config_from_router(ROUTER_API)
 if CONFIGURATION is None:
     MONGODB_CONFIG = {'host': 'localhost',
                       'port': 27017,
-                      'database': 'pypln',
+                      'database': 'pypln_dev',
                       'gridfs_collection': 'files',
                       'analysis_collection': 'analysis',
                       'monitoring_collection': 'monitoring',
