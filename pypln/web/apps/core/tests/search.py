@@ -35,7 +35,8 @@ from django.contrib.auth.models import User
 
 from mongodict import MongoDict
 
-from core.models import gridfs_storage, Corpus, Document
+from core.models import Corpus, Document
+from core.tests.utils import TestWithMongo
 
 __all__ = ["TestSearchPage"]
 
@@ -76,25 +77,11 @@ def _update_documents_text_property(store):
         store['id:{}:text'.format(document.id)] = text
         store['id:{}:_properties'.format(document.id)] = ['text']
 
-class TestSearchPage(TestCase):
+class TestSearchPage(TestWithMongo):
     fixtures = ['corpus']
 
     def setUp(self):
-        if 'test' not in gridfs_storage.database:
-            error_message = ("We expect the mongodb database name to contain the "
-                "string 'test' to make sure you don't mess up your production "
-                "database. Are you sure you're using settings.test to run these "
-                "tests?")
-            raise ImproperlyConfigured(error_message)
-
-        gridfs_storage._connection.drop_database(gridfs_storage.database)
-
-        self.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                               port=settings.MONGODB_CONFIG['port'],
-                               database=settings.MONGODB_CONFIG['database'],
-                               collection=settings.MONGODB_CONFIG['analysis_collection'])
-
-        self.user = User.objects.all()[0]
+        super(TestSearchPage, self).setUp()
 
         self.search_url = reverse('search')
         try:
@@ -103,7 +90,7 @@ class TestSearchPage(TestCase):
             pass
 
     def tearDown(self):
-        gridfs_storage._connection.drop_database(gridfs_storage.database)
+        super(TestSearchPage, self).tearDown()
         try:
             shutil.rmtree(settings.INDEX_PATH)
         except OSError:
