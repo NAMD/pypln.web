@@ -23,7 +23,7 @@
 
 <form id="search_form" method="GET" action="{% url search %}">
   <input type="text" name="query" value="{{ query }}" />
-  <input type="button" value="Submit" />
+  <input type="submit" value="Search" />
 </form>
 
 {% if query %}
