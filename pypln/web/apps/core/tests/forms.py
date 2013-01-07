@@ -18,35 +18,14 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from StringIO import StringIO
-from datetime import datetime
-from mock import patch
-import shutil
 
-import pymongo
-
-from datetime import datetime
-from StringIO import StringIO
-
-from django.core import management
-from django.core.files import File
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
-from django.core.files.base import ContentFile
-from django.core.urlresolvers import reverse
-from django.conf import settings
 
-from django.contrib.auth.models import User
-
-from django.test.client import Client
-from mongodict import MongoDict
-
-from core.models import gridfs_storage, Corpus, Document, index_schema
+from core.models import Document
 from core.forms import DocumentForm
-from core import views
 
 __all__ = ["DocumentFormTest"]
 
