@@ -16,66 +16,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
-
-
-
-from datetime import datetime
-from StringIO import StringIO
 import shutil
 
 from django.core import management
-from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 
-from django.contrib.auth.models import User
-
 from mongodict import MongoDict
 
-from core.models import Corpus, Document
-from core.tests.utils import TestWithMongo
+from core.models import Document
+from core.tests.utils import (TestWithMongo, create_document,
+                              create_corpus_and_documents,
+                              update_documents_text_property)
 
 __all__ = ["TestSearchPage"]
 
-def _create_document(filename, contents, owner):
-    fp = StringIO()
-    fp.write(contents)
-    fp.seek(0)
-    fp.name = filename
-    fp.size = len(contents.encode('utf-8')) # seriously, Django?
-
-    document = Document(slug=filename, owner=owner,
-            date_uploaded=datetime.now(), indexed=False)
-    document.blob.save(filename, File(fp))
-    document.save()
-    return document
-
-def _create_corpus_and_documents(owner):
-    document_1_text = u'this is the first test.\n'
-    document_2_text = u'this is the second test.\n'
-    document_1 = _create_document(filename='/doc-1.txt', owner=owner,
-            contents=document_1_text)
-    document_2 = _create_document(filename='/doc-2.txt', owner=owner,
-            contents=document_2_text)
-
-    now = datetime.now()
-    corpus = Corpus(name='Test', slug='test', owner=owner,
-            date_created=now, last_modified=now)
-    corpus.save()
-    corpus.documents.add(document_1)
-    corpus.documents.add(document_2)
-    corpus.save()
-
-    return corpus, document_1, document_2
-
-def _update_documents_text_property(store):
-    for document in Document.objects.all():
-        text = document.blob.read()
-        store['id:{}:text'.format(document.id)] = text
-        store['id:{}:_properties'.format(document.id)] = ['text']
 
 class TestSearchPage(TestWithMongo):
     fixtures = ['corpus']
@@ -108,21 +66,21 @@ class TestSearchPage(TestWithMongo):
         self.assertEqual(response.status_code, 200)
 
     def test_management_command_update_index(self):
-        _create_corpus_and_documents(owner=self.user)
+        create_corpus_and_documents(owner=self.user)
 
         management.call_command('update_index')
         # should not index since there is no 'text' for these documents
         for document in Document.objects.all():
             self.assertFalse(document.indexed)
 
-        _update_documents_text_property(store=self.store)
+        update_documents_text_property(store=self.store)
         management.call_command('update_index') # now will index
         for document in Document.objects.all():
             self.assertTrue(document.indexed)
 
     def test_search_should_work(self):
-        corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
-        _update_documents_text_property(store=self.store)
+        corpus, doc_1, doc_2 = create_corpus_and_documents(owner=self.user)
+        update_documents_text_property(store=self.store)
         management.call_command('update_index')
 
         self.client.login(username="admin", password="admin")
@@ -150,9 +108,9 @@ class TestSearchPage(TestWithMongo):
                           password="admin2")
         other_user.set_password("admin2") #XXX: WTF, Pinax?
         other_user.save()
-        corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
-        corpus, doc_3, doc_4 = _create_corpus_and_documents(owner=other_user)
-        _update_documents_text_property(store=self.store)
+        corpus, doc_1, doc_2 = create_corpus_and_documents(owner=self.user)
+        corpus, doc_3, doc_4 = create_corpus_and_documents(owner=other_user)
+        update_documents_text_property(store=self.store)
         management.call_command('update_index')
 
         self.client.login(username="admin", password="admin")

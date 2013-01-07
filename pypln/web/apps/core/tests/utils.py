@@ -16,14 +16,55 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from datetime import datetime
 from mongodict import MongoDict
+from StringIO import StringIO
 
 from django.test import TestCase
 from django.conf import settings
+from django.core.files import File
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.models import User
 
+from core.models import Corpus, Document
 from core.models import gridfs_storage
+
+def create_document(filename, contents, owner):
+    fp = StringIO()
+    fp.write(contents)
+    fp.seek(0)
+    fp.name = filename
+    fp.size = len(contents.encode('utf-8')) # seriously, Django?
+
+    document = Document(slug=filename, owner=owner,
+            date_uploaded=datetime.now(), indexed=False)
+    document.blob.save(filename, File(fp))
+    document.save()
+    return document
+
+def create_corpus_and_documents(owner):
+    document_1_text = u'this is the first test.\n'
+    document_2_text = u'this is the second test.\n'
+    document_1 = create_document(filename='/doc-1.txt', owner=owner,
+            contents=document_1_text)
+    document_2 = create_document(filename='/doc-2.txt', owner=owner,
+            contents=document_2_text)
+
+    now = datetime.now()
+    corpus = Corpus(name='Test', slug='test', owner=owner,
+            date_created=now, last_modified=now)
+    corpus.save()
+    corpus.documents.add(document_1)
+    corpus.documents.add(document_2)
+    corpus.save()
+
+    return corpus, document_1, document_2
+
+def update_documents_text_property(store):
+    for document in Document.objects.all():
+        text = document.blob.read()
+        store['id:{}:text'.format(document.id)] = text
+        store['id:{}:_properties'.format(document.id)] = ['text']
 
 
 class TestWithMongo(TestCase):
