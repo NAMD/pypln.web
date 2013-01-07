@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright 2012 NAMD-EMAP-FGV
 #
@@ -15,14 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
-
-from development import *
-
-MONGODB_CONFIG = {'host': 'localhost',
-                  'port': 27017,
-                  'database': 'test_pypln',
-                  'gridfs_collection': 'files',
-                  'analysis_collection': 'analysis',
-                  'monitoring_collection': 'monitoring',
-                  }
-INDEX_PATH = os.path.join(PROJECT_ROOT, 'test_index')
+from views import *
+from forms import *
+from models import *
+from search import *

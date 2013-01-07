@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-03 13:09-0200\n"
+"POT-Creation-Date: 2013-01-07 19:40-0200\n"
 "PO-Revision-Date: 2012-08-25 20:39-0300\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
 "Language-Team: Português <namdemapfgv@gmail.com>\n"
@@ -17,15 +17,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "X-Generator: Lokalize 1.4\n"
 
-#: apps/core/views.py:56
+#: apps/core/views.py:83
 msgid "ERROR: all fields are required!"
 msgstr "ERRO: todos os campos devem ser preenchidos!"
 
-#: apps/core/views.py:65
+#: apps/core/views.py:92
 msgid "Corpus created successfully!"
 msgstr "Corpus criado com sucesso!"
 
-#: apps/core/views.py:101
+#: apps/core/views.py:128
+#, python-format
 msgid "%(count)s document uploaded successfully!"
 msgid_plural "%(count)s documents uploaded successfully!"
 msgstr[0] "%(count)s documento transferido com sucesso!"
@@ -86,7 +87,7 @@ msgstr ""
 "  "
 
 #: templates/site_base.html:8 templates/core/corpora.html:20
-#: templates/core/corpora.html.py:22 templates/core/document.html:69
+#: templates/core/corpora.html.py:22 templates/core/document.html:76
 #: templates/core/documents.html:31
 msgid "Corpora"
 msgstr "Corpora"
@@ -172,10 +173,12 @@ msgid "Corpora List"
 msgstr "Lista de Corpora"
 
 #: templates/core/corpora.html:18 templates/core/documents.html:18
+#: templates/core/search.html:15
 msgid "You are here: "
 msgstr "Você está aqui:"
 
 #: templates/core/corpora.html:19 templates/core/documents.html:19
+#: templates/core/search.html:16
 msgid "Main page"
 msgstr "Página principal"
 
@@ -203,7 +206,7 @@ msgstr "Modificado em"
 msgid "Number of Documents"
 msgstr "Total de Documentos"
 
-#: templates/core/corpora.html:43 templates/core/corpus.html:79
+#: templates/core/corpora.html:43 templates/core/corpus.html:89
 #: templates/core/documents.html:30
 msgid "Owner"
 msgstr "Proprietário"
@@ -220,43 +223,47 @@ msgstr "Você está aqui:"
 msgid "Home"
 msgstr "Página inicial"
 
-#: templates/core/corpus.html:27
+#: templates/core/corpus.html:28
 msgid "Add a document"
 msgstr "Adicione documentos"
 
-#: templates/core/corpus.html:36 templates/core/document.html:40
+#: templates/core/corpus.html:37
+msgid "Search this corpus"
+msgstr "Procurar nesse corpus"
+
+#: templates/core/corpus.html:46 templates/core/document.html:40
 msgid "Metadata"
 msgstr "Metadados"
 
-#: templates/core/corpus.html:39 templates/core/document.html:47
+#: templates/core/corpus.html:49 templates/core/document.html:47
 msgid "Owner:"
 msgstr "Proprietário:"
 
-#: templates/core/corpus.html:47
+#: templates/core/corpus.html:57
 msgid "Number of documents:"
 msgstr "Total de documentos:"
 
-#: templates/core/corpus.html:55
+#: templates/core/corpus.html:65
 msgid "Date of creation:"
 msgstr "Criado em:"
 
-#: templates/core/corpus.html:63
+#: templates/core/corpus.html:73
 msgid "Last modified on:"
 msgstr "Modificado em:"
 
-#: templates/core/corpus.html:71
+#: templates/core/corpus.html:81
 msgid "List of Documents"
 msgstr "Relação de Documentos"
 
-#: templates/core/corpus.html:76 templates/core/documents.html:27
+#: templates/core/corpus.html:86 templates/core/documents.html:27
 msgid "Filename"
 msgstr "Nome do arquivo"
 
-#: templates/core/corpus.html:77 templates/core/documents.html:28
+#: templates/core/corpus.html:87 templates/core/documents.html:28
 msgid "Size"
 msgstr "Tamanho"
 
-#: templates/core/corpus.html:78 templates/core/documents.html:29
+#: templates/core/corpus.html:88 templates/core/documents.html:29
 msgid "Uploaded on"
 msgstr "Transferido em"
 
@@ -276,7 +283,19 @@ msgstr "Tamanho:"
 msgid "Upload date:"
 msgstr "Data da transferência:"
 
-#: templates/core/document.html:66
+#: templates/core/document.html:59
+msgid "Indexed:"
+msgstr "Indexado:"
+
+#: templates/core/document.html:62
+msgid "Yes"
+msgstr "Sim"
+
+#: templates/core/document.html:62
+msgid "No"
+msgstr "Não"
+
+#: templates/core/document.html:73
 msgid "Download the original file"
 msgstr "Fazer download do arquivo original"
 
@@ -287,7 +306,7 @@ msgstr "Relação de Documentos"
 
 #: templates/core/homepage.html:4
 msgid "Welcome"
-msgstr "Bem-vindo!"
+msgstr "Bem-vindo"
 
 #: templates/core/homepage.html:17
 msgid "Welcome to PyPLN"
@@ -321,7 +340,7 @@ msgstr ""
 
 #: templates/core/homepage.html:30
 msgid "Start using it!"
-msgstr ""
+msgstr "Comece a usar!"
 
 #: templates/core/homepage.html:32
 #, python-format
@@ -347,7 +366,7 @@ msgstr ""
 
 #: templates/core/homepage.html:40
 msgid "How to use it"
-msgstr ""
+msgstr "Como usar"
 
 #: templates/core/homepage.html:42
 #, python-format
@@ -387,7 +406,7 @@ msgstr ""
 
 #: templates/core/homepage.html:65
 msgid "Searching"
-msgstr ""
+msgstr "Procurando"
 
 #: templates/core/homepage.html:66
 msgid ""
@@ -397,6 +416,41 @@ msgid ""
 "p>\n"
 "                "
 msgstr ""
+
+#: templates/core/search.html:4 templates/core/search.html.py:22
+msgid "Search documents"
+msgstr "Procurar documentos:"
+
+#: templates/core/search.html:17 templates/core/search.html.py:26
+msgid "Search"
+msgstr "Buscar"
+
+#: templates/core/search.html:31
+msgid "No results found for"
+msgstr "Nenhum resultado encontrado para"
+
+#: templates/core/search.html:33
+msgid "Results"
+msgstr "Resultados"
+
+#: templates/core/search.html:35
+#, python-format
+msgid ""
+"\n"
+"    1 document found\n"
+"  "
+msgid_plural ""
+"\n"
+"    %(counter)s documents found\n"
+"  "
+msgstr[0] ""
+"\n"
+"    1 documento encontrado\n"
+"  "
+msgstr[1] ""
+"\n"
+"    %(counter)s documentos encontrados\n"
+"  "
 
 #: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"

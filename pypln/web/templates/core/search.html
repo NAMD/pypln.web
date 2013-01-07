@@ -19,24 +19,30 @@
     &gt; "<a href="{% url search %}?query={{ query }}">{{ query }}</a>"
     {% endif %}
 </div>
-<h2>Search documents</h2>
+<h2>{% trans "Search documents" %}</h2>
 
 <form id="search_form" method="GET" action="{% url search %}">
   <input type="text" name="query" value="{{ query }}" />
-  <input type="button" value="Submit" />
+  <input type="submit" value="{% trans 'Search' %}" />
 </form>
 
 {% if query %}
   {% if not results %}
   {% trans "No results found for" %} "{{ query }}".
   {% else %}
-  <h2>Results</h2>
-  <h3>{{ results|length }} {% trans "documents found" %}</h3>
+  <h2>{% trans "Results" %}</h2>
+  <h3>
+  {% blocktrans count counter=results|length %}
+    1 document found
+  {% plural %}
+    {{ counter }} documents found
+  {% endblocktrans %}
+  </h3>
   {% for result in results %}
   <div class="search_result">
     <div>
       <a href="{% url document_page result.slug %}">{{ result.file_name }}</a>
-      (Corpora: {% for corpus in result.corpus_set.all %}<a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+      (Corpus: {% for corpus in result.corpus_set.all %}<a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
     </div>
     <div>
       {{ result.concordance|safe }}
