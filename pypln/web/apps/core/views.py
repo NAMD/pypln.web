@@ -44,8 +44,12 @@ from pypln.web.apps.utils import LANGUAGES, create_pipeline
 def _slug(filename):
     return '.'.join([slugify(x) for x in filename.split('.')])
 
-def _search_filtering_by_owner(index, query, owner):
-    permitted_documents = Document.objects.filter(owner=owner)
+def _search_filtering_by_owner(index, query, owner, corpus=None):
+    if corpus is not None:
+        permitted_documents = Document.objects.filter(owner=owner,
+                                                      corpus=corpus)
+    else:
+        permitted_documents = Document.objects.filter(owner=owner)
     permitted_documents_by_id = {doc.id: doc for doc in permitted_documents}
     permitted_ids = [doc.id for doc in permitted_documents]
 
@@ -224,9 +228,15 @@ def document_download(request, document_slug):
 @login_required
 def search(request):
     query = request.GET.get('query', '').strip()
+    corpus_slug = request.GET.get('corpus', '').strip()
+    corpus = None
+    if corpus_slug:
+        corpus = Corpus.objects.filter(slug=corpus_slug)
     data = {'results': [], 'query': query}
     if query:
         index = WhooshIndex(settings.INDEX_PATH, index_schema)
-        data['results'] = _search_filtering_by_owner(index, query, request.user)
+        data['results'] = _search_filtering_by_owner(index=index, query=query,
+                                                     owner=request.user,
+                                                     corpus=corpus)
     return render_to_response('core/search.html', data,
                               context_instance=RequestContext(request))
