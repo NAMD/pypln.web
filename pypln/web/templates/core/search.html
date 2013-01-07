@@ -31,7 +31,13 @@
   {% trans "No results found for" %} "{{ query }}".
   {% else %}
   <h2>Results</h2>
-  <h3>{{ results|length }} {% trans "documents found" %}</h3>
+  <h3>
+  {% blocktrans count counter=results|length %}
+    1 document found
+  {% plural %}
+    {{ counter }} documents found
+  {% endblocktrans %}
+  </h3>
   {% for result in results %}
   <div class="search_result">
     <div>
