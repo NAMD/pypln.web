@@ -25,3 +25,4 @@ MONGODB_CONFIG = {'host': 'localhost',
                   'analysis_collection': 'analysis',
                   'monitoring_collection': 'monitoring',
                   }
+INDEX_PATH = os.path.join(PROJECT_ROOT, 'test_index')

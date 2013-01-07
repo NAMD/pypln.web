@@ -41,7 +41,10 @@ from django.conf import settings
 
 from django.contrib.auth.models import User
 
-from core.models import gridfs_storage, Corpus, Document
+from django.test.client import Client
+from mongodict import MongoDict
+
+from core.models import gridfs_storage, Corpus, Document, index_schema
 from core.forms import DocumentForm
 from core import views
 
@@ -302,15 +305,6 @@ class DocumentModelTest(TestCase):
         doc.save()
         self.assertEqual(doc.slug, "42.txt")
 
-from django.test.client import Client
-from mongodict import MongoDict
-
-from pypln.web.apps.core.models import Corpus, Document, index_schema
-
-
-USERNAME = 'testuser'
-PASSWORD = 'toostrong'
-EMAIL = 'test@user.com'
 
 def _create_document(filename, contents, owner):
     fp = StringIO()
@@ -350,29 +344,25 @@ def _update_documents_text_property(store):
         store['id:{}:_properties'.format(document.id)] = ['text']
 
 class TestSearchPage(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        settings.MONGODB_CONFIG = {'host': 'localhost',
-                                   'port': 27017,
-                                   'database': 'pypln_test',
-                                   'gridfs_collection': 'files',
-                                   'analysis_collection': 'analysis',
-                                   'monitoring_collection': 'monitoring',
-        }
-        settings.INDEX_PATH += '_test'
-        cls.connection = pymongo.Connection(host=settings.MONGODB_CONFIG['host'],
-                port=settings.MONGODB_CONFIG['port'])
-        cls.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                              port=settings.MONGODB_CONFIG['port'],
-                              database=settings.MONGODB_CONFIG['database'],
-                              collection=settings.MONGODB_CONFIG['analysis_collection'])
+    fixtures = ['corpus']
 
     def setUp(self):
-        self.connection.drop_database(settings.MONGODB_CONFIG['database'])
-        self.user = User(username=USERNAME, email=EMAIL, password=PASSWORD)
-        self.user.set_password(PASSWORD) #XXX: WTF, Pinax?
-        self.user.save()
+        if 'test' not in gridfs_storage.database:
+            error_message = ("We expect the mongodb database name to contain the "
+                "string 'test' to make sure you don't mess up your production "
+                "database. Are you sure you're using settings.test to run these "
+                "tests?")
+            raise ImproperlyConfigured(error_message)
+
+        gridfs_storage._connection.drop_database(gridfs_storage.database)
+
+        self.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
+                               port=settings.MONGODB_CONFIG['port'],
+                               database=settings.MONGODB_CONFIG['database'],
+                               collection=settings.MONGODB_CONFIG['analysis_collection'])
+
+        self.user = User.objects.all()[0]
+
         self.search_url = reverse('search')
         try:
             shutil.rmtree(settings.INDEX_PATH)
@@ -380,7 +370,7 @@ class TestSearchPage(TestCase):
             pass
 
     def tearDown(self):
-        self.connection.drop_database(settings.MONGODB_CONFIG['database'])
+        gridfs_storage._connection.drop_database(gridfs_storage.database)
         try:
             shutil.rmtree(settings.INDEX_PATH)
         except OSError:
@@ -393,7 +383,7 @@ class TestSearchPage(TestCase):
         self.assertEqual(response.get('Location', ''),
                          'http://testserver/account/login/?next=/search')
 
-        self.client.login(username=USERNAME, password=PASSWORD)
+        self.client.login(username="admin", password="admin")
         response = self.client.get(self.search_url)
         self.assertEqual(response.status_code, 200)
 
@@ -415,7 +405,7 @@ class TestSearchPage(TestCase):
         _update_documents_text_property(store=self.store)
         management.call_command('update_index')
 
-        self.client.login(username=USERNAME, password=PASSWORD)
+        self.client.login(username="admin", password="admin")
         response = self.client.get(self.search_url, data={'query': 'first'})
         self.assertTrue('results' in response.context)
         results = response.context['results']
@@ -436,16 +426,16 @@ class TestSearchPage(TestCase):
         self.assertEqual(results[1], doc_2)
 
     def test_search_should_only_return_documents_owned_by_this_user(self):
-        other_user = User(username=USERNAME + '2', email='some@email.com',
-                          password=PASSWORD + '2')
-        other_user.set_password(PASSWORD + '2') #XXX: WTF, Pinax?
+        other_user = User(username="admin2", email='some@email.com',
+                          password="admin2")
+        other_user.set_password("admin2") #XXX: WTF, Pinax?
         other_user.save()
         corpus, doc_1, doc_2 = _create_corpus_and_documents(owner=self.user)
         corpus, doc_3, doc_4 = _create_corpus_and_documents(owner=other_user)
         _update_documents_text_property(store=self.store)
         management.call_command('update_index')
 
-        self.client.login(username=USERNAME, password=PASSWORD)
+        self.client.login(username="admin", password="admin")
         response = self.client.get(self.search_url, data={'query': 'first'})
         results = response.context['results']
         self.assertEqual(results[0], doc_1)
@@ -458,7 +448,7 @@ class TestSearchPage(TestCase):
         self.assertEqual(results[0], doc_1)
         self.assertEqual(results[1], doc_2)
 
-        self.client.login(username=USERNAME + '2', password=PASSWORD + '2')
+        self.client.login(username="admin2", password="admin2")
         response = self.client.get(self.search_url, data={'query': 'first'})
         results = response.context['results']
         self.assertEqual(results[0], doc_3)
