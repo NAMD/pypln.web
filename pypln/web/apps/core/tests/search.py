@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+
 import shutil
 
 from django.core import management
@@ -100,8 +101,7 @@ class TestSearchPage(TestWithMongo):
         self.assertTrue('results' in response.context)
         results = response.context['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], doc_1)
-        self.assertEqual(results[1], doc_2)
+        self.assertEqual(set(results), set([doc_1, doc_2]))
 
     def test_search_should_only_return_documents_owned_by_this_user(self):
         other_user = User(username="admin2", email='some@email.com',
@@ -123,8 +123,7 @@ class TestSearchPage(TestWithMongo):
         response = self.client.get(self.search_url, data={'query': 'test'})
         results = response.context['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], doc_1)
-        self.assertEqual(results[1], doc_2)
+        self.assertEqual(set(results), set([doc_1, doc_2]))
 
         self.client.login(username="admin2", password="admin2")
         response = self.client.get(self.search_url, data={'query': 'first'})
@@ -136,7 +135,7 @@ class TestSearchPage(TestWithMongo):
         response = self.client.get(self.search_url, data={'query': 'test'})
         results = response.context['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0], doc_3)
-        self.assertEqual(results[1], doc_4)
+        self.assertEqual(set(results), set([doc_3, doc_4]))
+
 
     #TODO: test all breadcrumbs
