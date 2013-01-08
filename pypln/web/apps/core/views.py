@@ -248,7 +248,7 @@ def search(request):
     corpus = None
     if corpus_slug:
         corpus = Corpus.objects.filter(slug=corpus_slug)[0]
-        data['corpus'] = corpus.name
+        data['corpus'] = corpus
     if query:
         index = WhooshIndex(settings.INDEX_PATH, index_schema)
         data['results'] = _search_filtering_by_owner(index=index, query=query,

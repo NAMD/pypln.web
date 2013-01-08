@@ -15,16 +15,20 @@
     {% trans "You are here: " %}
     <a href="{% url home %}">{% trans "Main page" %}</a> &gt;
     {% if corpus %}
-    <a href="{% url corpus_page corpus %}">Corpus {{ corpus }}</a> &gt;
+    <a href="{% url corpus_page corpus.slug %}">Corpus {{ corpus.name }}</a> &gt;
     {% else %}
     <a href="{% url document_list %}">{% trans "Documents" %}</a> &gt;
     {% endif %}
     {% if query %}
-    <a href="{% url search %}?query={{ query }}{% if corpus %}&corpus={{ corpus }}{% endif %}">{% trans "Search for" %}
+    <a href="{% url search %}?query={{ query }}{% if corpus %}&corpus={{ corpus.slug }}{% endif %}">{% trans "Search for" %}
       "{{ query }}"</a>
     {% endif %}
 </div>
+{% if not corpus %}
 <h2>{% trans "Search documents" %}</h2>
+{% else %}
+<h2>{% trans "Search documents in" %} corpus <a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a></h2>
+{% endif %}
 
 <form id="search_form" method="GET" action="{% url search %}">
   <input type="text" name="query" value="{{ query }}" />
@@ -35,7 +39,11 @@
   {% if not results %}
   {% trans "No results found for" %} "{{ query }}".
   {% else %}
+  {% if not corpus %}
   <h2>{% trans "Results" %}</h2>
+  {% else %}
+  <h2>{% trans "Results" %} ({% trans "corpus" %} <a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a>)</h2>
+  {% endif %}
   <h3>
   {% blocktrans count counter=results|length %}
     1 document found
@@ -47,7 +55,9 @@
   <div class="search_result">
     <div>
       <a href="{% url document_page result.slug %}">{{ result.file_name }}</a>
-      (Corpus: {% for corpus in result.corpus_set.all %}<a href="{% url corpus_page corpus.slug %}">{{ corpus.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+      {% if not corpus %}
+      {% trans "in corpus" %} {% for corpus_object in result.corpus_set.all %}<a href="{% url corpus_page corpus_object.slug %}">{{ corpus_object.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+      {% endif %}
     </div>
     <div>
       {{ result.concordance|safe }}
