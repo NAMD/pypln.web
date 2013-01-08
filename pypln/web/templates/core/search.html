@@ -14,9 +14,14 @@
 <div class="breadcrumb">
     {% trans "You are here: " %}
     <a href="{% url home %}">{% trans "Main page" %}</a> &gt;
-    <a href="{% url search %}">{% trans "Search" %}</a>
+    {% if corpus %}
+    <a href="{% url corpus_page corpus %}">Corpus {{ corpus }}</a> &gt;
+    {% else %}
+    <a href="{% url document_list %}">{% trans "Documents" %}</a> &gt;
+    {% endif %}
     {% if query %}
-    &gt; "<a href="{% url search %}?query={{ query }}">{{ query }}</a>"
+    <a href="{% url search %}?query={{ query }}{% if corpus %}&corpus={{ corpus }}{% endif %}">{% trans "Search for" %}
+      "{{ query }}"</a>
     {% endif %}
 </div>
 <h2>{% trans "Search documents" %}</h2>
