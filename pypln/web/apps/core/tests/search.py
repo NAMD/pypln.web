@@ -137,5 +137,28 @@ class TestSearchPage(TestWithMongo):
         self.assertEqual(len(results), 2)
         self.assertEqual(set(results), set([doc_3, doc_4]))
 
+    def test_search_should_filter_by_corpus(self):
+        other_user = User(username="admin2", email='some@email.com',
+                          password="admin2")
+        other_user.set_password("admin2") #XXX: WTF, Pinax?
+        other_user.save()
+        corpus_1, doc_1, doc_2 = create_corpus_and_documents(owner=self.user)
+        corpus_2, doc_3, doc_4 = create_corpus_and_documents(owner=other_user)
+        corpus_3, doc_5, doc_6 = create_corpus_and_documents(owner=self.user)
+        update_documents_text_property(store=self.store)
+        management.call_command('update_index')
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(self.search_url, data={'query': 'first'})
+        results = response.context['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(set(results), set([doc_1, doc_5]))
+
+        self.client.login(username="admin", password="admin")
+        query_data = {'query': 'first', 'corpus': corpus_1.slug}
+        response = self.client.get(self.search_url, data=query_data)
+        results = response.context['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], doc_1)
 
     #TODO: test all breadcrumbs
