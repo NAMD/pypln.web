@@ -19,6 +19,13 @@
     <a href="{% url home %}">{% trans "Main page" %}</a> &gt;
     <a href="{% url document_list %}">{% trans "Document List" %} </a>
 </div>
+
+<h2>{% trans "Search your documents" %}</h2>
+<form method="GET" action="{% url search %}">
+  <input type="text" name="query" />
+  <input type="submit" value="{% trans 'Search' %}" />
+</form>
+
 <h2>{% trans "Document List" %}</h2>
 
     <table id="table_documents">

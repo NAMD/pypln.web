@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+
+import random
+
 from datetime import datetime
 from mongodict import MongoDict
 from StringIO import StringIO
@@ -43,16 +46,20 @@ def create_document(filename, contents, owner):
     return document
 
 def create_corpus_and_documents(owner):
+    doc1_filename = '/test-doc-{}.txt'.format(random.randint(0, 1000))
+    doc2_filename = '/test-doc-{}.txt'.format(random.randint(0, 1000))
     document_1_text = u'this is the first test.\n'
     document_2_text = u'this is the second test.\n'
-    document_1 = create_document(filename='/doc-1.txt', owner=owner,
-            contents=document_1_text)
-    document_2 = create_document(filename='/doc-2.txt', owner=owner,
-            contents=document_2_text)
+    document_1 = create_document(filename=doc1_filename, owner=owner,
+                                 contents=document_1_text)
+    document_2 = create_document(filename=doc2_filename, owner=owner,
+                                 contents=document_2_text)
 
+    corpus_name = 'Test Corpus {}'.format(random.randint(0, 1000))
+    corpus_slug = corpus_name.lower().replace(' ', '-')
     now = datetime.now()
-    corpus = Corpus(name='Test', slug='test', owner=owner,
-            date_created=now, last_modified=now)
+    corpus = Corpus(name=corpus_name, slug=corpus_slug, owner=owner,
+                    date_created=now, last_modified=now)
     corpus.save()
     corpus.documents.add(document_1)
     corpus.documents.add(document_2)

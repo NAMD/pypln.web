@@ -243,11 +243,12 @@ def document_download(request, document_slug):
 @login_required
 def search(request):
     query = request.GET.get('query', '').strip()
+    data = {'results': [], 'query': query}
     corpus_slug = request.GET.get('corpus', '').strip()
     corpus = None
     if corpus_slug:
-        corpus = Corpus.objects.filter(slug=corpus_slug)
-    data = {'results': [], 'query': query}
+        corpus = Corpus.objects.filter(slug=corpus_slug)[0]
+        data['corpus'] = corpus
     if query:
         index = WhooshIndex(settings.INDEX_PATH, index_schema)
         data['results'] = _search_filtering_by_owner(index=index, query=query,
