@@ -31,7 +31,7 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 
 from core.models import Corpus, Document, index_schema
@@ -76,9 +76,12 @@ def index(request):
 
 @login_required
 def corpora_list(request, as_json=False):
+    #TODO: this view needs an urgent refactoring. This is code is really
+    # confusing and there are a lot of duplications. We should do as we did
+    # with the document upload process, and try to move functionality to the
+    # form.
     if request.method == 'POST':
         form = CorpusForm(request.POST)
-        #TODO: do not permit to insert duplicated corpus
         if not form.is_valid():
             request.user.message_set.create(message=_('ERROR: all fields are '
                                                       'required!'))
@@ -88,6 +91,15 @@ def corpora_list(request, as_json=False):
             new_corpus.owner = request.user
             new_corpus.date_created = datetime.datetime.now()
             new_corpus.last_modified = datetime.datetime.now()
+            try:
+                new_corpus.validate_unique()
+            except ValidationError as exc:
+                messages.error(request, exc.message_dict['__all__'][0])
+                data = {'corpora': Corpus.objects.filter(owner=request.user.id),
+                        'form': form}
+                return render_to_response('core/corpora.html', data,
+                        context_instance=RequestContext(request))
+
             new_corpus.save()
             request.user.message_set.create(message=_('Corpus created '
                                                       'successfully!'))
