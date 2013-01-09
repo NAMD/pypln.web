@@ -36,3 +36,11 @@ label {
     padding-left: 20px;
     margin-left: -25px;
 }
+
+.messages>.error {
+    background-color: #e72f2f;
+    color: #000;
+    padding: 10px;
+    padding-left: 20px;
+    margin-left: -25px;
+}
