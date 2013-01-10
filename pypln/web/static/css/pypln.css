@@ -44,3 +44,11 @@ label {
     padding-left: 20px;
     margin-left: -25px;
 }
+
+.form-inline>#id_blob {
+    width: 80%;
+}
+
+.form-inline>.btn {
+    float: right;
+}

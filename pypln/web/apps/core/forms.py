@@ -28,7 +28,8 @@ class CorpusForm(ModelForm):
         fields = ('name', 'description')
 
 class MultipleFileField(FileField):
-    widget = ClearableFileInput(attrs={'multiple': 'multiple'})
+    widget = ClearableFileInput(attrs={'multiple': 'multiple', 'size': '30'})
+
 
 class DocumentForm(ModelForm):
     """
