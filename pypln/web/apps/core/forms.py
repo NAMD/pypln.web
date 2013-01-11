@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.forms import ModelForm, FileField
+from django.forms import ModelForm, FileField, ValidationError
 from django.forms.models import save_instance
 from core.models import Corpus, Document
 from django.forms.widgets import ClearableFileInput
+from django.utils.translation import ugettext as _
 
 class CorpusForm(ModelForm):
     class Meta:
@@ -45,6 +46,13 @@ class DocumentForm(ModelForm):
     def __init__(self, owner, *args, **kwargs):
         self.owner = owner
         return super(DocumentForm, self).__init__(*args, **kwargs)
+
+    def clean_blob(self):
+        blob = self.cleaned_data['blob']
+        if len(blob.name) >= 100:
+            raise ValidationError(_("File names need to be shorter than 100 "
+                                    "characters."))
+        return blob
 
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)

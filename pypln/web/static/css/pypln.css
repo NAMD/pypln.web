@@ -44,3 +44,10 @@ label {
     padding-left: 20px;
     margin-left: -25px;
 }
+
+.errorlist {
+    list-style: none;
+}
+.errorlist>li {
+    color: #e72f2f;
+}
