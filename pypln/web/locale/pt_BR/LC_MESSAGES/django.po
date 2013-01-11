@@ -1,21 +1,21 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Renato Rocha Souza <rsouza.fgv@gmail.com>, 2012.
 #
+# Renato Rocha Souza <rsouza.fgv@gmail.com>, 2012, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-03 13:11-0200\n"
-"PO-Revision-Date: 2012-08-25 20:39-0300\n"
+"PO-Revision-Date: 2013-01-11 16:15-0200\n"
 "Last-Translator: Renato Rocha Souza <rsouza.fgv@gmail.com>\n"
-"Language-Team: Português <namdemapfgv@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Lokalize 1.4\n"
+"X-Generator: Lokalize 1.5\n"
 
 #: apps/core/views.py:56
 msgid "ERROR: all fields are required!"
@@ -69,191 +69,191 @@ msgstr "website"
 
 #: apps/utils/tagset.py:22
 msgid "Dollar"
-msgstr ""
+msgstr "Sinal de \"Dollar\""
 
 #: apps/utils/tagset.py:24
 msgid "Closing quotation mark"
-msgstr ""
+msgstr "Fecha-aspas "
 
 #: apps/utils/tagset.py:27 apps/utils/tagset.py:34
 msgid "Opening parenthesis"
-msgstr ""
+msgstr "Abre parênteses"
 
 #: apps/utils/tagset.py:30 apps/utils/tagset.py:36
 msgid "Closing parenthesis"
-msgstr ""
+msgstr "Fecha parênteses"
 
 #: apps/utils/tagset.py:32
 msgid "Comma"
-msgstr ""
+msgstr "Vírgula"
 
 #: apps/utils/tagset.py:33
 msgid "Dot"
-msgstr ""
+msgstr "Ponto"
 
 #: apps/utils/tagset.py:38
 msgid "Dash"
-msgstr ""
+msgstr "Traço"
 
 #: apps/utils/tagset.py:40
 msgid "Sentence terminator"
-msgstr ""
+msgstr "Marcador de fim-de-sentença"
 
 #: apps/utils/tagset.py:43
 msgid "Colon or ellipsis"
-msgstr ""
+msgstr "Dois pontos ou reticências"
 
 #: apps/utils/tagset.py:46
 msgid "Conjunction, coordinating"
-msgstr ""
+msgstr "Conjunção coordenativa"
 
 #: apps/utils/tagset.py:49
 msgid "Numeral, cardinal"
-msgstr ""
+msgstr "Numeral cardinal"
 
 #: apps/utils/tagset.py:51
 msgid "Determiner"
-msgstr ""
+msgstr "Determinantes"
 
 #: apps/utils/tagset.py:53
 msgid "Existential there"
-msgstr ""
+msgstr "\"There\" no sentido existencial"
 
 #: apps/utils/tagset.py:55
 msgid "Foreign word"
-msgstr ""
+msgstr "Neologismo"
 
 #: apps/utils/tagset.py:57
 msgid "Preposition or conjunction, subordinating"
-msgstr ""
+msgstr "Preposição ou conjunção, subordinativa"
 
 #: apps/utils/tagset.py:60
 msgid "Adjective or numeral, ordinal"
-msgstr ""
+msgstr "Adjetivo ou numeral, ordinal"
 
 #: apps/utils/tagset.py:63
 msgid "Adjective, comparative"
-msgstr ""
+msgstr "Adjetivo, comparativo"
 
 #: apps/utils/tagset.py:66
 msgid "Adjective, superlative"
-msgstr ""
+msgstr "Adjetivo, superlativo"
 
 #: apps/utils/tagset.py:69
 msgid "List item marker"
-msgstr ""
+msgstr "Marcador de listas"
 
 #: apps/utils/tagset.py:72
 msgid "Modal auxiliary"
-msgstr ""
+msgstr "Modal auxiliar"
 
 #: apps/utils/tagset.py:75
 msgid "Noun, common, singular or mass"
-msgstr ""
+msgstr "Substantivo comum, singular ou plural"
 
 #: apps/utils/tagset.py:78 apps/utils/tagset.py:87
 msgid "Noun, proper, singular"
-msgstr ""
+msgstr "Nome próprio, singular"
 
 #: apps/utils/tagset.py:81 apps/utils/tagset.py:90
 msgid "Noun, proper, plural"
-msgstr ""
+msgstr "Nome próprio, plural"
 
 #: apps/utils/tagset.py:84
 msgid "Noun, common, plural"
-msgstr ""
+msgstr "Substantivo comum, plural"
 
 #: apps/utils/tagset.py:93
 msgid "Pre-determiner"
-msgstr ""
+msgstr "Pré-determinante"
 
 #: apps/utils/tagset.py:96
 msgid "Genitive marker"
-msgstr ""
+msgstr "Indicador de Genitivo"
 
 #: apps/utils/tagset.py:99 apps/utils/tagset.py:105
 msgid "Pronoun, personal"
-msgstr ""
+msgstr "Pronome pessoal"
 
 #: apps/utils/tagset.py:102 apps/utils/tagset.py:108
 msgid "Pronoun, possessive"
-msgstr ""
+msgstr "Pronome possessivo"
 
 #: apps/utils/tagset.py:110
 msgid "Adverb"
-msgstr ""
+msgstr "Advérbio"
 
 #: apps/utils/tagset.py:112
 msgid "Adverb, comparative"
-msgstr ""
+msgstr "Advérbio comparativo"
 
 #: apps/utils/tagset.py:115
 msgid "Adverb, superlative"
-msgstr ""
+msgstr "Advérbio superlativo"
 
 #: apps/utils/tagset.py:117
 msgid "Particle"
-msgstr ""
+msgstr "Partícula"
 
 #: apps/utils/tagset.py:118
 msgid "Symbol"
-msgstr ""
+msgstr "Símbolo"
 
 #: apps/utils/tagset.py:120
 msgid "\"to\" as preposition or infinitive marker"
-msgstr ""
+msgstr "\"to\" como preposição ou indicador de infinitivo"
 
 #: apps/utils/tagset.py:122
 msgid "Interjection"
-msgstr ""
+msgstr "Interjeição"
 
 #: apps/utils/tagset.py:124
 msgid "Verb, base form"
-msgstr ""
+msgstr "Verbo em forma canônica"
 
 #: apps/utils/tagset.py:127
 msgid "Verb, past tense"
-msgstr ""
+msgstr "Verbo (past tense)"
 
 #: apps/utils/tagset.py:130
 msgid "Verb, present participle or gerund"
-msgstr ""
+msgstr "Verbo (present participle ou gerúndio)"
 
 #: apps/utils/tagset.py:133
 msgid "Verb, past participle"
-msgstr ""
+msgstr "Verbo (past participle)"
 
 #: apps/utils/tagset.py:136
 msgid "Verb, present tense, not 3rd person singular"
-msgstr ""
+msgstr "Verbo (present tense, exceto 3a pessoa do singular)"
 
 #: apps/utils/tagset.py:139
 msgid "Verb, present tense, 3rd person singular"
-msgstr ""
+msgstr "Verbo (present tense, 3a pessoa do singular)"
 
 #: apps/utils/tagset.py:142
 msgid "Wh-determiner"
-msgstr ""
+msgstr "Determinante iniciado em \"Wh\" ou \"How\""
 
 #: apps/utils/tagset.py:144
 msgid "Wh-pronoun"
-msgstr ""
+msgstr "Pronome iniciado em \"Wh\" ou \"How\""
 
 #: apps/utils/tagset.py:146
 msgid "Wh-pronoun, possessive"
-msgstr ""
+msgstr "Pronome possessivo iniciado em \"Wh\" ou \"How\""
 
 #: apps/utils/tagset.py:148
 msgid "Wh-adverb"
-msgstr ""
+msgstr "Advérbio iniciado em \"Wh\" ou \"How\""
 
 #: apps/utils/tagset.py:150
 msgid "Opening quotation mark"
-msgstr ""
+msgstr "Abre-aspas"
 
 #: apps/utils/tagset.py:152
 msgid "Hash"
-msgstr ""
+msgstr "Cerquilha"
 
 #: templates/404.html:4
 msgid "Error 404 - Page not found"
@@ -305,21 +305,24 @@ msgstr "O que deseja fazer agora?"
 
 #: templates/about/what_next.html:15
 msgid "verify an email address"
-msgstr ""
+msgstr "Verifica um endereço de e-mail"
 
 #: templates/about/what_next.html:16
 msgid ""
 "so you can receive notifications, reset your password and so people can find "
 "you more easily."
 msgstr ""
+"de forma que se possa receber notificações, redefinir a senha e permitir que "
+"seja "
+"contactado mais facilmente."
 
 #: templates/about/what_next.html:18
 msgid "fill out your profile"
-msgstr ""
+msgstr "Preencha seu perfil"
 
 #: templates/about/what_next.html:19
 msgid "to tell the world a little about yourself."
-msgstr ""
+msgstr "e conte um pouco mais sobre você."
 
 #: templates/about/what_next.html:21
 msgid "add a corpus"
@@ -327,19 +330,19 @@ msgstr "Adicionar Corpus"
 
 #: templates/about/what_next.html:22
 msgid "to start analyzing your documents."
-msgstr ""
+msgstr "para começar a analisar seus documentos"
 
 #: templates/about/what_next.html:27
 msgid "invite more people to the site"
-msgstr ""
+msgstr "convide mais pessoas a usarem a ferramenta"
 
 #: templates/about/what_next.html:27
 msgid "[admin only]"
-msgstr ""
+msgstr "[área restrita]"
 
 #: templates/about/what_next.html:28
 msgid "so more people can share in the fun."
-msgstr ""
+msgstr "de forma que também possam se beneficiar."
 
 #: templates/about/what_next.html:38
 #, python-format
@@ -410,7 +413,7 @@ msgstr "Página inicial"
 
 #: templates/core/corpus.html:27
 msgid "Add a document"
-msgstr "Adicione documentos"
+msgstr "Adicione um documento"
 
 #: templates/core/corpus.html:36 templates/core/document.html:40
 msgid "Metadata"
@@ -426,7 +429,7 @@ msgstr "Total de documentos:"
 
 #: templates/core/corpus.html:55
 msgid "Date of creation:"
-msgstr "Criado em:"
+msgstr "Data de criação:"
 
 #: templates/core/corpus.html:63
 msgid "Last modified on:"
@@ -509,7 +512,7 @@ msgstr ""
 
 #: templates/core/homepage.html:30
 msgid "Start using it!"
-msgstr ""
+msgstr "Comece logo a utilizar!"
 
 #: templates/core/homepage.html:32
 #, python-format
@@ -535,7 +538,7 @@ msgstr ""
 
 #: templates/core/homepage.html:40
 msgid "How to use it"
-msgstr ""
+msgstr "Como usar"
 
 #: templates/core/homepage.html:42
 #, python-format
@@ -562,7 +565,7 @@ msgstr ""
 
 #: templates/core/homepage.html:57
 msgid "Document analysis"
-msgstr "Relação de Documentos"
+msgstr "Análise de Documentos"
 
 #: templates/core/homepage.html:58
 msgid ""
@@ -572,10 +575,16 @@ msgid ""
 "                  analysis in your documents.</p>\n"
 "                "
 msgstr ""
+"\n"
+"                <p>Como funcionalidades principais, você pode  visualizar "
+"características como\n"
+"                  as categorias morfossintáticas, estatísticas sobre "
+"frequências de palavras, dentre outras\n"
+"                  análises de seus documentos.</p>\n"
 
 #: templates/core/homepage.html:65
 msgid "Searching"
-msgstr ""
+msgstr "Buscando"
 
 #: templates/core/homepage.html:66
 msgid ""
@@ -585,6 +594,11 @@ msgid ""
 "p>\n"
 "                "
 msgstr ""
+"\n"
+"                <p>O PyPLN oferece busca em texto completo sobre seu corpus\n"
+"                  de forma a permitir que informações sejam  encontradas, "
+"visualizadas e analisada.</"
+"p>\n"
 
 #: templates/core/visualizations/pos-highlighter.html:3
 msgid "Controls"
@@ -604,7 +618,7 @@ msgstr "Texto marcado"
 #: templates/core/visualizations/pos-highlighter.html:43
 msgid "We could not do the part-of-speech tagging for this language, sorry."
 msgstr ""
-"Desculpe-nos, não conseguimos fazer a marcação morfossintática paraesta "
+"Desculpe-nos, não é possível fazer a marcação morfossintática para esta "
 "língua."
 
 #: templates/core/visualizations/statistics.html:6
