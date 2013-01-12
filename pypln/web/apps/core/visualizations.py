@@ -31,7 +31,6 @@ def _token_frequency_histogram(data):
     for key, value in freqdist:
         values[value] += 1
     data['values'] = [list(x) for x in values.most_common()]
-    del data['freqdist']
     data['momentum_1'] = '{:.2f}'.format(data['momentum_1'])
     data['momentum_2'] = '{:.2f}'.format(data['momentum_2'])
     data['momentum_3'] = '{:.2f}'.format(data['momentum_3'])

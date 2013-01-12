@@ -1,2 +1,3 @@
-"document_name","mean_token_distribution","variance_token_distribution","skewness_token_distribution","kurtosis_token_distribution",
-"{{ document.slug|addslashes }}","{{ momentum_1|addslashes }}","{{ momentum_2|addslashes }}","{{ momentum_3|addslashes }}","{{ momentum_4|addslashes }}"
+"token","count"
+{% for pair in freqdist %}"{{ pair|first|addslashes }}","{{ pair|last|addslashes}}"
+{% endfor %}
