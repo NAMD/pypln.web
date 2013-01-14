@@ -112,3 +112,13 @@ class DocumentFormTest(TestCase):
         doc1, doc2 = Document.objects.all()
         self.assertEqual(doc1.blob.read(), "Bring us a shrubbery!!")
         self.assertEqual(doc2.blob.read(), "Bring us another shrubbery!!")
+
+    def test_form_is_not_valid_with_filename_longer_than_100_chars(self):
+        file_with_long_name = StringIO("This file will have a really long name.")
+        file_with_long_name.name = "f" * 100
+
+        request = self.request_factory.post(self.url,
+                                            {"blob": file_with_long_name})
+        form = DocumentForm(self.user, request.POST, request.FILES)
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.errors.has_key('blob'))

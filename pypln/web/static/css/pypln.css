@@ -52,3 +52,11 @@ label {
 .form-inline>.btn {
     float: right;
 }
+
+.errorlist {
+    list-style: none;
+}
+
+.errorlist>li {
+    color: #e72f2f;
+}

@@ -34,7 +34,7 @@ gridfs_storage = GridFSStorage(location='/',
 
 class Document(models.Model):
     blob = models.FileField(upload_to='/', storage=gridfs_storage)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
     indexed = models.BooleanField(default=False)
