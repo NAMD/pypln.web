@@ -24,4 +24,7 @@ from .pipeline import create_pipeline, get_config_from_router
 
 from django.template.defaultfilters import slugify
 
-slugify_keeping_dots = lambda filename: '.'.join([slugify(x) for x in filename.split('.')])
+def slugify_keeping_dots(filename):
+    slug = '.'.join([slugify(x) for x in filename.split('.')])
+    # gridfs uses _ instead of -
+    return slug.replace('-', '_')
