@@ -58,3 +58,9 @@ class DocumentModelTest(TestWithMongo):
         doc.save()
         self.assertEqual(doc.slug, "42.txt")
 
+    def test_slugs_should_be_slugfied(self):
+        file_with_spaces = ContentFile("test")
+        file_with_spaces.name = "name with spaces.txt"
+        doc = Document(owner=self.user, blob=file_with_spaces)
+        doc.save()
+        self.assertEqual(doc.slug, "name-with-spaces.txt")

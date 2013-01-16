@@ -21,3 +21,7 @@
 from .tagset import TAGSET, COMMON_TAGS
 from .languages import LANGUAGES
 from .pipeline import create_pipeline, get_config_from_router
+
+from django.template.defaultfilters import slugify
+
+slugify_keeping_dots = lambda filename: '.'.join([slugify(x) for x in filename.split('.')])

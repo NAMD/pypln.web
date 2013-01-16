@@ -21,7 +21,9 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+
 from .storage import GridFSStorage
+from utils import slugify_keeping_dots
 
 from whoosh.fields import Schema, ID, TEXT
 
@@ -61,7 +63,8 @@ class Document(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.slug = self.blob.storage.get_available_name(self.blob.name)
+            slugfied_name = slugify_keeping_dots(self.blob.name)
+            self.slug = self.blob.storage.get_available_name(slugfied_name)
         return super(Document, self).save(*args, **kwargs)
 
 
