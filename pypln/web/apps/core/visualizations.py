@@ -55,9 +55,9 @@ def _pos_highlighter(data):
                 from django.core.mail import mail_admins
 
                 tb = traceback.format_exc(e)
-                subject = "Tag {} not in tagset".format(item[1])
-                message = ("Tag {} was extracted from document, but was not"
-                           "found in TAGSET.\n\n{}").format(item[1], tb)
+                subject = u"Tag {} not in tagset".format(item[1])
+                message = (u"Tag {} was extracted from document, but was not"
+                           u"found in TAGSET.\n\n{}").format(item[1], tb)
                 mail_admins(subject, message)
 
     return {'pos': pos, 'tagset': TAGSET[tagset], 'token_list': token_list}
