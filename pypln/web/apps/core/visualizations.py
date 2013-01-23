@@ -40,10 +40,14 @@ def _token_frequency_histogram(data):
 def _pos_highlighter(data):
     pos = []
     token_list = []
+    if 'tagset' not in data or data['tagset'] is None:
+        tagset = 'en-nltk'
+    else:
+        tagset = data['tagset']
     if data['pos'] is not None:
         for idx, item in enumerate(data['pos']):
             try:
-                tag = TAGSET[item[1]]
+                tag = TAGSET[tagset][item[1]]
                 pos.append({'slug': tag['slug'], 'token': item[0]})
                 token_list.append((idx, item[0], item[1]))
             except KeyError as e:
@@ -56,8 +60,7 @@ def _pos_highlighter(data):
                            "found in TAGSET.\n\n{}").format(item[1], tb)
                 mail_admins(subject, message)
 
-    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
-            'token_list': token_list}
+    return {'pos': pos, 'tagset': TAGSET[tagset], 'token_list': token_list}
 
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
@@ -91,7 +94,7 @@ VISUALIZATIONS = {
         },
         'pos-highlighter': {
             'label': _('Part-of-speech'),
-            'requires': set(['pos', 'tokens']),
+            'requires': set(['pos', 'tokens', 'tagset']),
             'process': _pos_highlighter,
         },
         'token-frequency-histogram': {
