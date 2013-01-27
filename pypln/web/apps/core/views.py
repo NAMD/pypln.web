@@ -181,7 +181,7 @@ def document_page(request, document_slug):
     properties = set(store.get('id:{}:_properties'.format(document.id), []))
     metadata = store.get('id:{}:file_metadata'.format(document.id), {})
     language = store.get('id:{}:language'.format(document.id), None)
-    metadata['language'] = LANGUAGES[language] if language else 'Unknown'
+    metadata['language'] = LANGUAGES[language] if language else _('Unknown')
     data['metadata'] = metadata
     visualizations = []
     for key, value in VISUALIZATIONS.items():
