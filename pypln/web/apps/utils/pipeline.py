@@ -26,9 +26,11 @@ default_pipeline = {Job('Extractor'): Job('Tokenizer'),
 
 def create_pipelines(api, broadcast, data, timeout):
     manager = PipelineManager(api, broadcast)
+    created_pipelines = []
     for document in data:
         pipeline = Pipeline(default_pipeline, data=document)
-        manager.start(pipeline)
+        created_pipelines.append(manager.start(pipeline))
+    return created_pipelines
 
 
 def get_config_from_router(api, timeout=5):
