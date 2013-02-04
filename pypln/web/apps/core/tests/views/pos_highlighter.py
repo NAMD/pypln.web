@@ -72,6 +72,9 @@ class PosHighlighterViewTest(TestWithMongo):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/pos-highlighter.csv")
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertEqual(response['Content-Disposition'], ('attachment; '
+                    'filename="document.txt-part-of-speech.csv"'))
 
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")

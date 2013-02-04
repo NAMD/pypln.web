@@ -31,8 +31,10 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
+from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
+from django.views.generic.base import TemplateView
 
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
@@ -46,6 +48,8 @@ from pypln.web.apps.core.search import WhooshIndex
 from pypln.web.apps.core.visualizations import VISUALIZATIONS
 from pypln.web.apps.utils import LANGUAGES, create_pipeline
 
+
+from apps.core.visualizations import pos_highlighter
 
 def _search_filtering_by_owner(index, query, owner, corpus=None):
     if corpus is not None:
@@ -191,7 +195,6 @@ def document_page(request, document_slug):
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))
 
-@login_required
 def document_visualization(request, document_slug, visualization, fmt):
     try:
         document = Document.objects.get(slug=document_slug,
@@ -231,44 +234,53 @@ def document_visualization(request, document_slug, visualization, fmt):
         response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
     return response
 
-@login_required
-def pos_highlighter_visualization(request, document_slug, fmt):
-    visualization = 'pos-highlighter'
-    from apps.core.visualizations import pos_highlighter
-    document = get_object_or_404(Document, slug=document_slug,
-                owner=request.user.id)
+class PosHighlighterVisualization(TemplateView):
+    @property
+    def template_name(self):
+        return 'core/visualizations/pos-highlighter.{fmt}'.format(**self.kwargs)
 
-    data = {}
-    store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                      port=settings.MONGODB_CONFIG['port'],
-                      database=settings.MONGODB_CONFIG['database'],
-                      collection=settings.MONGODB_CONFIG['analysis_collection'])
+    # Seriously? Do we really need this?
+    # https://docs.djangoproject.com/en/dev/topics/class-based-views/#decorating-the-class
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(PosHighlighterVisualization, self).dispatch(*args, **kwargs)
 
-    try:
-        properties = set(store['id:{}:_properties'.format(document.id)])
-    except KeyError:
-        raise Http404("Visualization not found.")
+    def get_context_data(self, document_slug, fmt):
+        visualization = 'pos-highlighter'
+        self.document = get_object_or_404(Document, slug=document_slug,
+                    owner=self.request.user.id)
 
-    if not VISUALIZATIONS[visualization]['requires'].issubset(properties):
-        raise Http404("Visualization not found.")
+        store = MongoDict(host=settings.MONGODB_CONFIG['host'],
+                          port=settings.MONGODB_CONFIG['port'],
+                          database=settings.MONGODB_CONFIG['database'],
+                          collection=settings.MONGODB_CONFIG['analysis_collection'])
 
-    input_data = {}
-    for key in pos_highlighter.requires:
-        input_data[key] = store['id:{}:{}'.format(document.id, key)]
+        try:
+            properties = set(store['id:{}:_properties'.format(self.document.id)])
+        except KeyError:
+            raise Http404("Visualization not found.")
 
-    template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
-    try:
-        template = get_template(template_name)
-    except TemplateDoesNotExist:
-        raise Http404("Visualization is not available in this format.")
+        if not pos_highlighter.requires.issubset(properties):
+            raise Http404("Visualization not found.")
 
-    data = pos_highlighter(input_data)
-    data['document'] = document
-    response = render_to_response(template_name, data, context_instance=RequestContext(request))
-    if fmt != "html":
-        response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
-        response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
-    return response
+        input_data = {}
+        for key in pos_highlighter.requires:
+            input_data[key] = store['id:{}:{}'.format(self.document.id, key)]
+
+        data = pos_highlighter(input_data)
+        data['document'] = self.document
+        return data
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super(PosHighlighterVisualization, self).render_to_response(
+                context, **response_kwargs)
+
+        fmt = self.kwargs['fmt']
+        if fmt != "html":
+            response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
+            response["Content-Disposition"] = ('attachment; '
+                    'filename="{}-part-of-speech.{}"').format(self.document.slug, fmt)
+        return response
 
 @login_required
 def document_list(request):
