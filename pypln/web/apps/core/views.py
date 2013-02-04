@@ -234,6 +234,7 @@ def document_visualization(request, document_slug, visualization, fmt):
 @login_required
 def pos_highlighter_visualization(request, document_slug, fmt):
     visualization = 'pos-highlighter'
+    from apps.core.visualizations import pos_highlighter
     document = get_object_or_404(Document, slug=document_slug,
                 owner=request.user.id)
 
@@ -246,24 +247,24 @@ def pos_highlighter_visualization(request, document_slug, fmt):
     try:
         properties = set(store['id:{}:_properties'.format(document.id)])
     except KeyError:
-        return HttpResponse('Visualization not found', status=404)
-    if visualization not in VISUALIZATIONS or \
-            not VISUALIZATIONS[visualization]['requires'].issubset(properties):
-        return HttpResponse('Visualization not found', status=404)
+        raise Http404("Visualization not found.")
 
-    data = {}
-    for key in VISUALIZATIONS[visualization]['requires']:
-        data[key] = store['id:{}:{}'.format(document.id, key)]
+    if not VISUALIZATIONS[visualization]['requires'].issubset(properties):
+        raise Http404("Visualization not found.")
+
+    input_data = {}
+    for key in pos_highlighter.requires:
+        input_data[key] = store['id:{}:{}'.format(document.id, key)]
+
     template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
     try:
         template = get_template(template_name)
     except TemplateDoesNotExist:
         raise Http404("Visualization is not available in this format.")
-    if 'process' in VISUALIZATIONS[visualization]:
-        data = VISUALIZATIONS[visualization]['process'](data)
+
+    data = pos_highlighter(input_data)
     data['document'] = document
-    response = render_to_response(template_name, data,
-            context_instance=RequestContext(request))
+    response = render_to_response(template_name, data, context_instance=RequestContext(request))
     if fmt != "html":
         response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
         response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)

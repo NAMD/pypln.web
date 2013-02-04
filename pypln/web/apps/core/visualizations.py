@@ -37,7 +37,7 @@ def _token_frequency_histogram(data):
     data['momentum_4'] = '{:.2f}'.format(data['momentum_4'])
     return data
 
-def _pos_highlighter(data):
+def pos_highlighter(data):
     pos = []
     token_list = []
     if data['pos'] is not None:
@@ -58,6 +58,8 @@ def _pos_highlighter(data):
 
     return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
             'token_list': token_list}
+
+pos_highlighter.requires = set(['pos', 'tokens'])
 
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
@@ -92,7 +94,7 @@ VISUALIZATIONS = {
         'pos-highlighter': {
             'label': _('Part-of-speech'),
             'requires': set(['pos', 'tokens']),
-            'process': _pos_highlighter,
+            'process': pos_highlighter,
         },
         'token-frequency-histogram': {
              'label': _('Token frequency histogram'),
