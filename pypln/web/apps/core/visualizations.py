@@ -40,21 +40,25 @@ def _token_frequency_histogram(data):
 def _pos_highlighter(data):
     pos = []
     token_list = []
+    tag_errors = []
     if data['pos'] is not None:
         for idx, item in enumerate(data['pos']):
             try:
                 tag = TAGSET[item[1]]
                 pos.append({'slug': tag['slug'], 'token': item[0]})
                 token_list.append((idx, item[0], item[1]))
-            except KeyError as e:
-                import traceback
-                from django.core.mail import mail_admins
+            except KeyError:
+                tag_errors.append(item)
 
-                tb = traceback.format_exc(e)
-                subject = "Tag {} not in tagset".format(item[1])
-                message = ("Tag {} was extracted from document, but was not"
-                           "found in TAGSET.\n\n{}").format(item[1], tb)
-                mail_admins(subject, message)
+    if tag_errors:
+        from django.core.mail import mail_admins
+
+        subject = "Tags not in tagset"
+        message = ""
+        for item in tag_errors:
+            message += ("Tag {} was assigned to token \"{}\", but was not found "
+                    "in tagset.\n\n").format(item[1], item[0])
+        mail_admins(subject, message)
 
     return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
             'token_list': token_list}
