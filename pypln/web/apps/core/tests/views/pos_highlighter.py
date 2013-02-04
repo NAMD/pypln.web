@@ -55,13 +55,22 @@ class PosHighlighterViewTest(TestWithMongo):
             kwargs={'document_slug': 'inexistent-document.txt', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
-    def test_shows_highlight_existing_document_without_error(self):
+    def test_shows_highlight_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('pos_highlighter_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/pos-highlighter.html")
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+    def test_shows_highlight_for_existing_document_in_csv_without_error(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('pos_highlighter_visualization',
+            kwargs={'document_slug': 'document.txt', 'fmt': 'csv'}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "core/visualizations/pos-highlighter.csv")
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
 
     def test_expected_data_is_in_context(self):
