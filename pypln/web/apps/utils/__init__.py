@@ -20,7 +20,7 @@
 
 from .tagset import TAGSET, COMMON_TAGS
 from .languages import LANGUAGES
-from .pipeline import create_pipeline, get_config_from_router
+from .pipeline import create_pipelines, get_config_from_router
 
 from django.template.defaultfilters import slugify
 
