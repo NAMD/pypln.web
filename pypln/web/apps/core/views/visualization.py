@@ -36,6 +36,7 @@ class VisualizationView(TemplateView):
     template context.
     """
     requires = set()
+    slug = ''
     base_template_name = 'core/visualizations/'
 
     @property
@@ -85,21 +86,25 @@ class VisualizationView(TemplateView):
         context['document'] = self.document
         return context
 
-class PosHighlighterVisualization(VisualizationView):
-    requires = set(['pos', 'tokens'])
-    base_template_name = 'core/visualizations/pos-highlighter'
-
-    def process(self):
-        input_data = self.get_data_from_store()
-        return pos_highlighter(input_data)
-
     def render_to_response(self, context, **response_kwargs):
-        response = super(PosHighlighterVisualization, self).render_to_response(
+        response = super(VisualizationView, self).render_to_response(
                 context, **response_kwargs)
 
         fmt = self.kwargs['fmt']
         if fmt != "html":
             response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
             response["Content-Disposition"] = ('attachment; '
-                    'filename="{}-part-of-speech.{}"').format(self.document.slug, fmt)
+                    'filename="{}-{}.{}"').format(self.document.slug,
+                            self.slug, fmt)
         return response
+
+
+
+class PosHighlighterVisualization(VisualizationView):
+    requires = set(['pos', 'tokens'])
+    base_template_name = 'core/visualizations/pos-highlighter'
+    slug = 'part-of-speech'
+
+    def process(self):
+        input_data = self.get_data_from_store()
+        return pos_highlighter(input_data)
