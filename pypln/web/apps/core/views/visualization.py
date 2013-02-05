@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
 
 from mongodict import MongoDict
@@ -31,11 +32,12 @@ from apps.core.visualizations import pos_highlighter
 class VisualizationView(TemplateView):
     """
     Base class for visualization views.  Each visualization should extend this,
-    declare it's requirements, slug, and a `process' method that returns the
-    data necessary in the template context.
+    declare it's requirements, label, slug, and a `process' method that returns
+    the data necessary in the template context.
     """
     requires = set()
     slug = ''
+    label = ''
 
     @property
     def template_name(self):
@@ -100,6 +102,7 @@ class VisualizationView(TemplateView):
 class PosHighlighterVisualization(VisualizationView):
     requires = set(['pos', 'tokens'])
     slug = 'part-of-speech'
+    label = _('Part-of-speech')
 
     def process(self):
         input_data = self.get_data_from_store()
