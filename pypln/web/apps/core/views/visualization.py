@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from collections import Counter
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -139,4 +141,25 @@ class PlainTextVisualization(VisualizationView):
     slug = 'text'
     label = _('Plain text')
 
-available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization]
+class TokenFrequencyVisualization(VisualizationView):
+    requires = set(['freqdist', 'momentum_1', 'momentum_2',
+                    'momentum_3', 'momentum_4'])
+    slug = 'token-frequency-histogram'
+    label = _('Token frequency histogram')
+
+    def process(self):
+        data = self.get_data_from_store()
+
+        freqdist = data['freqdist']
+        values = Counter()
+        for key, value in freqdist:
+            values[value] += 1
+        data['values'] = [list(x) for x in values.most_common()]
+        data['momentum_1'] = '{:.2f}'.format(data['momentum_1'])
+        data['momentum_2'] = '{:.2f}'.format(data['momentum_2'])
+        data['momentum_3'] = '{:.2f}'.format(data['momentum_3'])
+        data['momentum_4'] = '{:.2f}'.format(data['momentum_4'])
+        return data
+
+available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization,
+                            TokenFrequencyVisualization]

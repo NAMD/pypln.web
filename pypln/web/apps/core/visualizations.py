@@ -23,20 +23,6 @@ from nltk.corpus import stopwords
 from utils import LANGUAGES
 
 
-def _token_frequency_histogram(data):
-    from collections import Counter
-
-    freqdist = data['freqdist']
-    values = Counter()
-    for key, value in freqdist:
-        values[value] += 1
-    data['values'] = [list(x) for x in values.most_common()]
-    data['momentum_1'] = '{:.2f}'.format(data['momentum_1'])
-    data['momentum_2'] = '{:.2f}'.format(data['momentum_2'])
-    data['momentum_3'] = '{:.2f}'.format(data['momentum_3'])
-    data['momentum_4'] = '{:.2f}'.format(data['momentum_4'])
-    return data
-
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
     data['average_sentence_repertoire'] = \
@@ -63,12 +49,6 @@ def _wordcloud(data):
     return data
 
 VISUALIZATIONS = {
-        'token-frequency-histogram': {
-             'label': _('Token frequency histogram'),
-             'requires': set(['freqdist', 'momentum_1', 'momentum_2',
-                              'momentum_3', 'momentum_4']),
-             'process': _token_frequency_histogram,
-        },
         'statistics': {
             'label': _('Statistics'),
             'requires': set(['tokens', 'sentences', 'repertoire',
