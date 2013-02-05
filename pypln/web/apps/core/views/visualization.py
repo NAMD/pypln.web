@@ -75,7 +75,7 @@ class VisualizationView(TemplateView):
         return data
 
     def process(self):
-        raise NotImplementedError
+        return self.get_data_from_store()
 
     def get_context_data(self, document_slug, fmt):
         self.document = get_object_or_404(Document, slug=document_slug,
