@@ -23,9 +23,9 @@ from django.core.urlresolvers import reverse
 from core.models import Document
 from core.tests.utils import TestWithMongo
 
-__all__ = ["PosHighlighterViewTest"]
+__all__ = ["PartOfSpeechViewTest"]
 
-class PosHighlighterViewTest(TestWithMongo):
+class PartOfSpeechViewTest(TestWithMongo):
     fixtures = ['document']
 
     def prepare_storage(self):
@@ -40,11 +40,11 @@ class PosHighlighterViewTest(TestWithMongo):
         self.store['id:{}:_properties'.format(self.document.id)] = ['text', 'tokens', 'pos']
 
     def setUp(self):
-        super(PosHighlighterViewTest, self).setUp()
+        super(PartOfSpeechViewTest, self).setUp()
         self.prepare_storage()
 
     def test_requires_login(self):
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
@@ -52,13 +52,13 @@ class PosHighlighterViewTest(TestWithMongo):
 
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'inexistent-document.txt', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_highlight_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
@@ -67,7 +67,7 @@ class PosHighlighterViewTest(TestWithMongo):
 
     def test_shows_highlight_for_existing_document_in_csv_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
@@ -79,7 +79,7 @@ class PosHighlighterViewTest(TestWithMongo):
 
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
@@ -99,7 +99,7 @@ class PosHighlighterViewTest(TestWithMongo):
                                                             ["content", "NNP", 12]]
 
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('pos_highlighter_visualization',
+        response = self.client.get(reverse('part_of_speech_visualization',
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
 
         # The page should render normally, even if we find unknown tags.

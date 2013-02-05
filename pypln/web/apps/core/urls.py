@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls.defaults import patterns, url
-from core.views.visualization import PosHighlighterVisualization
+from core.views.visualization import PartOfSpeechVisualization
 
 
 urlpatterns = patterns('core.views',
@@ -24,7 +24,7 @@ urlpatterns = patterns('core.views',
             name='corpus_page'),
         url(r'^documents/?$', 'document_list', name='document_list'),
         url(r'^document/(?P<document_slug>.+)/visualization/part-of-speech.(?P<fmt>(html|csv|inex))$',
-            PosHighlighterVisualization.as_view(), name='pos_highlighter_visualization'),
+            PartOfSpeechVisualization.as_view(), name='part_of_speech_visualization'),
         url(r'^document/(?P<document_slug>.+)/visualization/(?P<visualization>[-\w]+).(?P<fmt>(html|csv|txt))$',
             'document_visualization', name='document_visualization'),
         url(r'^document/(?P<document_slug>.+)/download$', 'document_download',

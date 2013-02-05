@@ -97,8 +97,7 @@ class VisualizationView(TemplateView):
                             self.slug, fmt)
         return response
 
-
-class PosHighlighterVisualization(VisualizationView):
+class PartOfSpeechVisualization(VisualizationView):
     requires = set(['pos', 'tokens'])
     slug = 'part-of-speech'
     label = _('Part-of-speech')
@@ -134,4 +133,4 @@ class PosHighlighterVisualization(VisualizationView):
         return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
                 'token_list': token_list}
 
-available_visualizations = [PosHighlighterVisualization]
+available_visualizations = [PartOfSpeechVisualization]

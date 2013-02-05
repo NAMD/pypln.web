@@ -1,2 +1,2 @@
 from corpus import *
-from pos_highlighter import *
+from part_of_speech import *
