@@ -39,11 +39,12 @@ from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
 from apps.core.visualizations import VISUALIZATIONS, pos_highlighter
 
-from utils import LANGUAGES, create_pipeline
+from utils import LANGUAGES, create_pipelines
 from mongodict import MongoDict
 
 from pypln.web.apps.core.search import WhooshIndex
-from pypln.web.apps.utils import LANGUAGES, create_pipeline
+from pypln.web.apps.core.visualizations import VISUALIZATIONS
+from pypln.web.apps.utils import LANGUAGES, create_pipelines
 
 
 def _search_filtering_by_owner(index, query, owner, corpus=None):
@@ -119,6 +120,7 @@ def upload_documents(request, corpus_slug):
     form = DocumentForm(request.user, request.POST, request.FILES)
     if form.is_valid():
         docs = form.save(commit=False)
+        pipelines_data = []
         for doc in docs:
             doc.save()
             # XXX: updating the corpus_set should probably be done in
@@ -129,10 +131,10 @@ def upload_documents(request, corpus_slug):
             for corpus in doc.corpus_set.all():
                 corpus.last_modified = datetime.datetime.now()
                 corpus.save()
-            data = {'_id': str(doc.blob.file._id), 'id': doc.id}
-            create_pipeline(settings.ROUTER_API, settings.ROUTER_BROADCAST, data,
-                            timeout=settings.ROUTER_TIMEOUT)
+            pipelines_data.append({'_id': str(doc.blob.file._id), 'id': doc.id})
 
+        create_pipelines(settings.ROUTER_API, settings.ROUTER_BROADCAST,
+                    pipelines_data, timeout=settings.ROUTER_TIMEOUT)
         number_of_uploaded_docs = len(docs)
         # I know I should be using string.format, but gettext doesn't support
         # it yet: https://savannah.gnu.org/bugs/?30854

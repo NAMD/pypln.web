@@ -151,12 +151,12 @@ class UploadDocumentTest(TestCase):
         corpus = Corpus.objects.get(slug="test-corpus")
         self.assertGreater(corpus.last_modified, start_time)
 
-    @patch('core.views.create_pipeline')
-    def test_pipeline_is_created(self, create_pipeline_mock):
+    @patch('core.views.create_pipelines')
+    def test_pipeline_is_created(self, create_pipelines_mock):
         self.client.login(username="admin", password="admin")
         response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
         document = Document.objects.all()[0]
-        expected_data = {'_id': str(document.blob.file._id), 'id': document.id}
+        expected_data = [{'_id': str(document.blob.file._id), 'id': document.id}]
 
-        self.assertTrue(create_pipeline_mock.called)
-        self.assertIn(expected_data, create_pipeline_mock.call_args[0])
+        self.assertTrue(create_pipelines_mock.called)
+        self.assertIn(expected_data, create_pipelines_mock.call_args[0])
