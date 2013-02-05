@@ -203,6 +203,18 @@ class StatisticsVisualization(VisualizationView):
         data['percentual_sentences'] = '{:.2f}'.format(100 * data['number_of_unique_sentences'] / data['number_of_sentences'])
         return data
 
+
 available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization,
                             TokenFrequencyVisualization, WordCloudVisualization,
                             StatisticsVisualization]
+
+def visualization_router(*args, **kwargs):
+    """
+    This view exists only to route the request to the right visualization
+    based on the slug.
+    """
+    slug = kwargs.pop('visualization_slug')
+    for view_class in available_visualizations:
+        if view_class.slug == slug:
+            return view_class.as_view()(*args, **kwargs)
+    raise Http404("Visualization {} not found".format(visualization_slug))

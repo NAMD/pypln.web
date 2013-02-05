@@ -1,7 +1,7 @@
 {% load i18n %}
 <div id="pos">
   <h3>{% trans "Controls" %}</h3>
-  <a href="{% url part_of_speech_visualization document.slug "csv" %}">{% trans "Download data as CSV" %}</a>
+  <a href="{% url document_visualization document.slug "part-of-speech" "csv" %}">{% trans "Download data as CSV" %}</a>
   <br />
   <a href="#" id="checkall">select all</a> <a href="#" id="uncheckall">unselect all</a>
   <div id="controls"></div>

@@ -45,8 +45,9 @@ class StatisticsViewTest(TestWithMongo):
         self.prepare_storage()
 
     def test_requires_login(self):
-        response = self.client.get(reverse('statistics_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'statistics',
                                             'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
@@ -54,15 +55,17 @@ class StatisticsViewTest(TestWithMongo):
 
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('statistics_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'inexistent-document.txt',
+                                            'visualization_slug': 'statistics',
                                             'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_text_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('statistics_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'statistics',
                                             'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
@@ -71,8 +74,9 @@ class StatisticsViewTest(TestWithMongo):
 
     def test_shows_text_for_existing_document_in_txt_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('statistics_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'statistics',
                                             'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
@@ -84,8 +88,9 @@ class StatisticsViewTest(TestWithMongo):
 
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('statistics_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'statistics',
                                             'fmt': 'html'}))
 
         self.assertIn("document", response.context)

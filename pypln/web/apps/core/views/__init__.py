@@ -198,45 +198,6 @@ def document_page(request, document_slug):
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))
 
-def document_visualization(request, document_slug, visualization, fmt):
-    try:
-        document = Document.objects.get(slug=document_slug,
-                owner=request.user.id)
-    except ObjectDoesNotExist:
-        return HttpResponse('Document not found', status=404)
-
-    data = {}
-    store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                      port=settings.MONGODB_CONFIG['port'],
-                      database=settings.MONGODB_CONFIG['database'],
-                      collection=settings.MONGODB_CONFIG['analysis_collection'])
-
-    try:
-        properties = set(store['id:{}:_properties'.format(document.id)])
-    except KeyError:
-        return HttpResponse('Visualization not found', status=404)
-    if visualization not in VISUALIZATIONS or \
-            not VISUALIZATIONS[visualization]['requires'].issubset(properties):
-        return HttpResponse('Visualization not found', status=404)
-
-    data = {}
-    for key in VISUALIZATIONS[visualization]['requires']:
-        data[key] = store['id:{}:{}'.format(document.id, key)]
-    template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
-    try:
-        template = get_template(template_name)
-    except TemplateDoesNotExist:
-        raise Http404("Visualization is not available in this format.")
-    if 'process' in VISUALIZATIONS[visualization]:
-        data = VISUALIZATIONS[visualization]['process'](data)
-    data['document'] = document
-    response = render_to_response(template_name, data,
-            context_instance=RequestContext(request))
-    if fmt != "html":
-        response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
-        response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
-    return response
-
 @login_required
 def document_list(request):
     data = {'documents': Document.objects.filter(owner=request.user.id)}

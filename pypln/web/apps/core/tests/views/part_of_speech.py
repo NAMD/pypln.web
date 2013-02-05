@@ -44,22 +44,27 @@ class PartOfSpeechViewTest(TestWithMongo):
         self.prepare_storage()
 
     def test_requires_login(self):
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
+        response = self.client.get(reverse('document_visualization',
+                                    kwargs={'document_slug': 'document.txt',
+                                    'visualization_slug': 'part-of-speech',
+                                    'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
 
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'inexistent-document.txt', 'fmt': 'html'}))
+        response = self.client.get(reverse('document_visualization',
+                            kwargs={'document_slug': 'inexistent-document.txt',
+                            'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_highlight_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
+        response = self.client.get(reverse('document_visualization',
+                                    kwargs={'document_slug': 'document.txt',
+                                    'visualization_slug': 'part-of-speech',
+                                    'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/part-of-speech.html")
@@ -67,8 +72,9 @@ class PartOfSpeechViewTest(TestWithMongo):
 
     def test_shows_highlight_for_existing_document_in_csv_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'document.txt', 'fmt': 'csv'}))
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_slug': 'document.txt', 'visualization_slug':
+                'part-of-speech', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/part-of-speech.csv")
@@ -79,8 +85,9 @@ class PartOfSpeechViewTest(TestWithMongo):
 
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_slug': 'document.txt', 'visualization_slug':
+                'part-of-speech', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
         document = Document.objects.all()[0]
@@ -99,8 +106,9 @@ class PartOfSpeechViewTest(TestWithMongo):
                                                             ["content", "NNP", 12]]
 
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('part_of_speech_visualization',
-            kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_slug': 'document.txt', 'visualization_slug':
+                'part-of-speech', 'fmt': 'html'}))
 
         # The page should render normally, even if we find unknown tags.
         self.assertEqual(response.status_code, 200)
@@ -109,4 +117,4 @@ class PartOfSpeechViewTest(TestWithMongo):
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject,
-                            "{}Tags not in tagset".format(settings.EMAIL_SUBJECT_PREFIX))
+                    "{}Tags not in tagset".format(settings.EMAIL_SUBJECT_PREFIX))

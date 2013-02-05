@@ -31,15 +31,18 @@ class TextVisualizationViewTest(TestWithMongo):
     def prepare_storage(self):
         self.document = Document.objects.all()[0]
         self.store['id:{}:text'.format(self.document.id)] = "This is our content"
-        self.store['id:{}:_properties'.format(self.document.id)] = ['text', 'tokens', 'pos']
+        self.store['id:{}:_properties'.format(self.document.id)] = ['text',
+                                                                    'tokens',
+                                                                    'pos']
 
     def setUp(self):
         super(TextVisualizationViewTest, self).setUp()
         self.prepare_storage()
 
     def test_requires_login(self):
-        response = self.client.get(reverse('text_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'text',
                                             'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
@@ -47,15 +50,17 @@ class TextVisualizationViewTest(TestWithMongo):
 
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('text_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'inexistent-document.txt',
+                                            'visualization_slug': 'text',
                                             'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_text_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('text_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'text',
                                             'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
@@ -64,8 +69,9 @@ class TextVisualizationViewTest(TestWithMongo):
 
     def test_shows_text_for_existing_document_in_txt_without_error(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('text_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'text',
                                             'fmt': 'txt'}))
 
         self.assertEqual(response.status_code, 200)
@@ -77,8 +83,9 @@ class TextVisualizationViewTest(TestWithMongo):
 
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse('text_visualization',
+        response = self.client.get(reverse('document_visualization',
                                     kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'text',
                                             'fmt': 'html'}))
 
         self.assertIn("document", response.context)
