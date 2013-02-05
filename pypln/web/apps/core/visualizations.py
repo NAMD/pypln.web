@@ -43,7 +43,7 @@ def _wordcloud(data):
     stopwords_list = list(punctuation)
     document_language = LANGUAGES.get(data['language'])
     if document_language and document_language.lower() in stopwords.fileids():
-        stopwords_list += stopwords.words(document_language)
+        stopwords_list += stopwords.words(document_language.lower())
     data['freqdist'] = [[x[0], x[1]] for x in data['freqdist'] \
                                                  if x[0] not in stopwords_list]
     return data
