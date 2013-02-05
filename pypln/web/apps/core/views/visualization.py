@@ -91,7 +91,8 @@ class VisualizationView(TemplateView):
 
         fmt = self.kwargs['fmt']
         if fmt != "html":
-            response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
+            response["Content-Type"] = "text/{}; charset=utf-8".format('plain'
+                    if fmt == 'txt' else fmt)
             response["Content-Disposition"] = ('attachment; '
                     'filename="{}-{}.{}"').format(self.document.slug,
                             self.slug, fmt)
