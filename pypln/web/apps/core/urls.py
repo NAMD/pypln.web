@@ -19,11 +19,8 @@ from core.views.visualization import (PartOfSpeechVisualization, PlainTextVisual
                                       TokenFrequencyVisualization)
 
 
+# Visualization urls
 urlpatterns = patterns('core.views',
-        url(r'^corpora/?$', 'corpora_list', name='corpora_list'),
-        url(r'^corpora/(?P<corpus_slug>.+)/?$', 'corpus_page',
-            name='corpus_page'),
-        url(r'^documents/?$', 'document_list', name='document_list'),
         url(r'^document/(?P<document_slug>.+)/visualization/part-of-speech.(?P<fmt>(html|csv))$',
             PartOfSpeechVisualization.as_view(), name='part_of_speech_visualization'),
         url(r'^document/(?P<document_slug>.+)/visualization/text.(?P<fmt>(html|txt))$',
@@ -32,6 +29,13 @@ urlpatterns = patterns('core.views',
             TokenFrequencyVisualization.as_view(), name='token_frequency_histogram_visualization'),
         url(r'^document/(?P<document_slug>.+)/visualization/(?P<visualization>[-\w]+).(?P<fmt>(html|csv|txt))$',
             'document_visualization', name='document_visualization'),
+)
+
+urlpatterns += patterns('core.views',
+        url(r'^corpora/?$', 'corpora_list', name='corpora_list'),
+        url(r'^corpora/(?P<corpus_slug>.+)/?$', 'corpus_page',
+            name='corpus_page'),
+        url(r'^documents/?$', 'document_list', name='document_list'),
         url(r'^document/(?P<document_slug>.+)/download$', 'document_download',
             name='document_download'),
         url(r'^document/(?P<document_slug>.+)/?$', 'document_page',
