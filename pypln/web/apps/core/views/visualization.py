@@ -179,5 +179,30 @@ class WordCloudVisualization(VisualizationView):
                                                      if x[0] not in stopwords_list]
         return data
 
+class StatisticsVisualization(VisualizationView):
+    requires = set(['tokens', 'sentences', 'repertoire',
+                    'average_sentence_repertoire',
+                    'average_sentence_length'])
+    slug = 'statistics'
+    label = _('Statistics')
+
+    def process(self):
+        data = self.get_data_from_store()
+        data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
+        data['average_sentence_repertoire'] = \
+                '{:.2f}'.format(data['average_sentence_repertoire'] * 100)
+        data['average_sentence_length'] = '{:.2f}'.format(data['average_sentence_length'])
+        data['number_of_tokens'] = len(data['tokens'])
+        data['number_of_unique_tokens'] = len(set(data['tokens']))
+        sentences = []
+        for sentence in data['sentences']:
+            sentences.append(' '.join(sentence))
+        data['number_of_sentences'] = len(sentences)
+        data['number_of_unique_sentences'] = len(set(sentences))
+        data['percentual_tokens'] = '{:.2f}'.format(100 * data['number_of_unique_tokens'] / data['number_of_tokens'])
+        data['percentual_sentences'] = '{:.2f}'.format(100 * data['number_of_unique_sentences'] / data['number_of_sentences'])
+        return data
+
 available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization,
-                            TokenFrequencyVisualization, WordCloudVisualization]
+                            TokenFrequencyVisualization, WordCloudVisualization,
+                            StatisticsVisualization]
