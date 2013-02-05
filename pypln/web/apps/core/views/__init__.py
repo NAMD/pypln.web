@@ -37,7 +37,8 @@ from django.core.urlresolvers import reverse
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
-from apps.core.visualizations import VISUALIZATIONS, pos_highlighter
+from apps.core.visualizations import VISUALIZATIONS
+from apps.core.views.visualization import available_visualizations
 
 from utils import LANGUAGES, create_pipelines
 from mongodict import MongoDict
@@ -188,6 +189,11 @@ def document_page(request, document_slug):
     for key, value in VISUALIZATIONS.items():
         if value['requires'].issubset(properties):
             visualizations.append({'slug': key, 'label': value['label']})
+
+    for view in available_visualizations:
+        if view.requires.issubset(properties):
+            visualizations.append({'slug': view.slug, 'label': view.label})
+
     data['visualizations'] = visualizations
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))

@@ -23,11 +23,10 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
-
 from mongodict import MongoDict
 
 from apps.core.models import Document
-from apps.core.visualizations import pos_highlighter
+from apps.utils import TAGSET, COMMON_TAGS
 
 class VisualizationView(TemplateView):
     """
@@ -104,6 +103,35 @@ class PosHighlighterVisualization(VisualizationView):
     slug = 'part-of-speech'
     label = _('Part-of-speech')
 
+    def warn_about_unknown_tags(self, tag_errors):
+        from django.core.mail import mail_admins
+
+        subject = "Tags not in tagset"
+        message = ""
+        for item in tag_errors:
+            message += ("Tag {} was assigned to token \"{}\", but was not found "
+                    "in tagset.\n\n").format(item[1], item[0])
+        mail_admins(subject, message)
+
     def process(self):
-        input_data = self.get_data_from_store()
-        return pos_highlighter(input_data)
+        data = self.get_data_from_store()
+        pos = []
+        token_list = []
+        tag_errors = []
+
+        if data['pos'] is not None:
+            for idx, item in enumerate(data['pos']):
+                try:
+                    tag = TAGSET[item[1]]
+                    pos.append({'slug': tag['slug'], 'token': item[0]})
+                    token_list.append((idx, item[0], item[1]))
+                except KeyError:
+                    tag_errors.append(item)
+
+        if tag_errors:
+            self.warn_about_unknown_tags(tag_errors)
+
+        return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
+                'token_list': token_list}
+
+available_visualizations = [PosHighlighterVisualization]

@@ -20,7 +20,7 @@
 from string import punctuation
 from django.utils.translation import ugettext as _
 from nltk.corpus import stopwords
-from utils import TAGSET, COMMON_TAGS, LANGUAGES
+from utils import LANGUAGES
 
 
 def _token_frequency_histogram(data):
@@ -36,34 +36,6 @@ def _token_frequency_histogram(data):
     data['momentum_3'] = '{:.2f}'.format(data['momentum_3'])
     data['momentum_4'] = '{:.2f}'.format(data['momentum_4'])
     return data
-
-def pos_highlighter(data):
-    pos = []
-    token_list = []
-    tag_errors = []
-    if data['pos'] is not None:
-        for idx, item in enumerate(data['pos']):
-            try:
-                tag = TAGSET[item[1]]
-                pos.append({'slug': tag['slug'], 'token': item[0]})
-                token_list.append((idx, item[0], item[1]))
-            except KeyError:
-                tag_errors.append(item)
-
-    if tag_errors:
-        from django.core.mail import mail_admins
-
-        subject = "Tags not in tagset"
-        message = ""
-        for item in tag_errors:
-            message += ("Tag {} was assigned to token \"{}\", but was not found "
-                    "in tagset.\n\n").format(item[1], item[0])
-        mail_admins(subject, message)
-
-    return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
-            'token_list': token_list}
-
-pos_highlighter.requires = set(['pos', 'tokens'])
 
 def _statistics(data):
     data['repertoire'] = '{:.2f}'.format(data['repertoire'] * 100)
@@ -94,11 +66,6 @@ VISUALIZATIONS = {
         'text': {
             'label': _('Plain text'),
             'requires': set(['text']),
-        },
-        'pos-highlighter': {
-            'label': _('Part-of-speech'),
-            'requires': set(['pos', 'tokens']),
-            'process': pos_highlighter,
         },
         'token-frequency-histogram': {
              'label': _('Token frequency histogram'),
