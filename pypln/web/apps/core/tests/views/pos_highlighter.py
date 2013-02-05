@@ -61,7 +61,7 @@ class PosHighlighterViewTest(TestWithMongo):
             kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "core/visualizations/pos-highlighter.html")
+        self.assertTemplateUsed(response, "core/visualizations/part-of-speech.html")
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
 
     def test_shows_highlight_for_existing_document_in_csv_without_error(self):
@@ -70,7 +70,7 @@ class PosHighlighterViewTest(TestWithMongo):
             kwargs={'document_slug': 'document.txt', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "core/visualizations/pos-highlighter.csv")
+        self.assertTemplateUsed(response, "core/visualizations/part-of-speech.csv")
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
         self.assertEqual(response['Content-Disposition'], ('attachment; '

@@ -30,18 +30,16 @@ from apps.core.visualizations import pos_highlighter
 
 class VisualizationView(TemplateView):
     """
-    Base class for visualization views.
-    Each visualization should extend this, declare it's requirements, base
-    template name, and a process method that returns the data necessary in the
-    template context.
+    Base class for visualization views.  Each visualization should extend this,
+    declare it's requirements, slug, and a `process' method that returns the
+    data necessary in the template context.
     """
     requires = set()
     slug = ''
-    base_template_name = 'core/visualizations/'
 
     @property
     def template_name(self):
-        return '{}.{}'.format(self.base_template_name, self.kwargs['fmt'])
+        return 'core/visualizations/{}.{}'.format(self.slug, self.kwargs['fmt'])
 
     # Seriously? Do we really need this?
     # https://docs.djangoproject.com/en/dev/topics/class-based-views/#decorating-the-class
@@ -99,10 +97,8 @@ class VisualizationView(TemplateView):
         return response
 
 
-
 class PosHighlighterVisualization(VisualizationView):
     requires = set(['pos', 'tokens'])
-    base_template_name = 'core/visualizations/pos-highlighter'
     slug = 'part-of-speech'
 
     def process(self):
