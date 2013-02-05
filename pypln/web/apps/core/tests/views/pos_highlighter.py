@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf import settings
+from django.core import mail
 from django.core.urlresolvers import reverse
 
 from core.models import Document
@@ -28,15 +29,15 @@ class PosHighlighterViewTest(TestWithMongo):
     fixtures = ['document']
 
     def prepare_storage(self):
-        document = Document.objects.all()[0]
-        self.store['id:{}:text'.format(document.id)] = "This is our content"
-        self.store['id:{}:tokens'.format(document.id)] = ["This", "is", "our",
-                                                            "content"]
-        self.store['id:{}:pos'.format(document.id)] = [["This", "DT", 0 ],
-                                                       ["is", "VBZ", 5],
-                                                       [ "our", "PRP$", 8],
-                                                       ["content", "NNP", 12]]
-        self.store['id:{}:_properties'.format(document.id)] = ['text', 'tokens', 'pos']
+        self.document = Document.objects.all()[0]
+        self.store['id:{}:text'.format(self.document.id)] = "This is our content"
+        self.store['id:{}:tokens'.format(self.document.id)] = ["This", "is", "our",
+                                                                "content"]
+        self.store['id:{}:pos'.format(self.document.id)] = [["This", "DT", 0 ],
+                                                            ["is", "VBZ", 5],
+                                                            [ "our", "PRP$", 8],
+                                                            ["content", "NNP", 12]]
+        self.store['id:{}:_properties'.format(self.document.id)] = ['text', 'tokens', 'pos']
 
     def setUp(self):
         super(PosHighlighterViewTest, self).setUp()
@@ -89,3 +90,23 @@ class PosHighlighterViewTest(TestWithMongo):
         self.assertIn("tagset", response.context)
         self.assertIn("most_common", response.context)
         self.assertIn("token_list", response.context)
+
+    def test_send_email_warning_about_unknown_tags(self):
+        # We need to have an unknown tag in our data
+        self.store['id:{}:pos'.format(self.document.id)] = [["This", "UNKNOWN_TAG", 0 ],
+                                                            ["is", "VBZ", 5],
+                                                            [ "our", "PRP$", 8],
+                                                            ["content", "NNP", 12]]
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('pos_highlighter_visualization',
+            kwargs={'document_slug': 'document.txt', 'fmt': 'html'}))
+
+        # The page should render normally, even if we find unknown tags.
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "core/visualizations/part-of-speech.html")
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject,
+                            "{}Tags not in tagset".format(settings.EMAIL_SUBJECT_PREFIX))
