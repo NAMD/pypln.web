@@ -16,7 +16,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls.defaults import patterns, url
 from core.views.visualization import (PartOfSpeechVisualization, PlainTextVisualization,
-                                      TokenFrequencyVisualization)
+                                      TokenFrequencyVisualization, WordCloudVisualization)
 
 
 # Visualization urls
@@ -27,6 +27,8 @@ urlpatterns = patterns('core.views',
             PlainTextVisualization.as_view(), name='text_visualization'),
         url(r'^document/(?P<document_slug>.+)/visualization/token-frequency-histogram.(?P<fmt>(html|csv))$',
             TokenFrequencyVisualization.as_view(), name='token_frequency_histogram_visualization'),
+        url(r'^document/(?P<document_slug>.+)/visualization/word-cloud.(?P<fmt>(html|csv))$',
+            WordCloudVisualization.as_view(), name='word_cloud_visualization'),
         url(r'^document/(?P<document_slug>.+)/visualization/(?P<visualization>[-\w]+).(?P<fmt>(html|csv|txt))$',
             'document_visualization', name='document_visualization'),
 )

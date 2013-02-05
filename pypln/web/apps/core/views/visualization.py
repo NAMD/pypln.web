@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from collections import Counter
+from string import punctuation
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -25,10 +26,12 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
+
 from mongodict import MongoDict
+from nltk.corpus import stopwords
 
 from apps.core.models import Document
-from apps.utils import TAGSET, COMMON_TAGS
+from apps.utils import TAGSET, COMMON_TAGS, LANGUAGES
 
 class VisualizationView(TemplateView):
     """
@@ -161,5 +164,20 @@ class TokenFrequencyVisualization(VisualizationView):
         data['momentum_4'] = '{:.2f}'.format(data['momentum_4'])
         return data
 
+class WordCloudVisualization(VisualizationView):
+    requires = set(['freqdist', 'language'])
+    slug = 'word-cloud'
+    label = _('Word cloud')
+
+    def process(self):
+        data = self.get_data_from_store()
+        stopwords_list = list(punctuation)
+        document_language = LANGUAGES.get(data['language'])
+        if document_language and document_language.lower() in stopwords.fileids():
+            stopwords_list += stopwords.words(document_language.lower())
+        data['freqdist'] = [[x[0], x[1]] for x in data['freqdist'] \
+                                                     if x[0] not in stopwords_list]
+        return data
+
 available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization,
-                            TokenFrequencyVisualization]
+                            TokenFrequencyVisualization, WordCloudVisualization]

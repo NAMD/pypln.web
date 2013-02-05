@@ -17,10 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from string import punctuation
 from django.utils.translation import ugettext as _
-from nltk.corpus import stopwords
-from utils import LANGUAGES
 
 
 def _statistics(data):
@@ -39,15 +36,6 @@ def _statistics(data):
     data['percentual_sentences'] = '{:.2f}'.format(100 * data['number_of_unique_sentences'] / data['number_of_sentences'])
     return data
 
-def _wordcloud(data):
-    stopwords_list = list(punctuation)
-    document_language = LANGUAGES.get(data['language'])
-    if document_language and document_language.lower() in stopwords.fileids():
-        stopwords_list += stopwords.words(document_language.lower())
-    data['freqdist'] = [[x[0], x[1]] for x in data['freqdist'] \
-                                                 if x[0] not in stopwords_list]
-    return data
-
 VISUALIZATIONS = {
         'statistics': {
             'label': _('Statistics'),
@@ -55,10 +43,5 @@ VISUALIZATIONS = {
                              'average_sentence_repertoire',
                              'average_sentence_length']),
             'process': _statistics,
-        },
-        'word-cloud': {
-            'label': _('Word cloud'),
-            'requires': set(['freqdist', 'language']),
-            'process': _wordcloud,
         },
 }
