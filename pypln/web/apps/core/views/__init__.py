@@ -31,10 +31,8 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
-from django.views.generic.base import TemplateView
 
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
@@ -230,82 +228,6 @@ def document_visualization(request, document_slug, visualization, fmt):
         response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
         response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
     return response
-
-class VisualizationView(TemplateView):
-    """
-    Base class for visualization views.
-    Each visualization should extend this, declare it's requirements, base
-    template name, and a process method that returns the data necessary in the
-    template context.
-    """
-    requires = set()
-    base_template_name = 'core/visualizations/'
-
-    @property
-    def template_name(self):
-        return '{}.{}'.format(self.base_template_name, self.kwargs['fmt'])
-
-    # Seriously? Do we really need this?
-    # https://docs.djangoproject.com/en/dev/topics/class-based-views/#decorating-the-class
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(VisualizationView, self).dispatch(*args, **kwargs)
-
-    def get_data_from_store(self):
-        store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                          port=settings.MONGODB_CONFIG['port'],
-                          database=settings.MONGODB_CONFIG['database'],
-                          collection=settings.MONGODB_CONFIG['analysis_collection'])
-
-        try:
-            properties = set(store['id:{}:_properties'.format(self.document.id)])
-        except KeyError:
-            # FIXME: We know that we need better information about pipeline
-            # status. https://github.com/NAMD/pypln.web/issues/46
-            raise Http404("Visualization not found for this document.")
-
-        if not self.requires.issubset(properties):
-            # FIXME: We know that we need better information about pipeline
-            # status. https://github.com/NAMD/pypln.web/issues/46
-            raise Http404("Visualization not ready for this document. "
-                    "This means that the necessary processing is not finished "
-                    "or that an error has occured.")
-
-        data = {}
-        for key in self.requires:
-            data[key] = store['id:{}:{}'.format(self.document.id, key)]
-
-        return data
-
-    def process(self):
-        raise NotImplementedError
-
-    def get_context_data(self, document_slug, fmt):
-        self.document = get_object_or_404(Document, slug=document_slug,
-                    owner=self.request.user.id)
-
-        context = self.process()
-        context['document'] = self.document
-        return context
-
-class PosHighlighterVisualization(VisualizationView):
-    requires = set(['pos', 'tokens'])
-    base_template_name = 'core/visualizations/pos-highlighter'
-
-    def process(self):
-        input_data = self.get_data_from_store()
-        return pos_highlighter(input_data)
-
-    def render_to_response(self, context, **response_kwargs):
-        response = super(PosHighlighterVisualization, self).render_to_response(
-                context, **response_kwargs)
-
-        fmt = self.kwargs['fmt']
-        if fmt != "html":
-            response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
-            response["Content-Disposition"] = ('attachment; '
-                    'filename="{}-part-of-speech.{}"').format(self.document.slug, fmt)
-        return response
 
 @login_required
 def document_list(request):

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls.defaults import patterns, url
-from core.views import PosHighlighterVisualization
+from core.views.visualization import PosHighlighterVisualization
 
 
 urlpatterns = patterns('core.views',
