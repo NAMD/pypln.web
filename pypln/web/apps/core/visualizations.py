@@ -63,10 +63,6 @@ def _wordcloud(data):
     return data
 
 VISUALIZATIONS = {
-        'text': {
-            'label': _('Plain text'),
-            'requires': set(['text']),
-        },
         'token-frequency-histogram': {
              'label': _('Token frequency histogram'),
              'requires': set(['freqdist', 'momentum_1', 'momentum_2',

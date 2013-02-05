@@ -134,4 +134,9 @@ class PartOfSpeechVisualization(VisualizationView):
         return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
                 'token_list': token_list}
 
-available_visualizations = [PartOfSpeechVisualization]
+class PlainTextVisualization(VisualizationView):
+    requires = set(['text'])
+    slug = 'text'
+    label = _('Plain text')
+
+available_visualizations = [PlainTextVisualization, PartOfSpeechVisualization]
