@@ -37,13 +37,12 @@ from django.core.urlresolvers import reverse
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
 from django.conf import settings
-from apps.core.visualizations import VISUALIZATIONS
+from apps.core.views.visualization import available_visualizations
 
 from utils import LANGUAGES, create_pipelines
 from mongodict import MongoDict
 
 from pypln.web.apps.core.search import WhooshIndex
-from pypln.web.apps.core.visualizations import VISUALIZATIONS
 from pypln.web.apps.utils import LANGUAGES, create_pipelines
 
 
@@ -185,52 +184,13 @@ def document_page(request, document_slug):
     metadata['language'] = LANGUAGES[language] if language else _('Unknown')
     data['metadata'] = metadata
     visualizations = []
-    for key, value in VISUALIZATIONS.items():
-        if value['requires'].issubset(properties):
-            visualizations.append({'slug': key, 'label': value['label']})
+    for view in available_visualizations:
+        if view.requires.issubset(properties):
+            visualizations.append({'slug': view.slug, 'label': view.label})
+
     data['visualizations'] = visualizations
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))
-
-@login_required
-def document_visualization(request, document_slug, visualization, fmt):
-    try:
-        document = Document.objects.get(slug=document_slug,
-                owner=request.user.id)
-    except ObjectDoesNotExist:
-        return HttpResponse('Document not found', status=404)
-
-    data = {}
-    store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                      port=settings.MONGODB_CONFIG['port'],
-                      database=settings.MONGODB_CONFIG['database'],
-                      collection=settings.MONGODB_CONFIG['analysis_collection'])
-
-    try:
-        properties = set(store['id:{}:_properties'.format(document.id)])
-    except KeyError:
-        return HttpResponse('Visualization not found', status=404)
-    if visualization not in VISUALIZATIONS or \
-            not VISUALIZATIONS[visualization]['requires'].issubset(properties):
-        return HttpResponse('Visualization not found', status=404)
-
-    data = {}
-    for key in VISUALIZATIONS[visualization]['requires']:
-        data[key] = store['id:{}:{}'.format(document.id, key)]
-    template_name = 'core/visualizations/{}.{}'.format(visualization, fmt)
-    try:
-        template = get_template(template_name)
-    except TemplateDoesNotExist:
-        raise Http404("Visualization is not available in this format.")
-    if 'process' in VISUALIZATIONS[visualization]:
-        data = VISUALIZATIONS[visualization]['process'](data)
-    data['document'] = document
-    response = render_to_response(template_name, data,
-            context_instance=RequestContext(request))
-    if fmt != "html":
-        response["Content-Type"] = "text/{}; charset=utf-8".format(fmt)
-        response["Content-Disposition"] = 'attachment; filename="{}-{}.{}"'.format(document.slug, visualization, fmt)
-    return response
 
 @login_required
 def document_list(request):
