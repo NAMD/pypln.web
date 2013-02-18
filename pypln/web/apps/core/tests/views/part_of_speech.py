@@ -37,7 +37,9 @@ class PartOfSpeechViewTest(TestWithMongo):
                                                             ["is", "VBZ", 5],
                                                             [ "our", "PRP$", 8],
                                                             ["content", "NNP", 12]]
-        self.store['id:{}:_properties'.format(self.document.id)] = ['text', 'tokens', 'pos']
+        self.store['id:{}:tagset'.format(self.document.id)] = "en-nltk"
+        self.store['id:{}:_properties'.format(self.document.id)] = ['text',
+                'tokens', 'pos', 'tagset']
 
     def setUp(self):
         super(PartOfSpeechViewTest, self).setUp()

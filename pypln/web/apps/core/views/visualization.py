@@ -104,7 +104,7 @@ class VisualizationView(TemplateView):
         return response
 
 class PartOfSpeechVisualization(VisualizationView):
-    requires = set(['pos', 'tokens'])
+    requires = set(['pos', 'tokens', 'tagset'])
     slug = 'part-of-speech'
     label = _('Part-of-speech')
 
@@ -123,11 +123,14 @@ class PartOfSpeechVisualization(VisualizationView):
         pos = []
         token_list = []
         tag_errors = []
-
+        if 'tagset' not in data or data['tagset'] is None:
+            tagset = 'en-nltk'
+        else:
+            tagset = data['tagset']
         if data['pos'] is not None:
             for idx, item in enumerate(data['pos']):
                 try:
-                    tag = TAGSET[item[1]]
+                    tag = TAGSET[tagset][item[1]]
                     pos.append({'slug': tag['slug'], 'token': item[0]})
                     token_list.append((idx, item[0], item[1]))
                 except KeyError:
@@ -136,7 +139,7 @@ class PartOfSpeechVisualization(VisualizationView):
         if tag_errors:
             self.warn_about_unknown_tags(tag_errors)
 
-        return {'pos': pos, 'tagset': TAGSET, 'most_common': COMMON_TAGS[:20],
+        return {'pos': pos, 'tagset': TAGSET[tagset], 'most_common': COMMON_TAGS[:20],
                 'token_list': token_list}
 
 class PlainTextVisualization(VisualizationView):
