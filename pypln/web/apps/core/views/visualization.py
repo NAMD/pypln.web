@@ -104,7 +104,7 @@ class VisualizationView(TemplateView):
         return response
 
 class PartOfSpeechVisualization(VisualizationView):
-    requires = set(['pos', 'tokens', 'tagset'])
+    requires = set(['pos', 'tokens'])
     slug = 'part-of-speech'
     label = _('Part-of-speech')
 
