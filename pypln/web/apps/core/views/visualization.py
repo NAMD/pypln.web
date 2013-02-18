@@ -113,9 +113,9 @@ class PartOfSpeechVisualization(VisualizationView):
 
         subject = u"Tags not in tagset"
         message = u""
-        for item in tag_errors:
+        for item, tagset in tag_errors:
             message += (u"Tag {} was assigned to token \"{}\", but was not found "
-                    u"in tagset.\n\n").format(item[1], item[0])
+                    u"in tagset {}.\n\n").format(item[1], item[0], tagset)
         mail_admins(subject, message)
 
     def process(self):
@@ -134,7 +134,7 @@ class PartOfSpeechVisualization(VisualizationView):
                     pos.append({'slug': tag['slug'], 'token': item[0]})
                     token_list.append((idx, item[0], item[1]))
                 except KeyError:
-                    tag_errors.append(item)
+                    tag_errors.append((item, tagset))
 
         if tag_errors:
             self.warn_about_unknown_tags(tag_errors)
