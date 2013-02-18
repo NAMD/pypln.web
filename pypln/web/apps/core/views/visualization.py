@@ -111,11 +111,11 @@ class PartOfSpeechVisualization(VisualizationView):
     def warn_about_unknown_tags(self, tag_errors):
         from django.core.mail import mail_admins
 
-        subject = "Tags not in tagset"
-        message = ""
+        subject = u"Tags not in tagset"
+        message = u""
         for item in tag_errors:
-            message += ("Tag {} was assigned to token \"{}\", but was not found "
-                    "in tagset.\n\n").format(item[1], item[0])
+            message += (u"Tag {} was assigned to token \"{}\", but was not found "
+                    u"in tagset.\n\n").format(item[1], item[0])
         mail_admins(subject, message)
 
     def process(self):
