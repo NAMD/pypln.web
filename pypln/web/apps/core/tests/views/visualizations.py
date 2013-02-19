@@ -31,7 +31,11 @@ class VisualizationRoutingViewTest(TestWithMongo):
     def prepare_storage(self):
         self.document = Document.objects.all()[0]
         self.store['id:{}:text'.format(self.document.id)] = "This is our content"
-        self.store['id:{}:_properties'.format(self.document.id)] = ['text']
+        self.store['id:{}:freqdist'.format(self.document.id)] = [["this", 1], ["is", 1],
+                                                                 ["content", 1], ["our", 1]]
+        self.store['id:{}:language'.format(self.document.id)] = "en"
+        self.store['id:{}:_properties'.format(self.document.id)] = ['text', 'freqdist',
+                                                                    'language']
 
     def setUp(self):
         super(VisualizationRoutingViewTest, self).setUp()
@@ -43,4 +47,14 @@ class VisualizationRoutingViewTest(TestWithMongo):
                                     kwargs={'document_slug': 'document.txt',
                                             'visualization_slug': 'invalid',
                                             'fmt': 'html'}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_raises_404_for_existing_visualization_with_invalid_extension(self):
+        """This extension exists for other visualizations, but not for this
+        one. The request should be answered with 404."""
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_visualization',
+                                    kwargs={'document_slug': 'document.txt',
+                                            'visualization_slug': 'word-cloud',
+                                            'fmt': 'txt'}))
         self.assertEqual(response.status_code, 404)
