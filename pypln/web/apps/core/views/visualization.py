@@ -220,4 +220,4 @@ def visualization_router(*args, **kwargs):
     for view_class in available_visualizations:
         if view_class.slug == slug:
             return view_class.as_view()(*args, **kwargs)
-    raise Http404("Visualization {} not found".format(visualization_slug))
+    raise Http404("Visualization {} not found".format(slug))
