@@ -165,12 +165,7 @@ def corpus_page(request, corpus_slug):
 
 @login_required
 def document_page(request, document_slug):
-    try:
-        document = Document.objects.get(slug=document_slug,
-                owner=request.user.id)
-    except ObjectDoesNotExist:
-        return render_to_response('core/404.html', {},
-                context_instance=RequestContext(request))
+    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
 
     data = {'document': document,
             'corpora': Corpus.objects.filter(owner=request.user.id)}
@@ -200,12 +195,7 @@ def document_list(request):
 
 @login_required
 def document_download(request, document_slug):
-    try:
-        document = Document.objects.get(slug=document_slug,
-                owner=request.user.id)
-    except ObjectDoesNotExist:
-        return render_to_response('core/404.html', {},
-                context_instance=RequestContext(request))
+    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
     filename = document.blob.name.split('/')[-1]
     file_mime_type = guess_type(filename)[0]
     response = HttpResponse(document.blob, content_type=file_mime_type)
