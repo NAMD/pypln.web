@@ -23,6 +23,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
@@ -45,7 +47,15 @@ class VisualizationView(TemplateView):
 
     @property
     def template_name(self):
-        return 'core/visualizations/{}.{}'.format(self.slug, self.kwargs['fmt'])
+        fmt = self.kwargs['fmt']
+        template_name = 'core/visualizations/{}.{}'.format(self.slug, fmt)
+        try:
+            get_template(template_name)
+        except TemplateDoesNotExist:
+            raise Http404("Format {} not supported for visualization "
+                    "{}".format(fmt, self.slug))
+
+        return template_name
 
     # Seriously? Do we really need this?
     # https://docs.djangoproject.com/en/dev/topics/class-based-views/#decorating-the-class
