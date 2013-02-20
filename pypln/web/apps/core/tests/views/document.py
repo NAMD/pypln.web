@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 from core.models import Document
 from core.tests.utils import TestWithMongo, create_document
 
-__all__ = ["DocumentPageViewTest"]
+__all__ = ["DocumentPageViewTest", "DocumentDownloadViewTest"]
 
 class DocumentPageViewTest(TestWithMongo):
     fixtures = ['corpus']
@@ -101,3 +101,50 @@ class DocumentPageViewTest(TestWithMongo):
 
         self.assertIn("document", response.context)
         self.assertEqual(response.context["document"], second_document)
+
+class DocumentDownloadViewTest(TestWithMongo):
+    fixtures = ['corpus']
+
+    def setUp(self):
+        # We need the file in gridfs, so we'll just save it instead of using
+        # the 'document' fixture.
+        super(DocumentDownloadViewTest, self).setUp()
+        self.document = create_document("document.txt", "This is our content", self.user)
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('document_download',
+            args=(self.document.id, self.document.slug)))
+        self.assertEqual(response.status_code, 302)
+        login_url = settings.LOGIN_URL
+        self.assertTrue(login_url in response['Location'])
+
+    def test_raises_404_for_inexistent_corpus(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_download',
+            args=(999, 'inexistent_document.txt')))
+        self.assertEqual(response.status_code, 404)
+
+    def test_shows_existing_document_without_error(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_download',
+            args=(self.document.id, self.document.slug)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(response["Content-Disposition"],
+                ("attachment; filename={}".format(
+                    self.document.blob.name.split('/')[-1])))
+
+    def test_view_should_find_document_with_slug_that_is_not_unique(self):
+        second_document = create_document("document.txt", "This is our content", self.user)
+        second_document.slug = self.document.slug
+        second_document.save()
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_download',
+            args=(second_document.id, second_document.slug)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(response["Content-Disposition"],
+                ("attachment; filename={}".format(
+                    second_document.blob.name.split('/')[-1])))

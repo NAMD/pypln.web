@@ -70,7 +70,7 @@
       </div>
       {% endfor %}
       <div>
-          <a href="{% url document_download document.slug %}">{% trans "Download the original file" %}</a>
+          <a href="{% url document_download document.id document.slug %}">{% trans "Download the original file" %}</a>
       </div>
 
       <h4>{% trans "Corpora" %}</h4>

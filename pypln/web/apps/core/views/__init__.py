@@ -198,8 +198,8 @@ def document_list(request):
             context_instance=RequestContext(request))
 
 @login_required
-def document_download(request, document_slug):
-    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
+def document_download(request, document_id, document_slug):
+    document = get_object_or_404(Document, id=document_id, slug=document_slug, owner=request.user.id)
     filename = document.blob.name.split('/')[-1]
     store = MongoDict(host=settings.MONGODB_CONFIG['host'],
                       port=settings.MONGODB_CONFIG['port'],
