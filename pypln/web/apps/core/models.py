@@ -36,7 +36,7 @@ gridfs_storage = GridFSStorage(location='/',
 
 class Document(models.Model):
     blob = models.FileField(upload_to='/', storage=gridfs_storage)
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User)
     indexed = models.BooleanField(default=False)
@@ -63,8 +63,7 @@ class Document(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            slugfied_name = slugify_keeping_dots(self.blob.name)
-            self.slug = self.blob.storage.get_available_name(slugfied_name)
+            self.slug = slugify_keeping_dots(self.blob.name)
         return super(Document, self).save(*args, **kwargs)
 
 
