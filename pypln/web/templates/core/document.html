@@ -9,7 +9,7 @@
   <div class="breadcrumb">
     You are here:
     <a href="{% url home %}">{% trans "Home" %}</a> &gt;
-    <a href="{% url document_page document.slug %}">Document {{ document.file_name }}</a>
+    <a href="{% url document_page document.id document.slug %}">Document {{ document.file_name }}</a>
   </div>
 
   <h2 class="brand">{% trans "Document" %} {{ document.file_name }}</h2>

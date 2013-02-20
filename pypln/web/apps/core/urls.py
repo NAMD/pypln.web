@@ -25,7 +25,7 @@ urlpatterns = patterns('core.views',
             'visualization.visualization_router', name='document_visualization'),
         url(r'^document/(?P<document_slug>.+)/download$', 'document_download',
             name='document_download'),
-        url(r'^document/(?P<document_slug>.+)/?$', 'document_page',
+        url(r'^document/(?P<document_id>\d+)/(?P<document_slug>.+)/?$', 'document_page',
             name='document_page'),
         url(r'^search', 'search', name='search'),
 )

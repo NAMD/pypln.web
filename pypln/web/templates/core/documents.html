@@ -41,7 +41,7 @@
         <tbody>
         {% for document in documents %}
         <tr>
-          <td><a href="{% url document_page document_slug=document.slug %}">{{ document.file_name }}</a></td>
+          <td><a href="{% url document_page document.id document.slug %}">{{ document.file_name }}</a></td>
           <td>{{ document.file_size }}</td>
           <td>{{ document.date_uploaded }}</td>
           <td><a href="{% url profile_detail username=document.owner.username %}">{{ document.owner }}</a></td>

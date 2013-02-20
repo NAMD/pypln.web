@@ -17,17 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from StringIO import StringIO
-from datetime import datetime
-from mock import patch
-
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 
-from core.models import Corpus, Document
-from core.forms import DocumentForm
+from core.models import Document
 from core.tests.utils import TestWithMongo, create_document
 
 __all__ = ["DocumentPageViewTest"]
@@ -56,7 +49,7 @@ class DocumentPageViewTest(TestWithMongo):
 
     def test_requires_login(self):
         response = self.client.get(reverse('document_page',
-            kwargs={'document_slug': 'document.txt'}))
+            args=(self.document.id, self.document.slug)))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
@@ -64,13 +57,13 @@ class DocumentPageViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_corpus(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_page',
-            kwargs={'document_slug': 'inexistent_document.txt'}))
+            args=(999, 'inexistent_document.txt')))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_existing_document_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_page',
-            kwargs={'document_slug': 'document.txt'}))
+            args=(self.document.id, self.document.slug)))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/document.html")
@@ -79,7 +72,7 @@ class DocumentPageViewTest(TestWithMongo):
     def test_document_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_page',
-            kwargs={'document_slug': 'document.txt'}))
+            args=(self.document.id, self.document.slug)))
 
         self.assertIn("document", response.context)
         self.assertEqual(response.context["document"], self.document)
@@ -87,7 +80,7 @@ class DocumentPageViewTest(TestWithMongo):
     def test_metadata_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_page',
-            kwargs={'document_slug': 'document.txt'}))
+            args=(self.document.id, self.document.slug)))
 
         self.assertIn("metadata", response.context)
         metadata = response.context["metadata"]
@@ -99,8 +92,8 @@ class DocumentPageViewTest(TestWithMongo):
         second_document.slug = self.document.slug
         second_document.save()
         self.client.login(username="admin", password="admin")
-        response = self.client.get(reverse("document_page",
-            kwargs={"document_slug": "document.txt"}))
+        response = self.client.get(reverse('document_page',
+            args=(second_document.id, second_document.slug)))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/document.html")

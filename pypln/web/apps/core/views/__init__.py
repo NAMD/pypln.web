@@ -164,8 +164,8 @@ def corpus_page(request, corpus_slug):
         return list_corpus_documents(request, corpus_slug)
 
 @login_required
-def document_page(request, document_slug):
-    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
+def document_page(request, document_id, document_slug):
+    document = get_object_or_404(Document, id=document_id, owner=request.user.id)
 
     data = {'document': document,
             'corpora': Corpus.objects.filter(owner=request.user.id)}
