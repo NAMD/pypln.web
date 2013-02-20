@@ -177,7 +177,11 @@ def document_page(request, document_slug):
     metadata = store.get('id:{}:file_metadata'.format(document.id), {})
     language = store.get('id:{}:language'.format(document.id), None)
     metadata['language'] = LANGUAGES[language] if language else _('Unknown')
+    mimetype = store.get('id:{}:mimetype'.format(document.id))
+    if mimetype:
+        metadata['mimetype'] = mimetype
     data['metadata'] = metadata
+
     visualizations = []
     for view in available_visualizations:
         if view.requires.issubset(properties):
