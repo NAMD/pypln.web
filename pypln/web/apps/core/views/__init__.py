@@ -201,7 +201,15 @@ def document_list(request):
 def document_download(request, document_slug):
     document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
     filename = document.blob.name.split('/')[-1]
-    file_mime_type = guess_type(filename)[0]
+    store = MongoDict(host=settings.MONGODB_CONFIG['host'],
+                      port=settings.MONGODB_CONFIG['port'],
+                      database=settings.MONGODB_CONFIG['database'],
+                      collection=settings.MONGODB_CONFIG['analysis_collection'])
+    detected_mimetype =  store.get('id:{}:mimetype'.format(document.id))
+    if detected_mimetype:
+        file_mime_type = detected_mimetype
+    else:
+        file_mime_type = guess_type(filename)[0]
     response = HttpResponse(document.blob, content_type=file_mime_type)
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
     return response
