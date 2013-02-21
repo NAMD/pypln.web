@@ -21,32 +21,35 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 
 from core.models import Document
-from core.tests.utils import TestWithMongo
+from core.tests.utils import TestWithMongo, create_document
 
 __all__ = ["TokenFrequencyHistogramViewTest"]
 
 class TokenFrequencyHistogramViewTest(TestWithMongo):
     fixtures = ['document']
+    def _update_document_data(self, document):
+        self.store['id:{}:freqdist'.format(document.id)] = [["this", 1], ["is", 1],
+                                                                 ["content", 1], ["our", 1]]
+        self.store['id:{}:momentum_1'.format(document.id)] = 1
+        self.store['id:{}:momentum_2'.format(document.id)] = 1
+        self.store['id:{}:momentum_3'.format(document.id)] = 1
+        self.store['id:{}:momentum_4'.format(document.id)] = 1
+        self.store['id:{}:_properties'.format(document.id)] = ['freqdist', 'momentum_1',
+                                                                    'momentum_2', 'momentum_3',
+                                                                    'momentum_4']
 
     def prepare_storage(self):
         self.document = Document.objects.all()[0]
-        self.store['id:{}:freqdist'.format(self.document.id)] = [["this", 1], ["is", 1],
-                                                                 ["content", 1], ["our", 1]]
-        self.store['id:{}:momentum_1'.format(self.document.id)] = 1
-        self.store['id:{}:momentum_2'.format(self.document.id)] = 1
-        self.store['id:{}:momentum_3'.format(self.document.id)] = 1
-        self.store['id:{}:momentum_4'.format(self.document.id)] = 1
-        self.store['id:{}:_properties'.format(self.document.id)] = ['freqdist', 'momentum_1',
-                                                                    'momentum_2', 'momentum_3',
-                                                                    'momentum_4']
+        self._update_document_data(self.document)
+
     def setUp(self):
         super(TokenFrequencyHistogramViewTest, self).setUp()
         self.prepare_storage()
 
     def test_requires_login(self):
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-            'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
@@ -54,15 +57,15 @@ class TokenFrequencyHistogramViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'inexistent-document.txt',
-            'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
+            kwargs={'document_id': 999, 'document_slug': 'inexistent-document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_text_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-            'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/token-frequency-histogram.html")
@@ -71,8 +74,8 @@ class TokenFrequencyHistogramViewTest(TestWithMongo):
     def test_shows_text_for_existing_document_in_txt_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-            'visualization_slug': 'token-frequency-histogram', 'fmt': 'csv'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/token-frequency-histogram.csv")
@@ -84,8 +87,8 @@ class TokenFrequencyHistogramViewTest(TestWithMongo):
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-            'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
         document = Document.objects.all()[0]
@@ -95,3 +98,16 @@ class TokenFrequencyHistogramViewTest(TestWithMongo):
         self.assertIn("momentum_2", response.context)
         self.assertIn("momentum_3", response.context)
         self.assertIn("momentum_4", response.context)
+
+    def test_visualization_should_work_for_different_documents_with_the_same_slug(self):
+        # We need to simulate the same document being uploaded again
+        document = create_document("document.txt", "This is our content", self.user)
+        self._update_document_data(document)
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_id': document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'token-frequency-histogram', 'fmt': 'html'}))
+
+        self.assertIn("document", response.context)
+        self.assertEqual(response.context["document"], document)
