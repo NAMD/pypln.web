@@ -33,6 +33,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
@@ -152,7 +153,20 @@ def upload_documents(request, corpus_slug):
 def list_corpus_documents(request, corpus_slug):
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
     form = DocumentForm(request.user)
-    data = {'corpus': corpus, 'form': form}
+    paginator = Paginator(corpus.documents.all(), 10)
+    page = request.GET.get('page', '1')
+
+    try:
+        documents = paginator.page(page)
+    except PageNotAnInteger:
+        # If the page number is invalid, show the first page.
+        documents = paginator.page(1)
+    except EmptyPage:
+        # If it is out of range, show the last page.
+        documents = paginator.page(paginator.num_pages)
+
+    data = {'corpus': corpus, 'documents': documents,
+            'form': form}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
 

@@ -29,8 +29,9 @@ from django.core.urlresolvers import reverse
 
 from core.models import Corpus, Document
 from core.forms import DocumentForm
+from core.tests.utils import create_document
 
-__all__ = ["CorpusViewTest", "UploadDocumentTest"]
+__all__ = ["CorpusViewTest", "UploadDocumentTest", "CorpusViewPaginationTest"]
 
 class CorpusViewTest(TestCase):
     fixtures = ['corpus']
@@ -73,6 +74,7 @@ class CorpusViewTest(TestCase):
 
         self.assertIn("form", response.context)
         self.assertIsInstance(response.context["form"], DocumentForm)
+
 
 class UploadDocumentTest(TestCase):
     fixtures = ['corpus']
@@ -160,3 +162,74 @@ class UploadDocumentTest(TestCase):
 
         self.assertTrue(create_pipelines_mock.called)
         self.assertIn(expected_data, create_pipelines_mock.call_args[0])
+
+
+class CorpusViewPaginationTest(TestCase):
+    fixtures = ['corpus']
+
+    def _create_documents(self, n):
+        for i in range(n):
+            doc = create_document("document_{}".format(i),
+                    "content", self.user)
+            self.corpus.documents.add(doc)
+
+    def setUp(self):
+        self.user = User.objects.all()[0]
+        self.corpus = Corpus.objects.filter(owner=self.user)[0]
+
+
+    def test_list_should_use_default_number_of_documents_per_page(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}))
+
+        expected_document_list = list(self.corpus.documents.all()[:10])
+
+        self.assertIn("documents", response.context)
+
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+    def test_list_should_show_second_page(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'page': 2})
+
+        expected_document_list = list(self.corpus.documents.all()[10:])
+
+        self.assertIn("documents", response.context)
+
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+    def test_ignores_page_parameter_if_not_an_integer(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'page': 'invalid'})
+
+        expected_document_list = list(self.corpus.documents.all()[:10])
+
+        self.assertIn("documents", response.context)
+
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+    def test_show_last_page_if_request_is_out_of_range(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'page': 9999})
+
+        expected_document_list = list(self.corpus.documents.all()[10:])
+
+        self.assertIn("documents", response.context)
+
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)

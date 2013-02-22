@@ -3,16 +3,9 @@
 {% load ifsetting_tag %}
 {% block head_title %}{% trans "Corpus" %} {{ corpus.slug }}{% endblock %}
 {% block extra_head%}
-    <script src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
-    <link href="{{ STATIC_URL }}css/jquery.dataTables.css" rel="stylesheet"></link>
 {% endblock %}
 
 {% block body %}
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#table_documents').dataTable();
-        } );
-    </script>
 <div class="breadcrumb">
 {% trans "You are here:" %}
     <a href="{% url home %}">{% trans "Home" %}</a> &gt;
@@ -90,7 +83,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for document in corpus.documents.all %}
+        {% for document in documents.object_list %}
         <tr>
           <td><a href="{% url document_page document.id document.slug %}">{{ document.file_name }}</a></td>
           <td>{{ document.file_size }}</td>
@@ -100,4 +93,18 @@
         {% endfor %}
         </tbody>
     </table>
+    <div class="pagination pagination-right pagination-small">
+        <ul>
+            {% if documents.has_previous %}
+                <li><a href="?page={{ documents.previous_page_number }}">{% trans "previous" %}</a></li>
+            {% else %}
+                <li class="disabled"><span>{% trans "previous"%}</span></li>
+            {% endif %}
+            {% if documents.has_next %}
+                <li><a href="?page={{ documents.next_page_number }}">{% trans "next" %}</a></li>
+            {% else %}
+                <li class="disabled"><span>{% trans "next"%}</span></li>
+            {% endif %}
+        </ul>
+    </div>
 {% endblock %}
