@@ -18,7 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from StringIO import StringIO
-from datetime import datetime
+import datetime
 from mock import patch
 
 from django.conf import settings
@@ -146,7 +146,7 @@ class UploadDocumentTest(TestCase):
 
     def test_corpus_last_modified_date_is_updated(self):
         self.client.login(username="admin", password="admin")
-        start_time = datetime.now()
+        start_time = datetime.datetime.now()
         corpus = Corpus.objects.get(slug="test-corpus")
         self.assertLess(corpus.last_modified, start_time)
         response = self.client.post(self.url, {'blob': [self.fp]}, follow=True)
@@ -266,3 +266,77 @@ class CorpusViewPaginationTest(TestCase):
 
         paginator = response.context["documents"].paginator
         self.assertEqual(paginator.num_pages, 2)
+
+    def test_ignore_invalid_sort_key_and_sort_by_blob_name(self):
+        self.corpus.documents.add(create_document("z", "content", self.user))
+        self._create_documents(2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'sort_by': 'invalid'})
+        expected_document_list = list(self.corpus.documents.order_by('blob'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+
+    def test_sort_by_blob_name_by_default(self):
+        # create a document that should appear last, but without explicitly
+        # sorting by filename it will appear first
+        self.corpus.documents.add(create_document("z", "content", self.user))
+        self._create_documents(2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}))
+        expected_document_list = list(self.corpus.documents.order_by('blob'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+
+    def test_sort_by_blob_name(self):
+        self.corpus.documents.add(create_document("z", "content", self.user))
+        self._create_documents(2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'sort_by': 'filename'})
+        expected_document_list = list(self.corpus.documents.order_by('blob'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+
+    def test_reverse_sort_by_blob_name(self):
+        self.corpus.documents.add(create_document("z", "content", self.user))
+        self._create_documents(2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'sort_by': 'filename_desc'})
+        expected_document_list = list(self.corpus.documents.order_by('-blob'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+
+    def test_sort_by_date_uploaded(self):
+        doc_1 = create_document("z", "1", self.user)
+        doc_1.date_uploaded = datetime.date(2013, 1, 1)
+        doc_1.save()
+        self.corpus.documents.add(doc_1)
+        doc_2 = create_document("a", "1", self.user)
+        doc_2.date_uploaded = datetime.date(2013, 1, 10)
+        doc_2.save()
+        self.corpus.documents.add(doc_2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'sort_by': 'date'})
+        expected_document_list = list(self.corpus.documents.order_by('date_uploaded'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)
+
+    def test_reverse_sort_by_date_uploaded(self):
+        doc_1 = create_document("z", "1", self.user)
+        doc_1.date_uploaded = datetime.date(2013, 1, 10)
+        doc_1.save()
+        self.corpus.documents.add(doc_1)
+        doc_2 = create_document("a", "1", self.user)
+        doc_2.date_uploaded = datetime.date(2013, 1, 1)
+        doc_2.save()
+        self.corpus.documents.add(doc_2)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'sort_by': 'date_desc'})
+        expected_document_list = list(self.corpus.documents.order_by('-date_uploaded'))
+        self.assertEqual(list(response.context["documents"].object_list),
+                expected_document_list)

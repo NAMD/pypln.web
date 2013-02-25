@@ -166,7 +166,16 @@ def list_corpus_documents(request, corpus_slug):
     if per_page == 0:
         per_page = DEFAULT_PER_PAGE
 
-    paginator = Paginator(corpus.documents.all(), per_page)
+    sort_mapping = {
+        "filename": "blob",
+        "filename_desc": "-blob",
+        "date": "date_uploaded",
+        "date_desc": "-date_uploaded",
+    }
+    sort_key = request.GET.get('sort_by')
+    sort_by = sort_mapping.get(sort_key, 'blob')
+
+    paginator = Paginator(corpus.documents.order_by(sort_by), per_page)
 
     page = request.GET.get('page', '1')
     try:
@@ -179,7 +188,7 @@ def list_corpus_documents(request, corpus_slug):
         documents = paginator.page(paginator.num_pages)
 
     data = {'corpus': corpus, 'documents': documents,
-            'form': form}
+            'form': form, 'sort_by': sort_by}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
 

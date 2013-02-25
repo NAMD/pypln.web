@@ -118,3 +118,26 @@ label {
 div.per-page {
   margin: 15px 0;
 }
+
+thead .sort {
+    cursor: pointer;
+}
+thead .sort {
+    background: url('../images/sort_both.png') no-repeat center right;
+}
+
+thead .sort_asc {
+    background: url('../images/sort_asc.png') no-repeat center right;
+}
+
+thead .sort_desc {
+    background: url('../images/sort_desc.png') no-repeat center right;
+}
+
+thead .sort_asc_disabled {
+    background: url('../images/sort_asc_disabled.png') no-repeat center right;
+}
+
+thead .sort_desc_disabled {
+    background: url('../images/sort_desc_disabled.png') no-repeat center right;
+}
