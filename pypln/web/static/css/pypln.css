@@ -114,3 +114,7 @@ label {
   height: 20px;
   line-height: 20px;
 }
+
+div.per-page {
+  margin: 15px 0;
+}

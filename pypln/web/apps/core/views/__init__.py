@@ -151,11 +151,24 @@ def upload_documents(request, corpus_slug):
 
 @login_required
 def list_corpus_documents(request, corpus_slug):
+    DEFAULT_PER_PAGE = 10
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
     form = DocumentForm(request.user)
-    paginator = Paginator(corpus.documents.all(), 10)
-    page = request.GET.get('page', '1')
+    try:
+        per_page = int(request.GET.get('per_page', '10'))
+    except ValueError:
+        # If user asks for an invalid number of documents per page, show
+        # default number of documents per page.
+        per_page = DEFAULT_PER_PAGE
 
+    # We can't pass 0 to the paginator. If the user asked for 0, show default
+    # number of documents per page.
+    if per_page == 0:
+        per_page = DEFAULT_PER_PAGE
+
+    paginator = Paginator(corpus.documents.all(), per_page)
+
+    page = request.GET.get('page', '1')
     try:
         documents = paginator.page(page)
     except PageNotAnInteger:

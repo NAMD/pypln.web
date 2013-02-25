@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load ifsetting_tag %}
 {% block head_title %}{% trans "Corpus" %} {{ corpus.slug }}{% endblock %}
-{% block extra_head%}
+{% block extra_head %}
 {% endblock %}
 
 {% block body %}
@@ -72,7 +72,15 @@
         </div>
     </div>
     <h3>{% trans "List of Documents" %}</h3>
-
+    <div class="per-page">{% trans "Show" %}
+        <select id="per-page">
+            <option {% if documents.paginator.per_page == 10 %}selected{% endif %} value="10">10</option>
+            <option {% if documents.paginator.per_page == 25 %}selected{% endif %} value="25">25</option>
+            <option {% if documents.paginator.per_page == 50 %}selected{% endif %} value="50">50</option>
+            <option {% if documents.paginator.per_page == 100 %}selected{% endif %} value="100">100</option>
+        </select>
+        {% trans "entries" %}
+    </div>
     <table id="table_documents">
         <thead>
         <tr>
@@ -96,15 +104,22 @@
     <div class="pagination pagination-right pagination-small">
         <ul>
             {% if documents.has_previous %}
-                <li><a href="?page={{ documents.previous_page_number }}">{% trans "previous" %}</a></li>
+                <li><a href="?page={{ documents.previous_page_number }}&per_page={{ documents.paginator.per_page }}">{% trans "previous" %}</a></li>
             {% else %}
                 <li class="disabled"><span>{% trans "previous"%}</span></li>
             {% endif %}
             {% if documents.has_next %}
-                <li><a href="?page={{ documents.next_page_number }}">{% trans "next" %}</a></li>
+                <li><a href="?page={{ documents.next_page_number }}&per_page={{ documents.paginator.per_page }}">{% trans "next" %}</a></li>
             {% else %}
                 <li class="disabled"><span>{% trans "next"%}</span></li>
             {% endif %}
         </ul>
     </div>
+{% endblock %}
+{% block extra_body %}
+    <script type="text/javascript">
+        $('#per-page').change(function(ev){
+            window.location = "?per_page=" + ev.target.value;
+        })
+    </script>
 {% endblock %}

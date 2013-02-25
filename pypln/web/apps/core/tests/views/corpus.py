@@ -233,3 +233,36 @@ class CorpusViewPaginationTest(TestCase):
         self.assertEqual(list(response.context["documents"].object_list),
                 expected_document_list)
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
+
+    def test_user_can_define_number_of_objects_per_page(self):
+        self._create_documents(5)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'per_page': 2})
+
+        self.assertIn("documents", response.context)
+
+        paginator = response.context["documents"].paginator
+        self.assertEqual(paginator.num_pages, 3)
+
+    def test_ignores_invalid_number_of_objects_per_page(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'per_page': 'invalid'})
+
+        self.assertIn("documents", response.context)
+
+        paginator = response.context["documents"].paginator
+        self.assertEqual(paginator.num_pages, 2)
+
+    def test_ignores_number_of_objects_per_page_if_it_is_zero(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'per_page': 0})
+
+        self.assertIn("documents", response.context)
+
+        paginator = response.context["documents"].paginator
+        self.assertEqual(paginator.num_pages, 2)
