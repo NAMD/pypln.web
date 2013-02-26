@@ -206,25 +206,27 @@ class CorpusViewPaginationTest(TestCase):
                 expected_document_list)
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
 
-    def test_ignores_page_parameter_if_not_an_integer(self):
+    def test_returns_404_if_page_parameter_is_not_an_integer(self):
         self._create_documents(11)
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('corpus_page',
             kwargs={'corpus_slug': 'test-corpus'}), {'page': 'invalid'})
 
-        expected_document_list = list(self.corpus.documents.all()[:10])
+        self.assertEqual(response.status_code, 404)
 
-        self.assertIn("documents", response.context)
-
-        self.assertEqual(list(response.context["documents"].object_list),
-                expected_document_list)
-        self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)
-
-    def test_show_last_page_if_request_is_out_of_range(self):
+    def test_returns_404_if_requested_page_is_out_of_range(self):
         self._create_documents(11)
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('corpus_page',
             kwargs={'corpus_slug': 'test-corpus'}), {'page': 9999})
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_returns_last_page(self):
+        self._create_documents(11)
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('corpus_page',
+            kwargs={'corpus_slug': 'test-corpus'}), {'page': 'last'})
 
         expected_document_list = list(self.corpus.documents.all()[10:])
 

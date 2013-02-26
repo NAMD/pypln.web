@@ -116,6 +116,7 @@ class DocumentListViewPaginationTest(TestCase):
 
         expected_document_list = list(Document.objects.all()[10:])
 
+        self.assertEqual(response.status_code, 200)
         self.assertIn("documents", response.context)
         self.assertEqual(list(response.context["documents"]), expected_document_list)
         self.assertNotIn(settings.TEMPLATE_STRING_IF_INVALID, response.content)

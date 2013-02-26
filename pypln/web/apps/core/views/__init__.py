@@ -183,11 +183,12 @@ def list_corpus_documents(request, corpus_slug):
     try:
         documents = paginator.page(page)
     except PageNotAnInteger:
-        # If the page number is invalid, show the first page.
-        documents = paginator.page(1)
+        if page == 'last':
+            documents = paginator.page(paginator.num_pages)
+        else:
+            raise Http404("Invalid page")
     except EmptyPage:
-        # If it is out of range, show the last page.
-        documents = paginator.page(paginator.num_pages)
+        raise Http404("This page does not exist")
 
     data = {'corpus': corpus, 'documents': documents,
             'form': form, 'sort_by': sort_by}
