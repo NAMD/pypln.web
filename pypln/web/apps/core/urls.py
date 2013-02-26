@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls.defaults import patterns, url
+from core.views import DocumentListView
 
 urlpatterns = patterns('core.views',
         url(r'^corpora/?$', 'corpora_list', name='corpora_list'),
         url(r'^corpora/(?P<corpus_slug>.+)/?$', 'corpus_page',
             name='corpus_page'),
-        url(r'^documents/?$', 'document_list', name='document_list'),
+        url(r'^documents/?$', DocumentListView.as_view(), name='document_list'),
         url(r'^document/(?P<document_id>\d+)/(?P<document_slug>.+)/visualization/(?P<visualization_slug>[-\w]+)\.(?P<fmt>(html|csv|txt))$',
             'visualization.visualization_router', name='document_visualization'),
         url(r'^document/(?P<document_id>\d+)/(?P<document_slug>.+)/download$', 'document_download',

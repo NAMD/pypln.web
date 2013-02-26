@@ -29,8 +29,10 @@ from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
+from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -227,11 +229,18 @@ def document_page(request, document_id, document_slug):
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))
 
-@login_required
-def document_list(request):
-    data = {'documents': Document.objects.filter(owner=request.user.id)}
-    return render_to_response('core/documents.html', data,
-            context_instance=RequestContext(request))
+
+class DocumentListView(ListView):
+    template_name = "core/documents.html"
+    context_object_name = "documents"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DocumentListView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        return Document.objects.filter(owner=self.request.user.id)
+
 
 @login_required
 def document_download(request, document_id, document_slug):
