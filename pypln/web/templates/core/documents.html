@@ -36,11 +36,11 @@
     <table id="table_documents">
         <thead>
         <tr>
-            <th>{% trans "Filename" %}</th>
+            <th class="sort{% if sort_by == "blob" %} sort_asc{% endif %}{% if sort_by == "-blob" %} sort_desc{% endif %}" key="filename">{% trans "Filename" %}</th>
             <th>{% trans "Size" %}</th>
-            <th>{% trans "Uploaded on" %}</th>
+            <th class="sort{% if sort_by == "date_uploaded" %} sort_asc{% endif %}{% if sort_by == "-date_uploaded" %} sort_desc{% endif %}" key="date">{% trans "Uploaded on" %}</th>
             <th>{% trans "Owner" %}</th>
-            <th>{% trans "Corpora" %}</th>
+            <th class="sort{% if sort_by == "corpus" %} sort_asc{% endif %}{% if sort_by == "-corpus" %} sort_desc{% endif %}" key="corpus">{% trans "Corpus" %}</th>
         </tr>
         </thead>
         <tbody>

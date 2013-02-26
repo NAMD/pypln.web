@@ -234,10 +234,22 @@ class DocumentListView(ListView):
     template_name = "core/documents.html"
     context_object_name = "documents"
     paginate_by = 10
+    sort_keys = {
+        "filename": "blob",
+        "filename_desc": "-blob",
+        "date": "date_uploaded",
+        "date_desc": "-date_uploaded",
+        "corpus": "corpus",
+        "corpus_desc": "-corpus",
+    }
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DocumentListView, self).dispatch(*args, **kwargs)
+
+    def get_order_by(self):
+        sort_key = self.request.GET.get('sort_by')
+        return self.sort_keys.get(sort_key, 'blob')
 
     def get_paginate_by(self, queryset):
         try:
@@ -255,7 +267,13 @@ class DocumentListView(ListView):
         return per_page
 
     def get_queryset(self):
-        return Document.objects.filter(owner=self.request.user.id)
+        self.sort_by = self.get_order_by()
+        return Document.objects.filter(owner=self.request.user.id).order_by(self.sort_by)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(DocumentListView, self).get_context_data(*args, **kwargs)
+        context['sort_by'] = self.sort_by
+        return context
 
 
 @login_required
