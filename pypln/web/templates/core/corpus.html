@@ -135,9 +135,6 @@
             }
             return params;
         }
-        $('#per-page').change(function(ev){
-            window.location = "?per_page=" + ev.target.value;
-        });
 
         $('.sort').click(function(ev) {
             var params = getURLParams();

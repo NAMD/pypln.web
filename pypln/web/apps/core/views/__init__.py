@@ -233,10 +233,26 @@ def document_page(request, document_id, document_slug):
 class DocumentListView(ListView):
     template_name = "core/documents.html"
     context_object_name = "documents"
+    paginate_by = 10
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DocumentListView, self).dispatch(*args, **kwargs)
+
+    def get_paginate_by(self, queryset):
+        try:
+            per_page = int(self.request.GET.get('per_page', '10'))
+        except ValueError:
+            # If user asks for an invalid number of documents per page, show
+            # default number of documents per page.
+            per_page = self.paginate_by
+
+        # We can't pass 0 to the paginator. If the user asked for 0, show default
+        # number of documents per page.
+        if per_page == 0:
+            per_page = self.paginate_by
+
+        return per_page
 
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user.id)
