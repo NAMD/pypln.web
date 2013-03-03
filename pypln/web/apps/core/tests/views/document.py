@@ -54,7 +54,7 @@ class DocumentPageViewTest(TestWithMongo):
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
 
-    def test_raises_404_for_inexistent_corpus(self):
+    def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_page',
             args=(999, 'inexistent_document.txt')))
