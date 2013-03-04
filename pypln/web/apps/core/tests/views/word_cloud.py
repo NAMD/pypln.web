@@ -21,19 +21,22 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 
 from core.models import Document
-from core.tests.utils import TestWithMongo
+from core.tests.utils import TestWithMongo, create_document
 
 __all__ = ["WordCloudViewTest"]
 
 class WordCloudViewTest(TestWithMongo):
     fixtures = ['document']
 
+    def _update_document_data(self, document):
+        self.store['id:{}:freqdist'.format(document.id)] = [["this", 1], ["is", 1],
+                                                                 ["content", 1], ["our", 1]]
+        self.store['id:{}:language'.format(document.id)] = "en"
+        self.store['id:{}:_properties'.format(document.id)] = ['freqdist', 'language']
+
     def prepare_storage(self):
         self.document = Document.objects.all()[0]
-        self.store['id:{}:freqdist'.format(self.document.id)] = [["this", 1], ["is", 1],
-                                                                 ["content", 1], ["our", 1]]
-        self.store['id:{}:language'.format(self.document.id)] = "en"
-        self.store['id:{}:_properties'.format(self.document.id)] = ['freqdist', 'language']
+        self._update_document_data(self.document)
 
     def setUp(self):
         super(WordCloudViewTest, self).setUp()
@@ -41,8 +44,8 @@ class WordCloudViewTest(TestWithMongo):
 
     def test_requires_login(self):
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                        'visualization_slug': 'word-cloud', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
@@ -50,15 +53,15 @@ class WordCloudViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'inexistent-document.txt',
-                        'visualization_slug': 'word-cloud', 'fmt': 'html'}))
+            kwargs={'document_id': 999, 'document_slug': 'inexistent-document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_text_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                        'visualization_slug': 'word-cloud', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/word-cloud.html")
@@ -67,8 +70,8 @@ class WordCloudViewTest(TestWithMongo):
     def test_shows_text_for_existing_document_in_txt_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                            'visualization_slug': 'word-cloud', 'fmt': 'csv'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/word-cloud.csv")
@@ -80,11 +83,24 @@ class WordCloudViewTest(TestWithMongo):
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                        'visualization_slug': 'word-cloud', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
         document = Document.objects.all()[0]
         self.assertEqual(response.context["document"], document)
         self.assertIn("freqdist", response.context)
         self.assertIn("language", response.context)
+
+    def test_visualization_should_work_for_different_documents_with_the_same_slug(self):
+        # We need to simulate the same document being uploaded again
+        document = create_document("document.txt", "This is our content", self.user)
+        self._update_document_data(document)
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_id': document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'word-cloud', 'fmt': 'html'}))
+
+        self.assertIn("document", response.context)
+        self.assertEqual(response.context["document"], document)

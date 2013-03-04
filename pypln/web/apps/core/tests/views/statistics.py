@@ -21,24 +21,27 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 
 from core.models import Document
-from core.tests.utils import TestWithMongo
+from core.tests.utils import TestWithMongo, create_document
 
 __all__ = ["StatisticsViewTest"]
 
 class StatisticsViewTest(TestWithMongo):
     fixtures = ['document']
 
-    def prepare_storage(self):
-        self.document = Document.objects.all()[0]
-        self.store['id:{}:tokens'.format(self.document.id)] = ["This", "is", "our",
+    def _update_document_data(self, document):
+        self.store['id:{}:tokens'.format(document.id)] = ["This", "is", "our",
                                                                 "content"]
-        self.store['id:{}:sentences'.format(self.document.id)] = [["this", "is", "our", "content"]]
-        self.store['id:{}:repertoire'.format(self.document.id)] = 1
-        self.store['id:{}:average_sentence_repertoire'.format(self.document.id)] = 1
-        self.store['id:{}:average_sentence_length'.format(self.document.id)] = 4
-        self.store['id:{}:_properties'.format(self.document.id)] = ['tokens', 'sentences', 'repertoire',
+        self.store['id:{}:sentences'.format(document.id)] = [["this", "is", "our", "content"]]
+        self.store['id:{}:repertoire'.format(document.id)] = 1
+        self.store['id:{}:average_sentence_repertoire'.format(document.id)] = 1
+        self.store['id:{}:average_sentence_length'.format(document.id)] = 4
+        self.store['id:{}:_properties'.format(document.id)] = ['tokens', 'sentences', 'repertoire',
                                                                     'average_sentence_repertoire',
                                                                     'average_sentence_length']
+
+    def prepare_storage(self):
+        self.document = Document.objects.all()[0]
+        self._update_document_data(self.document)
 
     def setUp(self):
         super(StatisticsViewTest, self).setUp()
@@ -46,9 +49,8 @@ class StatisticsViewTest(TestWithMongo):
 
     def test_requires_login(self):
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                            'visualization_slug': 'statistics',
-                                            'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
@@ -56,17 +58,15 @@ class StatisticsViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'inexistent-document.txt',
-                                            'visualization_slug': 'statistics',
-                                            'fmt': 'html'}))
+            kwargs={'document_id': 999, 'document_slug': 'inexistent-document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_text_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                            'visualization_slug': 'statistics',
-                                            'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/statistics.html")
@@ -75,9 +75,8 @@ class StatisticsViewTest(TestWithMongo):
     def test_shows_text_for_existing_document_in_txt_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                            'visualization_slug': 'statistics',
-                                            'fmt': 'csv'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/statistics.csv")
@@ -89,9 +88,8 @@ class StatisticsViewTest(TestWithMongo):
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                            'visualization_slug': 'statistics',
-                                            'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
         document = Document.objects.all()[0]
@@ -105,3 +103,16 @@ class StatisticsViewTest(TestWithMongo):
         self.assertIn("number_of_unique_sentences", response.context)
         self.assertIn("percentual_tokens", response.context)
         self.assertIn("percentual_sentences", response.context)
+
+    def test_visualization_should_work_for_different_documents_with_the_same_slug(self):
+        # We need to simulate the same document being uploaded again
+        document = create_document("document.txt", "This is our content", self.user)
+        self._update_document_data(document)
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_id': document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'statistics', 'fmt': 'html'}))
+
+        self.assertIn("document", response.context)
+        self.assertEqual(response.context["document"], document)

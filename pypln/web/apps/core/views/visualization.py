@@ -92,8 +92,8 @@ class VisualizationView(TemplateView):
     def process(self):
         return self.get_data_from_store()
 
-    def get_context_data(self, document_slug, fmt):
-        self.document = get_object_or_404(Document, slug=document_slug,
+    def get_context_data(self, document_id, document_slug, fmt):
+        self.document = get_object_or_404(Document, id=document_id, slug=document_slug,
                     owner=self.request.user.id)
 
         context = self.process()

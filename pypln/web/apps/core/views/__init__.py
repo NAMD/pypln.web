@@ -29,10 +29,13 @@ from django.template.loader import get_template
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.defaultfilters import slugify, pluralize
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
+from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from core.models import Corpus, Document, index_schema
 from core.forms import CorpusForm, DocumentForm
@@ -150,9 +153,45 @@ def upload_documents(request, corpus_slug):
 
 @login_required
 def list_corpus_documents(request, corpus_slug):
+    DEFAULT_PER_PAGE = 10
     corpus = get_object_or_404(Corpus, slug=corpus_slug, owner=request.user.id)
     form = DocumentForm(request.user)
-    data = {'corpus': corpus, 'form': form}
+    try:
+        per_page = int(request.GET.get('per_page', '10'))
+    except ValueError:
+        # If user asks for an invalid number of documents per page, show
+        # default number of documents per page.
+        per_page = DEFAULT_PER_PAGE
+
+    # We can't pass 0 to the paginator. If the user asked for 0, show default
+    # number of documents per page.
+    if per_page == 0:
+        per_page = DEFAULT_PER_PAGE
+
+    sort_mapping = {
+        "filename": "blob",
+        "filename_desc": "-blob",
+        "date": "date_uploaded",
+        "date_desc": "-date_uploaded",
+    }
+    sort_key = request.GET.get('sort_by')
+    sort_by = sort_mapping.get(sort_key, 'blob')
+
+    paginator = Paginator(corpus.documents.order_by(sort_by), per_page)
+
+    page = request.GET.get('page', '1')
+    try:
+        documents = paginator.page(page)
+    except PageNotAnInteger:
+        if page == 'last':
+            documents = paginator.page(paginator.num_pages)
+        else:
+            raise Http404("Invalid page")
+    except EmptyPage:
+        raise Http404("This page does not exist")
+
+    data = {'corpus': corpus, 'documents': documents,
+            'form': form, 'sort_by': sort_by}
     return render_to_response('core/corpus.html', data,
             context_instance=RequestContext(request))
 
@@ -164,8 +203,8 @@ def corpus_page(request, corpus_slug):
         return list_corpus_documents(request, corpus_slug)
 
 @login_required
-def document_page(request, document_slug):
-    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
+def document_page(request, document_id, document_slug):
+    document = get_object_or_404(Document, id=document_id, slug=document_slug, owner=request.user.id)
 
     data = {'document': document,
             'corpora': Corpus.objects.filter(owner=request.user.id)}
@@ -191,15 +230,56 @@ def document_page(request, document_slug):
     return render_to_response('core/document.html', data,
         context_instance=RequestContext(request))
 
-@login_required
-def document_list(request):
-    data = {'documents': Document.objects.filter(owner=request.user.id)}
-    return render_to_response('core/documents.html', data,
-            context_instance=RequestContext(request))
+
+class DocumentListView(ListView):
+    template_name = "core/documents.html"
+    context_object_name = "documents"
+    paginate_by = 10
+    sort_keys = {
+        "filename": "blob",
+        "filename_desc": "-blob",
+        "date": "date_uploaded",
+        "date_desc": "-date_uploaded",
+        "corpus": "corpus",
+        "corpus_desc": "-corpus",
+    }
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DocumentListView, self).dispatch(*args, **kwargs)
+
+    def get_order_by(self):
+        sort_key = self.request.GET.get('sort_by')
+        return self.sort_keys.get(sort_key, 'blob')
+
+    def get_paginate_by(self, queryset):
+        try:
+            per_page = int(self.request.GET.get('per_page', '10'))
+        except ValueError:
+            # If user asks for an invalid number of documents per page, show
+            # default number of documents per page.
+            per_page = self.paginate_by
+
+        # We can't pass 0 to the paginator. If the user asked for 0, show default
+        # number of documents per page.
+        if per_page == 0:
+            per_page = self.paginate_by
+
+        return per_page
+
+    def get_queryset(self):
+        self.sort_by = self.get_order_by()
+        return Document.objects.filter(owner=self.request.user.id).order_by(self.sort_by)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(DocumentListView, self).get_context_data(*args, **kwargs)
+        context['sort_by'] = self.sort_by
+        return context
+
 
 @login_required
-def document_download(request, document_slug):
-    document = get_object_or_404(Document, slug=document_slug, owner=request.user.id)
+def document_download(request, document_id, document_slug):
+    document = get_object_or_404(Document, id=document_id, slug=document_slug, owner=request.user.id)
     filename = document.blob.name.split('/')[-1]
     store = MongoDict(host=settings.MONGODB_CONFIG['host'],
                       port=settings.MONGODB_CONFIG['port'],

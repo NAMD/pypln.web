@@ -9,7 +9,7 @@
   <div class="breadcrumb">
     You are here:
     <a href="{% url home %}">{% trans "Home" %}</a> &gt;
-    <a href="{% url document_page document.slug %}">Document {{ document.file_name }}</a>
+    <a href="{% url document_page document.id document.slug %}">Document {{ document.file_name }}</a>
   </div>
 
   <h2 class="brand">{% trans "Document" %} {{ document.file_name }}</h2>
@@ -23,7 +23,7 @@
           {% for visualization in visualizations %}
           <li> <a data-visualization="{{ visualization.slug }}"
                   class="link-visualization"
-                  href="{% url document_visualization document.slug visualization.slug "html" %}">{{ visualization.label }}</a> </li>
+                  href="{% url document_visualization document.id document.slug visualization.slug "html" %}">{{ visualization.label }}</a> </li>
           {% endfor %}
         </ul>
         <div id="visualization"></div>
@@ -70,7 +70,7 @@
       </div>
       {% endfor %}
       <div>
-          <a href="{% url document_download document.slug %}">{% trans "Download the original file" %}</a>
+          <a href="{% url document_download document.id document.slug %}">{% trans "Download the original file" %}</a>
       </div>
 
       <h4>{% trans "Corpora" %}</h4>

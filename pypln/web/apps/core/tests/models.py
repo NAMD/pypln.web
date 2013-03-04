@@ -39,7 +39,11 @@ class DocumentModelTest(TestWithMongo):
         doc.save()
         self.assertEqual(doc.slug, "42.txt")
 
-    def test_saving_another_file_with_the_same_name_should_generate_new_slug(self):
+    def test_saving_another_file_with_the_same_name_should_generate_the_same_slug(self):
+        """We used to depend on the slug being unique, so the slug generation
+        needed to find an unused slug. Now it is ok to just use the same slug
+        for all files with the same name, since we depend on the document id
+        to find it."""
         doc = Document(owner=self.user, blob=self.file)
         doc.save()
         self.assertEqual(doc.slug, "42.txt")
@@ -48,7 +52,7 @@ class DocumentModelTest(TestWithMongo):
         other_file.name = "42.txt"
         other_doc = Document(owner=self.user, blob=other_file)
         other_doc.save()
-        self.assertEqual(other_doc.slug, "42_1.txt")
+        self.assertEqual(other_doc.slug, "42.txt")
 
     def test_editing_a_file_should_not_alter_slug(self):
         doc = Document(owner=self.user, blob=self.file)
@@ -65,7 +69,9 @@ class DocumentModelTest(TestWithMongo):
         doc.save()
         self.assertEqual(doc.slug, "name_with_spaces.txt")
 
-    def test_saving_the_same_filename_with_spaces_should_generate_different_slugs(self):
+    def test_saving_the_same_filename_with_spaces_should_generate_the_same_slugs(self):
+        """Again, this test exists for historical reasons that changed when we
+        started relying on the document id to retrieve it."""
         file_with_spaces = ContentFile("test")
         file_with_spaces.name = "name with spaces.txt"
         doc = Document(owner=self.user, blob=file_with_spaces)
@@ -76,4 +82,4 @@ class DocumentModelTest(TestWithMongo):
         other_file.name = "name with spaces.txt"
         other_doc = Document(owner=self.user, blob=other_file)
         other_doc.save()
-        self.assertEqual(other_doc.slug, "name_with_spaces_1.txt")
+        self.assertEqual(other_doc.slug, "name_with_spaces.txt")

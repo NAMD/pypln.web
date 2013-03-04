@@ -44,7 +44,7 @@ class VisualizationRoutingViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_visualization(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
                                             'visualization_slug': 'invalid',
                                             'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
@@ -54,7 +54,7 @@ class VisualizationRoutingViewTest(TestWithMongo):
         one. The request should be answered with 404."""
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
                                             'visualization_slug': 'word-cloud',
                                             'fmt': 'txt'}))
         self.assertEqual(response.status_code, 404)

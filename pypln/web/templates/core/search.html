@@ -54,7 +54,7 @@
   {% for result in results %}
   <div class="search_result">
     <div>
-      <a href="{% url document_page result.slug %}">{{ result.file_name }}</a>
+      <a href="{% url document_page result.id result.slug %}">{{ result.file_name }}</a>
       {% if not corpus %}
       {% trans "in corpus" %} {% for corpus_object in result.corpus_set.all %}<a href="{% url corpus_page corpus_object.slug %}">{{ corpus_object.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
       {% endif %}

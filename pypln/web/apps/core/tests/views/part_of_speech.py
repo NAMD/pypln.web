@@ -21,25 +21,28 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 
 from core.models import Document
-from core.tests.utils import TestWithMongo
+from core.tests.utils import TestWithMongo, create_document
 
 __all__ = ["PartOfSpeechViewTest"]
 
 class PartOfSpeechViewTest(TestWithMongo):
     fixtures = ['document']
 
-    def prepare_storage(self):
-        self.document = Document.objects.all()[0]
-        self.store['id:{}:text'.format(self.document.id)] = "This is our content"
-        self.store['id:{}:tokens'.format(self.document.id)] = ["This", "is", "our",
+    def _update_document_data(self, document):
+        self.store['id:{}:text'.format(document.id)] = "This is our content"
+        self.store['id:{}:tokens'.format(document.id)] = ["This", "is", "our",
                                                                 "content"]
-        self.store['id:{}:pos'.format(self.document.id)] = [["This", "DT", 0 ],
+        self.store['id:{}:pos'.format(document.id)] = [["This", "DT", 0 ],
                                                             ["is", "VBZ", 5],
                                                             [ "our", "PRP$", 8],
                                                             ["content", "NNP", 12]]
-        self.store['id:{}:tagset'.format(self.document.id)] = "en-nltk"
-        self.store['id:{}:_properties'.format(self.document.id)] = ['text',
+        self.store['id:{}:tagset'.format(document.id)] = "en-nltk"
+        self.store['id:{}:_properties'.format(document.id)] = ['text',
                 'tokens', 'pos', 'tagset']
+
+    def prepare_storage(self):
+        self.document = Document.objects.all()[0]
+        self._update_document_data(self.document)
 
     def setUp(self):
         super(PartOfSpeechViewTest, self).setUp()
@@ -47,9 +50,8 @@ class PartOfSpeechViewTest(TestWithMongo):
 
     def test_requires_login(self):
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                    'visualization_slug': 'part-of-speech',
-                                    'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 302)
         login_url = settings.LOGIN_URL
         self.assertTrue(login_url in response['Location'])
@@ -57,16 +59,15 @@ class PartOfSpeechViewTest(TestWithMongo):
     def test_raises_404_for_inexistent_document(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                            kwargs={'document_slug': 'inexistent-document.txt',
-                            'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
+            kwargs={'document_id': 999, 'document_slug': 'inexistent-document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
         self.assertEqual(response.status_code, 404)
 
     def test_shows_highlight_for_existing_document_in_html_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-                                    kwargs={'document_slug': 'document.txt',
-                                    'visualization_slug': 'part-of-speech',
-                                    'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/part-of-speech.html")
@@ -75,8 +76,8 @@ class PartOfSpeechViewTest(TestWithMongo):
     def test_shows_highlight_for_existing_document_in_csv_without_error(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-            kwargs={'document_slug': 'document.txt', 'visualization_slug':
-                'part-of-speech', 'fmt': 'csv'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'csv'}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/visualizations/part-of-speech.csv")
@@ -88,8 +89,8 @@ class PartOfSpeechViewTest(TestWithMongo):
     def test_expected_data_is_in_context(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-            kwargs={'document_slug': 'document.txt', 'visualization_slug':
-                'part-of-speech', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
 
         self.assertIn("document", response.context)
         document = Document.objects.all()[0]
@@ -109,8 +110,8 @@ class PartOfSpeechViewTest(TestWithMongo):
 
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse('document_visualization',
-            kwargs={'document_slug': 'document.txt', 'visualization_slug':
-                'part-of-speech', 'fmt': 'html'}))
+            kwargs={'document_id': self.document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
 
         # The page should render normally, even if we find unknown tags.
         self.assertEqual(response.status_code, 200)
@@ -120,3 +121,21 @@ class PartOfSpeechViewTest(TestWithMongo):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject,
                     "{}Tags not in tagset".format(settings.EMAIL_SUBJECT_PREFIX))
+
+    def test_visualization_should_work_for_different_documents_with_the_same_slug(self):
+        # We need to simulate the same document being uploaded again
+        document = create_document("document.txt", "This is our content", self.user)
+        self._update_document_data(document)
+
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse('document_visualization',
+            kwargs={'document_id': document.id, 'document_slug': 'document.txt',
+                'visualization_slug': 'part-of-speech', 'fmt': 'html'}))
+
+        self.assertIn("document", response.context)
+        self.assertEqual(response.context["document"], document)
+
+        self.assertIn("pos", response.context)
+        self.assertIn("tagset", response.context)
+        self.assertIn("most_common", response.context)
+        self.assertIn("token_list", response.context)
