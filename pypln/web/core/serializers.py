@@ -17,28 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from rest_framework import generics
-from rest_framework.decorators import api_view
-from rest_framework.reverse import reverse
-from rest_framework.response import Response
-
 from pypln.web.core.models import Corpus
-from pypln.web.core.serializers import CorpusSerializer
 
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({'corpus': reverse('corpus-list', request=request)})
+from rest_framework import serializers
 
-class CorpusList(generics.ListCreateAPIView):
-    model = Corpus
-    serializer_class = CorpusSerializer
-
-    def pre_save(self, obj):
-        obj.owner = self.request.user
-
-class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
-    model = Corpus
-    serializer_class = CorpusSerializer
-
-    def pre_save(self, obj):
-        obj.owner = self.request.user
+class CorpusSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Corpus
+        fields = ('url', 'name', 'description', 'created_at')

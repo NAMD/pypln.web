@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url, include
+from rest_framework.urlpatterns import format_suffix_patterns
+from pypln.web.core.views import CorpusList, CorpusDetail
 
-from django.contrib import admin
-admin.autodiscover()
-
-urlpatterns = patterns('',
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('pypln.web.core.urls')),
+urlpatterns = patterns('pypln.web.core.views',
+    url(r'^$', 'api_root'),
+    url(r'^corpora/$', CorpusList.as_view(), name='corpus-list'),
+    url(r'^corpora/(?P<pk>\d+)/$', CorpusDetail.as_view(), name='corpus-detail'),
 )
+
+urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'api'])
