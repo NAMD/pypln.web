@@ -22,6 +22,8 @@ from pypln.web.core.models import Corpus
 from rest_framework import serializers
 
 class CorpusSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.Field(source="owner.username")
+    documents = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+            source='document_set.all', view_name="document-detail")
     class Meta:
         model = Corpus
-        fields = ('url', 'name', 'description', 'created_at')
