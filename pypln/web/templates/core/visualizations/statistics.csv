@@ -1,2 +1,0 @@
-"document_name","unique_tokens","total_tokens","unique_sentences","total_sentences","average_sentence_length","repertoire","average_sentence_repertoire"
-"{{ document.slug|addslashes }}","{{ number_of_unique_tokens|addslashes }}","{{ number_of_tokens|addslashes }}","{{ number_of_unique_sentences|addslashes }}","{{ number_of_sentences|addslashes }}","{{ average_sentence_length|addslashes }}","{{ repertoire|addslashes }}","{{ average_sentence_repertoire|addslashes }}"

@@ -1,3 +1,0 @@
-"token","count"
-{% for pair in freqdist %}"{{ pair|first|addslashes }}","{{ pair|last|addslashes}}"
-{% endfor %}

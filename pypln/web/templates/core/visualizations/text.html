@@ -1,5 +1,0 @@
-{% load i18n %}
-<p><a href="{% url document_visualization document.id document.slug "text" "txt" %}">{% trans "Download plain text" %}</a></p>
-<div id="text-visualization" style="height: 400px; overflow: auto;">
-  {{ text|linebreaks }}
-</div>
