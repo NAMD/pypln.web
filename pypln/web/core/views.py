@@ -22,12 +22,15 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
-from pypln.web.core.models import Corpus
-from pypln.web.core.serializers import CorpusSerializer
+from pypln.web.core.models import Corpus, Document
+from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
-    return Response({'corpus': reverse('corpus-list', request=request)})
+    return Response({
+        'corpora': reverse('corpus-list', request=request),
+        'documents': reverse('document-list', request=request),
+    })
 
 class CorpusList(generics.ListCreateAPIView):
     model = Corpus
@@ -39,6 +42,20 @@ class CorpusList(generics.ListCreateAPIView):
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Corpus
     serializer_class = CorpusSerializer
+
+    def pre_save(self, obj):
+        obj.owner = self.request.user
+
+class DocumentList(generics.ListCreateAPIView):
+    model = Document
+    serializer_class = DocumentSerializer
+
+    def pre_save(self, obj):
+        obj.owner = self.request.user
+
+class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = Document
+    serializer_class = DocumentSerializer
 
     def pre_save(self, obj):
         obj.owner = self.request.user

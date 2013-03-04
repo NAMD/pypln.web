@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from pypln.web.core.models import Corpus
+from pypln.web.core.models import Corpus, Document
 
 from rest_framework import serializers
 
@@ -27,3 +27,8 @@ class CorpusSerializer(serializers.HyperlinkedModelSerializer):
             source='document_set.all', view_name="document-detail")
     class Meta:
         model = Corpus
+
+class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.Field(source="owner.username")
+    class Meta:
+        model = Document
