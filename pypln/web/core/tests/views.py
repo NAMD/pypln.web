@@ -23,9 +23,9 @@ from django.test import TestCase
 
 from pypln.web.core.models import Corpus
 
-__all__ = ["TestCorpusListView"]
+__all__ = ["CorpusListViewTest"]
 
-class TestCorpusListView(TestCase):
+class CorpusListViewTest(TestCase):
     fixtures = ['corpora']
 
     def test_requires_login(self):
