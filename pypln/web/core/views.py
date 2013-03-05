@@ -18,6 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -35,6 +36,7 @@ def api_root(request, format=None):
 class CorpusList(generics.ListCreateAPIView):
     model = Corpus
     serializer_class = CorpusSerializer
+    permission_classes = (permissions.IsAuthenticated, )
 
     def pre_save(self, obj):
         obj.owner = self.request.user
