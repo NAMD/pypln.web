@@ -44,6 +44,23 @@ class CorpusListViewTest(TestCase):
 
         self.assertEqual(list(expected_data), list(object_list))
 
+    def test_create_new_corpus(self):
+        user = User.objects.get(username="user")
+        self.assertEqual(len(user.corpus_set.all()), 1)
+        self.client.login(username="user", password="user")
+        response = self.client.post(reverse('corpus-list'), {"name": "Corpus",
+            "description": "description"})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(user.corpus_set.all()), 2)
+
+    def test_cant_create_new_corpus_for_another_user(self):
+        self.client.login(username="user", password="user")
+        # We try to set 'admin' as the owner (id=1)
+        response = self.client.post(reverse('corpus-list'), {"name": "Corpus",
+            "description": "description", "owner": 1})
+        self.assertEqual(response.status_code, 201)
+        # but the view sets the request user as the owner anyway
+        self.assertEqual(response.data["owner"], "user")
 
 class CorpusDetailViewTest(TestCase):
     fixtures = ['corpora']
