@@ -36,7 +36,7 @@ class Document(models.Model):
     blob = models.FileField(upload_to='documents/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User')
-    corpora = models.ForeignKey(Corpus)
+    corpus = models.ForeignKey(Corpus)
 
     def __unicode__(self):
         return self.blob.name
