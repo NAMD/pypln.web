@@ -30,4 +30,9 @@ urlpatterns = patterns('pypln.web.core.views',
     url(r'^documents/(?P<pk>\d+)/$', DocumentDetail.as_view(), name='document-detail'),
 )
 
+urlpatterns += patterns('',
+    url(r'^api-auth/', include('rest_framework.urls',
+        namespace='rest_framework')),
+)
+
 urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'api'])
