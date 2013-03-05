@@ -56,6 +56,10 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
 class DocumentList(generics.ListCreateAPIView):
     model = Document
     serializer_class = DocumentSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return Document.objects.filter(owner=self.request.user)
 
     def pre_save(self, obj):
         obj.owner = self.request.user

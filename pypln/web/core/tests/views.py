@@ -21,9 +21,10 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from pypln.web.core.models import Corpus
+from pypln.web.core.models import Corpus, Document
 
-__all__ = ["CorpusListViewTest", "CorpusDetailViewTest"]
+__all__ = ["CorpusListViewTest", "CorpusDetailViewTest",
+    "DocumentListViewTest"]
 
 class CorpusListViewTest(TestCase):
     fixtures = ['corpora']
@@ -72,3 +73,22 @@ class CorpusDetailViewTest(TestCase):
         response = self.client.get(reverse('corpus-detail',
             kwargs={'pk': corpus.id}))
         self.assertEqual(response.status_code, 403)
+
+
+class DocumentListViewTest(TestCase):
+    fixtures = ['corpora', 'documents']
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('document-list'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_only_lists_documents_that_belong_to_the_authenticated_user(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('document-list'))
+        self.assertEqual(response.status_code, 200)
+
+        expected_data = Document.objects.filter(
+                owner=User.objects.get(username="user"))
+        object_list = response.renderer_context['view'].object_list
+
+        self.assertEqual(list(expected_data), list(object_list))
