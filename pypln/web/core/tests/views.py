@@ -23,7 +23,7 @@ from django.test import TestCase
 
 from pypln.web.core.models import Corpus
 
-__all__ = ["CorpusListViewTest"]
+__all__ = ["CorpusListViewTest", "CorpusDetailViewTest"]
 
 class CorpusListViewTest(TestCase):
     fixtures = ['corpora']
@@ -42,3 +42,33 @@ class CorpusListViewTest(TestCase):
         object_list = response.renderer_context['view'].object_list
 
         self.assertEqual(list(expected_data), list(object_list))
+
+
+class CorpusDetailViewTest(TestCase):
+    fixtures = ['corpora']
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('corpus-detail', kwargs={'pk': 2}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_shows_corpus_correctly(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="user")[0]
+        response = self.client.get(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.renderer_context['view'].object, corpus)
+
+    def test_returns_404_for_inexistent_corpus(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('corpus-detail',
+            kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_returns_403_if_user_is_not_the_owner_of_the_corpus(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="admin")[0]
+        response = self.client.get(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}))
+        self.assertEqual(response.status_code, 403)

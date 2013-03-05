@@ -25,6 +25,7 @@ from rest_framework.response import Response
 
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
+from pypln.web.core.permissions import IsOwner
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -47,6 +48,7 @@ class CorpusList(generics.ListCreateAPIView):
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Corpus
     serializer_class = CorpusSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
 
     def pre_save(self, obj):
         obj.owner = self.request.user
