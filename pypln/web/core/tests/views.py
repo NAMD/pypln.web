@@ -17,8 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+
+from pypln.web.core.models import Corpus
 
 __all__ = ["TestCorpusListView"]
 
@@ -28,3 +31,14 @@ class TestCorpusListView(TestCase):
     def test_requires_login(self):
         response = self.client.get(reverse('corpus-list'))
         self.assertEqual(response.status_code, 403)
+
+    def test_only_lists_corpora_that_belongs_to_the_authenticated_user(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('corpus-list'))
+        self.assertEqual(response.status_code, 200)
+
+        expected_data = Corpus.objects.filter(
+                owner=User.objects.get(username="user"))
+        object_list = response.renderer_context['view'].object_list
+
+        self.assertEqual(list(expected_data), list(object_list))

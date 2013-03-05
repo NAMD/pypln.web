@@ -38,6 +38,9 @@ class CorpusList(generics.ListCreateAPIView):
     serializer_class = CorpusSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
+    def get_queryset(self):
+        return Corpus.objects.filter(owner=self.request.user)
+
     def pre_save(self, obj):
         obj.owner = self.request.user
 
