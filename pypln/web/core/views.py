@@ -67,6 +67,7 @@ class DocumentList(generics.ListCreateAPIView):
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Document
     serializer_class = DocumentSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
 
     def pre_save(self, obj):
         obj.owner = self.request.user

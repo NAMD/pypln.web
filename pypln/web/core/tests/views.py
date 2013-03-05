@@ -24,7 +24,7 @@ from django.test import TestCase
 from pypln.web.core.models import Corpus, Document
 
 __all__ = ["CorpusListViewTest", "CorpusDetailViewTest",
-    "DocumentListViewTest"]
+    "DocumentListViewTest", "DocumentDetailViewTest"]
 
 class CorpusListViewTest(TestCase):
     fixtures = ['corpora']
@@ -92,3 +92,35 @@ class DocumentListViewTest(TestCase):
         object_list = response.renderer_context['view'].object_list
 
         self.assertEqual(list(expected_data), list(object_list))
+
+
+class DocumentDetailViewTest(TestCase):
+    fixtures = ['corpora', 'documents']
+
+    def test_requires_login(self):
+        document = Document.objects.filter(owner__username='user')[0]
+        response = self.client.get(reverse('document-detail',
+            kwargs={'pk': document.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_shows_document_correctly(self):
+        self.client.login(username="user", password="user")
+        document = Document.objects.filter(owner__username="user")[0]
+        response = self.client.get(reverse('document-detail',
+            kwargs={'pk': document.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.renderer_context['view'].object, document)
+
+    def test_returns_404_for_inexistent_document(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('document-detail',
+            kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_returns_403_if_user_is_not_the_owner_of_the_document(self):
+        self.client.login(username="user", password="user")
+        document = Document.objects.filter(owner__username="admin")[0]
+        response = self.client.get(reverse('document-detail',
+            kwargs={'pk': document.id}))
+        self.assertEqual(response.status_code, 403)
