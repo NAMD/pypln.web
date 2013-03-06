@@ -31,7 +31,7 @@ __all__ = ["CorpusListViewTest", "CorpusDetailViewTest",
     "DocumentListViewTest", "DocumentDetailViewTest"]
 
 class CorpusListViewTest(TestCase):
-    fixtures = ['corpora']
+    fixtures = ['users', 'corpora']
 
     def test_requires_login(self):
         response = self.client.get(reverse('corpus-list'))
@@ -68,7 +68,7 @@ class CorpusListViewTest(TestCase):
 
 
 class CorpusDetailViewTest(TestCase):
-    fixtures = ['corpora']
+    fixtures = ['users', 'corpora']
 
     def test_requires_login(self):
         response = self.client.get(reverse('corpus-detail', kwargs={'pk': 2}))
@@ -154,7 +154,7 @@ class CorpusDetailViewTest(TestCase):
 
 
 class DocumentListViewTest(TestCase):
-    fixtures = ['corpora', 'documents']
+    fixtures = ['users', 'corpora', 'documents']
 
     def setUp(self):
         self.user = User.objects.get(username="user")
@@ -224,7 +224,7 @@ class DocumentListViewTest(TestCase):
 
 
 class DocumentDetailViewTest(TestCase):
-    fixtures = ['corpora', 'documents']
+    fixtures = ['users', 'corpora', 'documents']
 
     def setUp(self):
         self.user = User.objects.get(username="user")
