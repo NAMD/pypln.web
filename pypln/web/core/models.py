@@ -21,7 +21,7 @@ from django.db import models
 
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User')
 
