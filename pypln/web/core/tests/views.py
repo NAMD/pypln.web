@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 import json
+from StringIO import StringIO
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from rest_framework.reverse import reverse as rest_framework_reverse
 
 from pypln.web.core.models import Corpus, Document
 
@@ -152,6 +154,11 @@ class CorpusDetailViewTest(TestCase):
 class DocumentListViewTest(TestCase):
     fixtures = ['corpora', 'documents']
 
+    def setUp(self):
+        self.user = User.objects.get(username="user")
+        self.fp = StringIO("Content")
+        self.fp.name = "document.txt"
+
     def test_requires_login(self):
         response = self.client.get(reverse('document-list'))
         self.assertEqual(response.status_code, 403)
@@ -166,6 +173,40 @@ class DocumentListViewTest(TestCase):
         object_list = response.renderer_context['view'].object_list
 
         self.assertEqual(list(expected_data), list(object_list))
+
+    def test_create_new_document(self):
+        self.assertEqual(len(self.user.document_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        data = {"corpus": rest_framework_reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), "blob": self.fp}
+        response = self.client.post(reverse('document-list'), data)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(self.user.document_set.all()), 2)
+
+    def test_cant_create_document_for_another_user(self):
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        corpus_url = rest_framework_reverse('corpus-detail', kwargs={'pk': corpus.id})
+        data = {"corpus": corpus_url, "blob": self.fp, "owner": 1}
+        response = self.client.post(reverse('document-list'), data)
+
+        self.assertEqual(response.status_code, 201)
+        document = self.user.document_set.all()[1]
+        self.assertEqual(document.owner, self.user)
+
+    def test_cant_create_document_for_inexistent_corpus(self):
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        corpus_url = rest_framework_reverse('corpus-detail', kwargs={'pk': 9999})
+        data = {"corpus": corpus_url, "blob": self.fp}
+        response = self.client.post(reverse('document-list'), data)
+
+        self.assertEqual(response.status_code, 400)
 
 
 class DocumentDetailViewTest(TestCase):
