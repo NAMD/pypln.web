@@ -208,6 +208,18 @@ class DocumentListViewTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_cant_create_document_in_another_users_corpus(self):
+        self.client.login(username="user", password="user")
+
+        # We'll try to associate this document to a corpus that belongs to
+        # 'admin'
+        corpus = Corpus.objects.filter(owner__username="admin")[0]
+        corpus_url = rest_framework_reverse('corpus-detail', kwargs={'pk': corpus.id})
+        data = {"corpus": corpus_url, "blob": self.fp}
+        response = self.client.post(reverse('document-list'), data)
+
+        self.assertEqual(response.status_code, 400)
+
 
 class DocumentDetailViewTest(TestCase):
     fixtures = ['corpora', 'documents']

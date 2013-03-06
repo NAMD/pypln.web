@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from django.forms.models import ModelChoiceIterator
+from rest_framework import serializers
 
 from pypln.web.core.models import Corpus, Document
-
-from rest_framework import serializers
 
 class CorpusSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.Field(source="owner.username")
@@ -30,5 +30,12 @@ class CorpusSerializer(serializers.HyperlinkedModelSerializer):
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.Field(source="owner.username")
+    corpus = serializers.HyperlinkedRelatedField(view_name="corpus-detail")
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs['context']['request'].user
+        self.base_fields['corpus'].queryset = Corpus.objects.filter(owner=user)
+        super(DocumentSerializer, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Document
