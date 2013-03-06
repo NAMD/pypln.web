@@ -27,6 +27,7 @@ class Corpus(models.Model):
 
     class Meta:
         verbose_name_plural = 'corpora'
+        unique_together = ('name', 'owner')
 
     def __unicode__(self):
         return self.name
