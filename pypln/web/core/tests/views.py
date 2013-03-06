@@ -22,6 +22,7 @@ from StringIO import StringIO
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.client import encode_multipart, BOUNDARY, MULTIPART_CONTENT
 from rest_framework.reverse import reverse as rest_framework_reverse
 
 from pypln.web.core.models import Corpus, Document
@@ -64,6 +65,7 @@ class CorpusListViewTest(TestCase):
         self.assertEqual(response.status_code, 201)
         # but the view sets the request user as the owner anyway
         self.assertEqual(response.data["owner"], "user")
+
 
 class CorpusDetailViewTest(TestCase):
     fixtures = ['corpora']
@@ -224,6 +226,15 @@ class DocumentListViewTest(TestCase):
 class DocumentDetailViewTest(TestCase):
     fixtures = ['corpora', 'documents']
 
+    def setUp(self):
+        self.user = User.objects.get(username="user")
+        self.fp = StringIO("Content")
+        self.fp.name = "document.txt"
+
+    def _get_corpus_url(self, corpus_id):
+        return rest_framework_reverse('corpus-detail',
+                kwargs={'pk': corpus_id})
+
     def test_requires_login(self):
         document = Document.objects.filter(owner__username='user')[0]
         response = self.client.get(reverse('document-detail',
@@ -251,3 +262,65 @@ class DocumentDetailViewTest(TestCase):
         response = self.client.get(reverse('document-detail',
             kwargs={'pk': document.id}))
         self.assertEqual(response.status_code, 403)
+
+    def test_edit_document(self):
+        self.client.login(username="user", password="user")
+
+        document = self.user.document_set.all()[0]
+        new_corpus = Corpus.objects.create(name="New corpus",
+                description="", owner=self.user)
+        data = encode_multipart(BOUNDARY, {"corpus": self._get_corpus_url(
+            new_corpus.id), "blob": self.fp})
+        response = self.client.put(reverse('document-detail',
+            kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
+
+        self.assertEqual(response.status_code, 200)
+        updated_document = Document.objects.get(id=document.id)
+        self.assertEqual(updated_document.corpus, new_corpus)
+
+    def test_cant_edit_other_peoples_documents(self):
+        self.client.login(username="user", password="user")
+        document = Document.objects.filter(owner__username="admin")[0]
+        data = encode_multipart(BOUNDARY,
+                {"corpus": self._get_corpus_url(document.corpus.id),
+                    "blob": self.fp})
+        response = self.client.put(reverse('document-detail',
+            kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_cant_change_the_owner_of_a_document(self):
+        self.client.login(username="user", password="user")
+        document = self.user.document_set.all()[0]
+        # We try to set 'admin' as the owner (id=1)
+        data = encode_multipart(BOUNDARY, {"blob": self.fp,
+            "corpus": self._get_corpus_url(document.corpus.id), "owner": 1})
+
+        response = self.client.put(reverse('document-detail',
+            kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
+
+        self.assertEqual(response.status_code, 200)
+        # but the view sets the request user as the owner anyway
+        self.assertEqual(response.data["owner"], "user")
+
+    def test_delete_a_document(self):
+        self.client.login(username="user", password="user")
+        self.assertEqual(len(self.user.document_set.all()), 1)
+
+        document = self.user.document_set.all()[0]
+        response = self.client.delete(reverse('document-detail',
+            kwargs={'pk': document.id}))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(self.user.document_set.all()), 0)
+
+    def test_cant_delete_other_peoples_documents(self):
+        self.client.login(username="user", password="user")
+        self.assertEqual(len(Corpus.objects.filter(owner__username="admin")), 1)
+
+        document = Document.objects.filter(owner__username="admin")[0]
+        response = self.client.delete(reverse('document-detail',
+            kwargs={'pk': document.id}))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(Corpus.objects.filter(owner__username="admin")), 1)
