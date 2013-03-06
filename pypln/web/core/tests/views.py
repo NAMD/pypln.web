@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -90,6 +91,62 @@ class CorpusDetailViewTest(TestCase):
         response = self.client.get(reverse('corpus-detail',
             kwargs={'pk': corpus.id}))
         self.assertEqual(response.status_code, 403)
+
+    def test_edit_corpus(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="user")[0]
+        response = self.client.put(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
+            "description": "New description"}), content_type="application/json")
+
+        self.assertEqual(response.status_code, 200)
+        updated_corpus = Corpus.objects.filter(owner__username="user")[0]
+        self.assertEqual(updated_corpus.name, "New name")
+        self.assertEqual(updated_corpus.description, "New description")
+
+    def test_cant_edit_other_peoples_corpora(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="admin")[0]
+        response = self.client.put(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
+            "description": "New description"}), content_type="application/json")
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_cant_change_the_owner_of_a_corpus(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="user")[0]
+        # We try to set 'admin' as the owner (id=1)
+        response = self.client.put(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), json.dumps({"name": "Corpus",
+            "description": "description", "owner": 1}),
+            content_type="application/json")
+
+        self.assertEqual(response.status_code, 200)
+        # but the view sets the request user as the owner anyway
+        self.assertEqual(response.data["owner"], "user")
+
+    def test_delete_a_corpus(self):
+        self.client.login(username="user", password="user")
+        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
+
+        corpus = Corpus.objects.filter(owner__username="user")[0]
+        response = self.client.delete(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 0)
+
+    def test_cant_delete_other_peoples_corpora(self):
+        self.client.login(username="user", password="user")
+        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
+
+        corpus = Corpus.objects.filter(owner__username="admin")[0]
+        response = self.client.delete(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
 
 
 class DocumentListViewTest(TestCase):
