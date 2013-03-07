@@ -31,3 +31,10 @@ function manage_with_settings() {
 
 alias manage="manage_with_settings development"
 alias test_manage="manage_with_settings test"
+
+function reset_development_database() {
+	rm "$PYPLN_ROOT"/pypln/web/dev.db
+	manage syncdb --noinput
+	manage loaddata users corpora documents
+	PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" DJANGO_SETTINGS_MODULE="pypln.web.settings.development" python "$PYPLN_ROOT"/contrib/reset_gridfs_collection.py;
+}
