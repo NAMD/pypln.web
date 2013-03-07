@@ -1,4 +1,4 @@
-#!/bin/bash
+# -*- coding:utf-8 -*-
 #
 # Copyright 2012 NAMD-EMAP-FGV
 #
@@ -17,17 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-# This is a suggested postactivate script. Copy this to (or source it
-# from) $VIRTUAL_ENV and it will add some helper functions to your
-# environment when the virtualenv is activated
+from pypln.web.settings.base import *
 
-export PYPLN_ROOT=$(dirname $(find "$VIRTUAL_ENV" -type d -name '.git'))
-
-function manage_with_settings() {
-	 SETTINGS=$1
-	 shift
-	 PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" python "$PYPLN_ROOT"/manage.py $* --settings=pypln.web.settings.$SETTINGS;
+MONGODB_CONFIG = {
+    'host': 'localhost',
+    'port': 27017,
+    'database': 'pypln_dev',
+    'gridfs_collection': 'files',
+    'analysis_collection': 'analysis',
+    'monitoring_collection': 'monitoring',
 }
 
-alias manage="manage_with_settings development"
-alias test_manage="manage_with_settings test"
