@@ -16,7 +16,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from django.conf import settings
 from django.db import models
+
+from pypln.web.core.storage import GridFSStorage
+
+
+gridfs_storage = GridFSStorage(location='/',
+                               host=settings.MONGODB_CONFIG['host'],
+                               port=settings.MONGODB_CONFIG['port'],
+                               database=settings.MONGODB_CONFIG['database'],
+                               collection=settings.MONGODB_CONFIG['gridfs_collection'])
 
 
 class Corpus(models.Model):
@@ -34,7 +44,7 @@ class Corpus(models.Model):
 
 
 class Document(models.Model):
-    blob = models.FileField(upload_to='documents/')
+    blob = models.FileField(upload_to='/', storage=gridfs_storage)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User')
     corpus = models.ForeignKey(Corpus)
