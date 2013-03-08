@@ -23,6 +23,7 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
+from pypln.web.backend_adapter.pipelines import create_pipeline
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 from pypln.web.core.permissions import IsOwner
@@ -63,6 +64,10 @@ class DocumentList(generics.ListCreateAPIView):
 
     def pre_save(self, obj):
         obj.owner = self.request.user
+
+    def post_save(self, obj, created):
+        data = {"_id": str(obj.blob.file._id), "id": obj.id}
+        create_pipeline(data)
 
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Document

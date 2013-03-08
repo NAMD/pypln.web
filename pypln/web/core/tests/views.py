@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 import json
+from mock import patch
 from StringIO import StringIO
 
 from django.contrib.auth.models import User
@@ -25,6 +26,7 @@ from django.test import TestCase
 from django.test.client import encode_multipart, BOUNDARY, MULTIPART_CONTENT
 from rest_framework.reverse import reverse as rest_framework_reverse
 
+from pypln.web.backend_adapter.pipelines import create_pipeline
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.tests.utils import TestWithMongo
 
@@ -177,7 +179,8 @@ class DocumentListViewTest(TestWithMongo):
 
         self.assertEqual(list(expected_data), list(object_list))
 
-    def test_create_new_document(self):
+    @patch('pypln.web.core.views.create_pipeline')
+    def test_create_new_document(self, create_pipelines):
         self.assertEqual(len(self.user.document_set.all()), 1)
         self.client.login(username="user", password="user")
 
@@ -211,7 +214,8 @@ class DocumentListViewTest(TestWithMongo):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_cant_create_document_in_another_users_corpus(self):
+    @patch('pypln.web.core.views.create_pipeline')
+    def test_cant_create_document_in_another_users_corpus(self, create_pipelines):
         self.client.login(username="user", password="user")
 
         # We'll try to associate this document to a corpus that belongs to
@@ -222,6 +226,22 @@ class DocumentListViewTest(TestWithMongo):
         response = self.client.post(reverse('document-list'), data)
 
         self.assertEqual(response.status_code, 400)
+
+    @patch('pypln.web.core.views.create_pipeline')
+    def test_creating_a_document_should_create_a_pipeline_for_it(self, create_pipeline):
+        self.assertEqual(len(self.user.document_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        data = {"corpus": rest_framework_reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), "blob": self.fp}
+        response = self.client.post(reverse('document-list'), data)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(create_pipeline.called)
+        document = response.renderer_context['view'].object
+        pipeline_data = {"_id": str(document.blob.file._id), "id": document.id}
+        create_pipeline.assert_called_with(pipeline_data)
 
 
 class DocumentDetailViewTest(TestWithMongo):
