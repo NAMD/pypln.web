@@ -18,6 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase
 
 from pypln.web.core.models import Document, gridfs_storage
 
