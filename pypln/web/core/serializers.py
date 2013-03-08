@@ -33,8 +33,26 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     corpus = serializers.HyperlinkedRelatedField(view_name="corpus-detail")
 
     def __init__(self, *args, **kwargs):
-        user = kwargs['context']['request'].user
-        self.base_fields['corpus'].queryset = Corpus.objects.filter(owner=user)
+        # If the serializer is treating input from a view, there will be a
+        # context from which we can take the owner, and filter the possible
+        # corpora with it.
+        if 'context' in kwargs:
+            user = kwargs['context']['request'].user
+            self.base_fields['corpus'].queryset = Corpus.objects.filter(owner=user)
+        # If we get a document that already exists, we can filter based on it's
+        # owner.
+        elif args:
+            document = args[0]
+            self.base_fields['corpus'].queryset = Corpus.objects.filter(
+                    owner=document.owner)
+        # In other cases we don't filter the queryset. All the user input
+        # should come through a view, and this view needs to send us a
+        # 'context' and if we do create a document, we should set its owner
+        # anyway. This means our Serializer needs to have either a context or a
+        # document.
+        else:
+            raise ValueError("DocumentSerializer needs either a Document or a "
+                    "context.")
         super(DocumentSerializer, self).__init__(*args, **kwargs)
 
     class Meta:
