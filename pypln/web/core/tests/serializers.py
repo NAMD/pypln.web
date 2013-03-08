@@ -20,14 +20,14 @@ import json
 from StringIO import StringIO
 
 from django.contrib.auth.models import User
-from django.test import TestCase
 
 from pypln.web.core.models import Document
 from pypln.web.core.serializers import DocumentSerializer
+from pypln.web.core.tests.utils import TestWithMongo
 
 __all__ = ["DocumentSerializerTest"]
 
-class DocumentSerializerTest(TestCase):
+class DocumentSerializerTest(TestWithMongo):
     """
     This is supposed to test the behaviour we added to the serializer. We
     don't really need to test all the serializer behaviour since this is tested
@@ -54,3 +54,10 @@ class DocumentSerializerTest(TestCase):
         """
         with self.assertRaises(ValueError):
             DocumentSerializer()
+
+    def test_serialized_data_should_include_file_size(self):
+        document = Document.objects.all()[0]
+        serializer = DocumentSerializer(document)
+
+        self.assertIn("size", serializer.data)
+        self.assertEqual(serializer.data["size"], document.blob.size)

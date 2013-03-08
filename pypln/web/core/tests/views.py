@@ -26,6 +26,7 @@ from django.test.client import encode_multipart, BOUNDARY, MULTIPART_CONTENT
 from rest_framework.reverse import reverse as rest_framework_reverse
 
 from pypln.web.core.models import Corpus, Document
+from pypln.web.core.tests.utils import TestWithMongo
 
 __all__ = ["CorpusListViewTest", "CorpusDetailViewTest",
     "DocumentListViewTest", "DocumentDetailViewTest"]
@@ -153,7 +154,7 @@ class CorpusDetailViewTest(TestCase):
         self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
 
 
-class DocumentListViewTest(TestCase):
+class DocumentListViewTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
     def setUp(self):
@@ -223,7 +224,7 @@ class DocumentListViewTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-class DocumentDetailViewTest(TestCase):
+class DocumentDetailViewTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
     def setUp(self):
