@@ -24,7 +24,8 @@ from pypln.web.core.models import Document, gridfs_storage
 
 class TestWithMongo(TestCase):
 
-    def setUp(self):
+    def _pre_setup(self, *args, **kwargs):
+        super(TestWithMongo, self)._pre_setup(*args, **kwargs)
         if 'test' not in gridfs_storage.database:
             error_message = ("We expect the mongodb database name to contain the "
                 "string 'test' to make sure you don't mess up your production "
@@ -37,5 +38,6 @@ class TestWithMongo(TestCase):
         for doc in Document.objects.all():
             gridfs_storage.save(doc.blob.name, "Test")
 
-    def tearDown(self):
+    def _post_teardown(self, *args, **kwargs):
         gridfs_storage._connection.drop_database(gridfs_storage.database)
+        super(TestWithMongo, self)._post_teardown(*args, **kwargs)
