@@ -192,7 +192,8 @@ class DocumentListViewTest(TestWithMongo):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(self.user.document_set.all()), 2)
 
-    def test_cant_create_document_for_another_user(self):
+    @patch('pypln.web.core.views.create_pipeline')
+    def test_cant_create_document_for_another_user(self, create_pipeline):
         self.client.login(username="user", password="user")
 
         corpus = self.user.corpus_set.all()[0]
