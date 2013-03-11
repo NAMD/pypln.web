@@ -28,3 +28,8 @@ MONGODB_CONFIG = {
     'monitoring_collection': 'monitoring',
 }
 
+# During tests, we should not depend on the router being available. The
+# behaviour of pypelinin should be mocked.
+ROUTER_API = 'dummy'
+ROUTER_BROADCAST = 'dummy'
+ROUTER_TIMEOUT = 5

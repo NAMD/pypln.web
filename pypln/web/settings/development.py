@@ -28,3 +28,6 @@ MONGODB_CONFIG = {
     'monitoring_collection': 'monitoring',
 }
 
+ROUTER_API = 'tcp://127.0.0.1:5555'
+ROUTER_BROADCAST = 'tcp://127.0.0.1:5556'
+ROUTER_TIMEOUT = 5
