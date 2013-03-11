@@ -145,6 +145,7 @@ INSTALLED_APPS = (
     'rest_framework',
 
     'pypln.web.core',
+    'pypln.web.backend_adapter',
 )
 
 # A sample logging configuration. The only tangible logging
