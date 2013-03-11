@@ -17,9 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf import settings
-from pypelinin import Pipeline, PipelineManager
+from pypelinin import Job, Pipeline, PipelineManager
 
-default_pipeline = {}
+default_pipeline = {
+    Job("Extractor"): Job("Tokenizer"),
+    Job("Tokenizer"): (Job("POS"), Job("FreqDist")),
+    Job("FreqDist"): Job("Statistics")
+}
 
 def create_pipeline(data):
     manager = PipelineManager(settings.ROUTER_API, settings.ROUTER_BROADCAST)
