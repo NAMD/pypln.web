@@ -5,7 +5,7 @@
     "fields": {
         "owner": 2,
         "uploaded_at": "2013-03-05T19:54:46.518Z",
-        "blob": "documents/test_file.txt",
+        "blob": "/test_file.txt",
         "corpus": 2
     }
 },
@@ -15,7 +15,7 @@
     "fields": {
         "owner": 1,
         "uploaded_at": "2013-03-05T19:55:18.195Z",
-        "blob": "documents/test_file_1.txt",
+        "blob": "/test_file_1.txt",
         "corpus": 1
     }
 }

@@ -36,7 +36,8 @@ class TestWithMongo(TestCase):
         gridfs_storage._connection.drop_database(gridfs_storage.database)
 
         for doc in Document.objects.all():
-            gridfs_storage.save(doc.blob.name, "Test")
+            gridfs_storage.save(os.path.basename(doc.blob.name),
+                    "This is a test file with some test text.")
 
     def _post_teardown(self, *args, **kwargs):
         gridfs_storage._connection.drop_database(gridfs_storage.database)
