@@ -16,6 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from django.conf import settings
+from pypelinin import Pipeline, PipelineManager
+
+default_pipeline = {}
 
 def create_pipeline(data):
-    pass
+    manager = PipelineManager(settings.ROUTER_API, settings.ROUTER_BROADCAST)
+    pipeline = Pipeline(default_pipeline, data=data)
+    manager.start(pipeline)
