@@ -46,7 +46,7 @@ class Corpus(models.Model):
     def __unicode__(self):
         return self.name
 
-class StoreProxy(DictMixin):
+class StoreProxy(DictMixin, dict):
     def __init__(self, document_id, store):
         self._store = store
         self.document_id = document_id
@@ -60,6 +60,9 @@ class StoreProxy(DictMixin):
             else:
                 msg = "Can't find key {key} for document with id {document_id}"
             raise KeyError(msg.format(key=key, document_id=self.document_id))
+
+    def __setitem__(self, key, value):
+        raise AttributeError("StoreProxy is read-only.")
 
     def keys(self, *args, **kwargs):
         return self['_properties']
