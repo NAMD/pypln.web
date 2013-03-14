@@ -86,12 +86,12 @@ class CorpusDetailViewTest(TestCase):
             kwargs={'pk': 9999}))
         self.assertEqual(response.status_code, 404)
 
-    def test_returns_403_if_user_is_not_the_owner_of_the_corpus(self):
+    def test_returns_404_if_user_is_not_the_owner_of_the_corpus(self):
         self.client.login(username="user", password="user")
         corpus = Corpus.objects.filter(owner__username="admin")[0]
         response = self.client.get(reverse('corpus-detail',
             kwargs={'pk': corpus.id}))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
     def test_edit_corpus(self):
         self.client.login(username="user", password="user")
@@ -106,13 +106,24 @@ class CorpusDetailViewTest(TestCase):
         self.assertEqual(updated_corpus.description, "New description")
 
     def test_cant_edit_other_peoples_corpora(self):
+        """
+        A PUT request to another person's corpus actually raises Http404, as
+        if the document did not exist. Since rest_framework uses PUT-as-create,
+        this means a new object is created with the provided information.
+        """
         self.client.login(username="user", password="user")
         corpus = Corpus.objects.filter(owner__username="admin")[0]
         response = self.client.put(reverse('corpus-detail',
             kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
             "description": "New description"}), content_type="application/json")
 
-        self.assertEqual(response.status_code, 403)
+        new_corpus = response.renderer_context['view'].object
+        self.assertEqual(response.status_code, 201)
+        self.assertNotEqual(new_corpus.id, corpus.id)
+
+        reloaded_corpus = Corpus.objects.filter(owner__username="admin")[0]
+        self.assertNotEqual(reloaded_corpus.name, "New name")
+        self.assertNotEqual(reloaded_corpus.description, "New description")
 
     def test_cant_change_the_owner_of_a_corpus(self):
         self.client.login(username="user", password="user")
@@ -146,5 +157,5 @@ class CorpusDetailViewTest(TestCase):
         response = self.client.delete(reverse('corpus-detail',
             kwargs={'pk': corpus.id}))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)

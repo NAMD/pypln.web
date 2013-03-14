@@ -26,7 +26,6 @@ from rest_framework.response import Response
 from pypln.web.backend_adapter.pipelines import create_pipeline
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
-from pypln.web.core.permissions import IsOwner
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -49,7 +48,10 @@ class CorpusList(generics.ListCreateAPIView):
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Corpus
     serializer_class = CorpusSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwner)
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return Corpus.objects.filter(owner=self.request.user)
 
     def pre_save(self, obj):
         obj.owner = self.request.user
@@ -72,7 +74,10 @@ class DocumentList(generics.ListCreateAPIView):
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Document
     serializer_class = DocumentSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOwner)
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return Document.objects.filter(owner=self.request.user)
 
     def pre_save(self, obj):
         obj.owner = self.request.user

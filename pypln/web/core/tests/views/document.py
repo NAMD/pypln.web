@@ -151,12 +151,12 @@ class DocumentDetailViewTest(TestWithMongo):
             kwargs={'pk': 9999}))
         self.assertEqual(response.status_code, 404)
 
-    def test_returns_403_if_user_is_not_the_owner_of_the_document(self):
+    def test_returns_404_if_user_is_not_the_owner_of_the_document(self):
         self.client.login(username="user", password="user")
         document = Document.objects.filter(owner__username="admin")[0]
         response = self.client.get(reverse('document-detail',
             kwargs={'pk': document.id}))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
     def test_edit_document(self):
         self.client.login(username="user", password="user")
@@ -182,7 +182,7 @@ class DocumentDetailViewTest(TestWithMongo):
         response = self.client.put(reverse('document-detail',
             kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
     def test_cant_change_the_owner_of_a_document(self):
         self.client.login(username="user", password="user")
@@ -217,5 +217,5 @@ class DocumentDetailViewTest(TestWithMongo):
         response = self.client.delete(reverse('document-detail',
             kwargs={'pk': document.id}))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(len(Corpus.objects.filter(owner__username="admin")), 1)
