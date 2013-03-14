@@ -21,6 +21,7 @@ from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from pypln.web.core.views import CorpusList, CorpusDetail
 from pypln.web.core.views import DocumentList, DocumentDetail
+from pypln.web.core.views import PlainTextVisualization
 
 urlpatterns = patterns('pypln.web.core.views',
     url(r'^$', 'api_root'),
@@ -28,6 +29,8 @@ urlpatterns = patterns('pypln.web.core.views',
     url(r'^corpora/(?P<pk>\d+)/$', CorpusDetail.as_view(), name='corpus-detail'),
     url(r'^documents/$', DocumentList.as_view(), name='document-list'),
     url(r'^documents/(?P<pk>\d+)/$', DocumentDetail.as_view(), name='document-detail'),
+    url(r'^documents/(?P<pk>\d+)/visualizations/plain-text/$',
+        PlainTextVisualization.as_view(), name='plain-text-visualization'),
 )
 
 urlpatterns += patterns('',

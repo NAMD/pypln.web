@@ -26,6 +26,7 @@ from rest_framework.response import Response
 from pypln.web.backend_adapter.pipelines import create_pipeline
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
+from pypln.web.core.serializers import PlainTextSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -81,3 +82,10 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def pre_save(self, obj):
         obj.owner = self.request.user
+
+class PlainTextVisualization(generics.RetrieveAPIView):
+    serializer_class = PlainTextSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        return Document.objects.filter(owner=self.request.user)
