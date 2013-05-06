@@ -62,3 +62,6 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class PlainTextSerializer(serializers.Serializer):
     # We should also probably have a reference to the document itself here
     text = serializers.Field(source="properties.text")
+
+class FreqDistSerializer(serializers.Serializer):
+    freqdist = serializers.Field(source="properties.freqdist")

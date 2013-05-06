@@ -21,7 +21,7 @@ from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from pypln.web.core.views import CorpusList, CorpusDetail
 from pypln.web.core.views import DocumentList, DocumentDetail
-from pypln.web.core.views import PlainTextVisualization
+from pypln.web.core.views import PlainTextVisualization, FreqDistVisualization
 
 urlpatterns = patterns('pypln.web.core.views',
     url(r'^$', 'api_root'),
@@ -31,6 +31,8 @@ urlpatterns = patterns('pypln.web.core.views',
     url(r'^documents/(?P<pk>\d+)/$', DocumentDetail.as_view(), name='document-detail'),
     url(r'^documents/(?P<pk>\d+)/visualizations/plain-text/$',
         PlainTextVisualization.as_view(), name='plain-text-visualization'),
+    url(r'^documents/(?P<pk>\d+)/visualizations/freq-dist/$',
+        FreqDistVisualization.as_view(), name='freq-dist-visualization'),
 )
 
 urlpatterns += patterns('',
