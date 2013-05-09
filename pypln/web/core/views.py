@@ -22,11 +22,11 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
+from rest_framework import serializers
 
 from pypln.web.backend_adapter.pipelines import create_pipeline
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
-from pypln.web.core.serializers import PlainTextSerializer, FreqDistSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -83,16 +83,15 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     def pre_save(self, obj):
         obj.owner = self.request.user
 
-class PlainTextVisualization(generics.RetrieveAPIView):
-    serializer_class = PlainTextSerializer
+class PropertyDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user)
 
-class FreqDistVisualization(generics.RetrieveAPIView):
-    serializer_class = FreqDistSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    def get_serializer_class(self, *args, **kwargs):
+        prop = self.kwargs['property']
 
-    def get_queryset(self):
-        return Document.objects.filter(owner=self.request.user)
+        class PropertySerializer(serializers.Serializer):
+            value = serializers.Field(source="properties.{}".format(prop))
+        return PropertySerializer
