@@ -54,6 +54,12 @@ class DocumentDetailTest(TestWithMongo):
             kwargs={'pk': 9999, 'property': 'text'}))
         self.assertEqual(response.status_code, 404)
 
+    def test_returns_404_for_inexistent_property(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('property-detail',
+            kwargs={'pk': self.document.id, 'property': 'inexistent'}))
+        self.assertEqual(response.status_code, 404)
+
     def test_returns_404_if_user_is_not_the_owner_of_the_document(self):
         self.client.login(username="user", password="user")
         other_doc = Document.objects.filter(owner__username="admin")[0]

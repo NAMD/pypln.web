@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.http import Http404
+
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.decorators import api_view
@@ -86,12 +88,20 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
 class PropertyDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
+    def get_object(self, *args, **kwargs):
+        doc = super(PropertyDetail, self).get_object(*args, **kwargs)
+        prop = self.kwargs['property']
+        if prop in doc.properties:
+            return doc
+        else:
+            raise Http404("Property '{}' does not exist for document "
+                    "{}.".format(prop, doc))
+
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user)
 
     def get_serializer_class(self, *args, **kwargs):
-        prop = self.kwargs['property']
-
         class PropertySerializer(serializers.Serializer):
-            value = serializers.Field(source="properties.{}".format(prop))
+            value = serializers.Field(source="properties.{}".format(
+                self.kwargs['property']))
         return PropertySerializer
