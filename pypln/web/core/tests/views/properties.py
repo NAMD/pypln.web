@@ -23,7 +23,59 @@ from rest_framework.reverse import reverse as rest_framework_reverse
 from pypln.web.core.models import Document
 from pypln.web.core.tests.utils import TestWithMongo
 
-__all__ = ["DocumentDetailTest"]
+__all__ = ["DocumentListTest", "DocumentDetailTest"]
+
+
+class DocumentListTest(TestWithMongo):
+    fixtures = ['users', 'corpora', 'documents']
+
+    def setUp(self):
+        self.document = Document.objects.filter(owner__username="user")[0]
+        self.user = self.document.owner
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_shows_document_correctly(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+
+        self.assertEqual(response.status_code, 200)
+        #self.assertEqual(response.renderer_context['view'].object, self.document)
+        self.assertEqual(response.data['properties'],
+                self.document.properties.keys())
+
+    def test_returns_404_for_inexistent_document(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('property-list',
+            kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_returns_404_if_user_is_not_the_owner_of_the_document(self):
+        self.client.login(username="user", password="user")
+        other_doc = Document.objects.filter(owner__username="admin")[0]
+        response = self.client.get(reverse('property-list',
+            kwargs={'pk': other_doc.id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_only_accepts_get(self):
+        self.client.login(username="user", password="user")
+        document = Document.objects.filter(owner__username="admin")[0]
+
+        response = self.client.post(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.put(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.delete(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+        self.assertEqual(response.status_code, 405)
 
 
 class DocumentDetailTest(TestWithMongo):
@@ -82,4 +134,3 @@ class DocumentDetailTest(TestWithMongo):
         response = self.client.delete(reverse('property-detail',
             kwargs={'pk': self.document.id, 'property': 'text'}))
         self.assertEqual(response.status_code, 405)
-

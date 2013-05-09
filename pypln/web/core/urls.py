@@ -21,7 +21,7 @@ from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from pypln.web.core.views import CorpusList, CorpusDetail
 from pypln.web.core.views import DocumentList, DocumentDetail
-from pypln.web.core.views import PropertyDetail
+from pypln.web.core.views import PropertyList, PropertyDetail
 
 urlpatterns = patterns('pypln.web.core.views',
     url(r'^$', 'api_root'),
@@ -29,6 +29,8 @@ urlpatterns = patterns('pypln.web.core.views',
     url(r'^corpora/(?P<pk>\d+)/$', CorpusDetail.as_view(), name='corpus-detail'),
     url(r'^documents/$', DocumentList.as_view(), name='document-list'),
     url(r'^documents/(?P<pk>\d+)/$', DocumentDetail.as_view(), name='document-detail'),
+    url(r'^documents/(?P<pk>\d+)/properties/$',
+        PropertyList.as_view(), name='property-list'),
     url(r'^documents/(?P<pk>\d+)/properties/(?P<property>[\w\d-]+)/$',
         PropertyDetail.as_view(), name='property-detail'),
 )

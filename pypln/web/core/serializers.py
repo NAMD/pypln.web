@@ -58,3 +58,6 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Document
+
+class PropertyListSerializer(serializers.Serializer):
+    properties = serializers.Field(source="properties._properties")
