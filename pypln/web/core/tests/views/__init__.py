@@ -1,3 +1,3 @@
 from corpus import *
 from document import *
-from visualization import *
+from properties import *

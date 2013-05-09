@@ -23,10 +23,10 @@ from rest_framework.reverse import reverse as rest_framework_reverse
 from pypln.web.core.models import Document
 from pypln.web.core.tests.utils import TestWithMongo
 
-__all__ = ["PlainTextVisualizationTest", "FreqDistVisualizationTest"]
+__all__ = ["DocumentDetailTest"]
 
 
-class PlainTextVisualizationTest(TestWithMongo):
+class DocumentDetailTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
     def setUp(self):
@@ -77,54 +77,3 @@ class PlainTextVisualizationTest(TestWithMongo):
             kwargs={'pk': self.document.id, 'property': 'text'}))
         self.assertEqual(response.status_code, 405)
 
-
-class FreqDistVisualizationTest(TestWithMongo):
-    fixtures = ['users', 'corpora', 'documents']
-
-    def setUp(self):
-        self.document = Document.objects.filter(owner__username="user")[0]
-        self.user = self.document.owner
-
-    def test_requires_login(self):
-        response = self.client.get(reverse('property-detail',
-            kwargs={'pk': self.document.id, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 403)
-
-    def test_shows_document_correctly(self):
-        self.client.login(username="user", password="user")
-        response = self.client.get(reverse('property-detail',
-            kwargs={'pk': self.document.id, 'property': 'freqdist'}))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.renderer_context['view'].object, self.document)
-        self.assertEqual(response.data['value'],
-                self.document.properties['freqdist'])
-
-    def test_returns_404_for_inexistent_document(self):
-        self.client.login(username="user", password="user")
-        response = self.client.get(reverse('property-detail',
-            kwargs={'pk': 9999, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_returns_404_if_user_is_not_the_owner_of_the_document(self):
-        self.client.login(username="user", password="user")
-        other_doc = Document.objects.filter(owner__username="admin")[0]
-        response = self.client.get(reverse('property-detail',
-            kwargs={'pk': other_doc.id, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 404)
-
-    def test_only_accepts_get(self):
-        self.client.login(username="user", password="user")
-        document = Document.objects.filter(owner__username="admin")[0]
-
-        response = self.client.post(reverse('property-detail',
-            kwargs={'pk': self.document.id, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 405)
-
-        response = self.client.put(reverse('property-detail',
-            kwargs={'pk': self.document.id, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 405)
-
-        response = self.client.delete(reverse('property-detail',
-            kwargs={'pk': self.document.id, 'property': 'freqdist'}))
-        self.assertEqual(response.status_code, 405)
