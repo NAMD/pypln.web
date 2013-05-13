@@ -18,6 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.forms.models import ModelChoiceIterator
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from pypln.web.core.models import Corpus, Document
 
@@ -60,4 +61,10 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         model = Document
 
 class PropertyListSerializer(serializers.Serializer):
-    properties = serializers.Field(source="properties._properties")
+    properties = serializers.SerializerMethodField("get_property_urls")
+
+    def get_property_urls(self, obj):
+        request = self.context['request']
+        return [reverse('property-detail', kwargs={"pk": obj.id,
+            "property": prop}, request=request) for prop
+            in obj.properties.keys()]

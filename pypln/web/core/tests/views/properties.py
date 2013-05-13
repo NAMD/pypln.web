@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 
 from rest_framework.reverse import reverse as rest_framework_reverse
 
@@ -44,9 +45,14 @@ class DocumentListTest(TestWithMongo):
             kwargs={'pk': self.document.id}))
 
         self.assertEqual(response.status_code, 200)
-        #self.assertEqual(response.renderer_context['view'].object, self.document)
-        self.assertEqual(response.data['properties'],
-                self.document.properties.keys())
+        self.assertEqual(response.renderer_context['view'].object, self.document)
+        fake_request = RequestFactory().get(reverse('property-list',
+            kwargs={'pk': self.document.id}))
+
+        expected_urls = [rest_framework_reverse('property-detail', kwargs={
+            'pk': self.document.id, 'property': prop}, request=fake_request)
+            for prop in self.document.properties.keys()]
+        self.assertEqual(response.data['properties'], expected_urls)
 
     def test_returns_404_for_inexistent_document(self):
         self.client.login(username="user", password="user")
