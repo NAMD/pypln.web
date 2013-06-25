@@ -18,6 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from pypln.web.settings.base import *
+from pypln.web.backend_adapter.pipelines import get_config_from_router
 
 ADMINS = [
     ("pypln", "pyplnproject@gmail.com"),
