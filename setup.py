@@ -21,9 +21,8 @@ from setuptools import setup, find_packages
 
 
 def get_requirements():
-    requirements_fp = open('requirements.txt')
-    requirements = requirements_fp.readlines()
-    requirements_fp.close()
+    with open('requirements/production.txt') as requirements_fp:
+        requirements = requirements_fp.readlines()
     packages = []
     for package in requirements:
         package = package.split('#')[0].strip()
