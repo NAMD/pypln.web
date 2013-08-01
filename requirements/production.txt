@@ -3,3 +3,4 @@ djangorestframework
 mongodict
 pymongo
 pypelinin
+gunicorn
