@@ -27,6 +27,7 @@ ADMINS = [
 MANAGERS = ADMINS
 
 SERVE_MEDIA = False
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static_files")
 
 pgpass_file_path = os.path.expanduser("~/.pgpass")
 secret_key_file_path = os.path.expanduser("~/.secret_key")
