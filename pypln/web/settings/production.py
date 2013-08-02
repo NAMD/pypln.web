@@ -20,6 +20,8 @@
 from pypln.web.settings.base import *
 from pypln.web.backend_adapter.pipelines import get_config_from_router
 
+DEBUG = False
+
 ADMINS = [
     ("pypln", "pyplnproject@gmail.com"),
 ]
