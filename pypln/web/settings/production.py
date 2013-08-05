@@ -34,6 +34,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, "static_files")
 pgpass_file_path = os.path.expanduser("~/.pgpass")
 secret_key_file_path = os.path.expanduser("~/.secret_key")
 smtp_config_file_path = os.path.expanduser("~/.smtp_config")
+allowed_hosts_file_path = os.path.expanduser("~/.pypln_allowed_hosts")
 
 if os.path.exists(smtp_config_file_path):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -48,6 +49,9 @@ with open(pgpass_file_path, 'r') as pgpass_file:
     pg_credentials = pgpass_file.read().strip()
 
 db_host, db_port, db_name, db_user, db_password = pg_credentials.split(":")
+
+with open(allowed_hosts_file_path, 'r') as allowed_hosts_file:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_file.readlines()]
 
 DATABASES = {
     "default": {
