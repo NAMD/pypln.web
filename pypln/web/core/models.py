@@ -22,6 +22,7 @@ from django.conf import settings
 from django.db import models
 
 from mongodict import MongoDict
+from rest_framework.reverse import reverse
 
 from pypln.web.core.storage import GridFSStorage
 
@@ -90,3 +91,6 @@ class Document(models.Model):
                    database=settings.MONGODB_CONFIG['database'],
                    collection=settings.MONGODB_CONFIG['analysis_collection'])
         return StoreProxy(self.id, self._store)
+
+    def properties_url(self):
+        return reverse("property-list", args=[self.pk])
