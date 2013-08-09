@@ -18,5 +18,6 @@
         </li>
     {% else %}
         <li>{% optional_login request %}</li>
+        <li><a href="{% url 'registration_register' %}">Register</a></li>
     {% endif %}
 {% endblock %}
