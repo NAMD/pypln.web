@@ -18,6 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from pypln.web.settings.base import *
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MONGODB_CONFIG = {
     'host': 'localhost',

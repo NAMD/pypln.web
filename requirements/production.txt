@@ -4,3 +4,4 @@ mongodict
 pymongo
 pypelinin
 gunicorn
+django-registration

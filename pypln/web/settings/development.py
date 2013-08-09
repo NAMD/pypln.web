@@ -19,6 +19,8 @@
 
 from pypln.web.settings.base import *
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 MONGODB_CONFIG = {
     'host': 'localhost',
     'port': 27017,
