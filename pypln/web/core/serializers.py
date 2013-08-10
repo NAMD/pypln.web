@@ -33,7 +33,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.Field(source="owner.username")
     corpus = serializers.HyperlinkedRelatedField(view_name="corpus-detail")
     size = serializers.Field(source="blob.size")
-    properties = serializers.Field(source="properties_url")
+    properties = serializers.HyperlinkedIdentityField(view_name="property-list")
 
     def __init__(self, *args, **kwargs):
         # If the serializer is treating input from a view, there will be a

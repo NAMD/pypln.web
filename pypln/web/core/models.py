@@ -91,6 +91,3 @@ class Document(models.Model):
                    database=settings.MONGODB_CONFIG['database'],
                    collection=settings.MONGODB_CONFIG['analysis_collection'])
         return StoreProxy(self.id, self._store)
-
-    def properties_url(self):
-        return reverse("property-list", args=[self.pk])
