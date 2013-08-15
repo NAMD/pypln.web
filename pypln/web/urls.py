@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding:utf-8 -*-
 #
 # Copyright 2012 NAMD-EMAP-FGV
 #
@@ -17,32 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
-from django.conf.urls.defaults import *
-from django.views.generic.simple import direct_to_template
+from django.conf.urls import patterns, include, url
+
 from django.contrib import admin
-from pinax.apps.account.openid_consumer import PinaxConsumer
-import apps.core.urls
-
-
 admin.autodiscover()
-handler500 = "pinax.views.server_error"
-urlpatterns = patterns("",
-    url(r"^$", 'core.views.index', name='home'),
-    url(r"^admin/invite_user/$",
-         "pinax.apps.signup_codes.views.admin_invite_user",
-         name="admin_invite_user"),
-    url(r"^admin/", include(admin.site.urls)),
-    url(r"^about/", include("about.urls")),
-    url(r"^account/", include("pinax.apps.account.urls")),
-    url(r"^openid/", include(PinaxConsumer().urls)),
-    url(r"^profiles/", include("idios.urls")),
-    url(r"^notices/", include("notification.urls")),
-    url(r"^announcements/", include("announcements.urls")),
-)
-urlpatterns += apps.core.urls.urlpatterns
 
-if settings.SERVE_MEDIA:
-    urlpatterns += patterns("",
-        url(r"", include("staticfiles.urls")),
-    )
+urlpatterns = patterns('',
+    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include('pypln.web.core.urls')),
+)

@@ -21,9 +21,8 @@ from setuptools import setup, find_packages
 
 
 def get_requirements():
-    requirements_fp = open('requirements/production.txt')
-    requirements = requirements_fp.readlines()
-    requirements_fp.close()
+    with open('requirements/production.txt') as requirements_fp:
+        requirements = requirements_fp.readlines()
     packages = []
     for package in requirements:
         package = package.split('#')[0].strip()
@@ -42,6 +41,7 @@ setup(name='pypln.web',
       description='Distributed natural language processing pipeline - Web interface',
       zip_safe=False,
       packages=find_packages(),
+      include_package_data=True,
       namespace_packages=["pypln"],
       install_requires=get_requirements(),
       test_suite='nose.collector',

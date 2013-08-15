@@ -1,10 +1,7 @@
-# common
-pypelinin
-mongodict
-nltk
-
-# pypln.web-specific
-Pinax
-flask
-jinja2
 django
+djangorestframework
+mongodict
+pymongo
+pypelinin
+gunicorn
+django-registration

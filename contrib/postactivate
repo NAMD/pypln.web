@@ -26,8 +26,15 @@ export PYPLN_ROOT=$(dirname $(find "$VIRTUAL_ENV" -type d -name '.git'))
 function manage_with_settings() {
 	 SETTINGS=$1
 	 shift
-	 PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" "$PYPLN_ROOT"/pypln/web/manage.py $* --settings=settings.$SETTINGS;
+	 PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" python "$PYPLN_ROOT"/manage.py $* --settings=pypln.web.settings.$SETTINGS;
 }
 
 alias manage="manage_with_settings development"
 alias test_manage="manage_with_settings test"
+
+function reset_development_database() {
+	rm "$PYPLN_ROOT"/pypln/web/dev.db
+	manage syncdb --noinput
+	manage loaddata users corpora documents
+	PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" DJANGO_SETTINGS_MODULE="pypln.web.settings.development" python "$PYPLN_ROOT"/contrib/reset_gridfs_collection.py;
+}

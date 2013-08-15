@@ -1,0 +1,9 @@
+{% extends "registration/base.html" %}
+
+{% block userlinks %}
+{% endblock %}
+
+{% block content %}
+<p>Thank you for registering. You can now
+<a href="{% url 'rest_framework:login' %}?next=/">login</a> and use PyPLN.</p>
+{% endblock %}

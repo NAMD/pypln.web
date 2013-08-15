@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 #
 # Copyright 2012 NAMD-EMAP-FGV
 #
@@ -16,47 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from base import *
-ADMINS = [
-    ("Admin", "admin@example.com"),
-]
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(PROJECT_ROOT, "dev.db"),
-        "USER": "",
-        "PASSWORD": "",
-        "HOST": "",
-        "PORT": "",
-    }
-}
-
-DEBUG = True
-TEMPLATE_DEBUG = True
-# tells Pinax to serve media through the staticfiles app.
-SERVE_MEDIA = True
-
-TEMPLATE_STRING_IF_INVALID = "INVALID_CONTEXT_VARIABLE"
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = "r9^6-zqrk-$uyu96z!$sakf%^ng!w&4^d8qj@t#taxtgi+a1p9"
+from pypln.web.settings.base import *
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_DEBUG = True
+
+MONGODB_CONFIG = {
+    'host': 'localhost',
+    'port': 27017,
+    'database': 'pypln_dev',
+    'gridfs_collection': 'files',
+    'analysis_collection': 'analysis',
+    'monitoring_collection': 'monitoring',
+}
 
 ROUTER_API = 'tcp://127.0.0.1:5555'
 ROUTER_BROADCAST = 'tcp://127.0.0.1:5556'
 ROUTER_TIMEOUT = 5
-
-CONFIGURATION = get_config_from_router(ROUTER_API)
-if CONFIGURATION is None:
-    MONGODB_CONFIG = {'host': 'localhost',
-                      'port': 27017,
-                      'database': 'pypln_dev',
-                      'gridfs_collection': 'files',
-                      'analysis_collection': 'analysis',
-                      'monitoring_collection': 'monitoring',
-    }
-else:
-    MONGODB_CONFIG = CONFIGURATION['store']

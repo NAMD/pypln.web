@@ -16,21 +16,27 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from django.conf import settings
+from pypelinin import Job, Pipeline, PipelineManager, Client
 
-from pypln.web.settings.base import *
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-MONGODB_CONFIG = {
-    'host': 'localhost',
-    'port': 27017,
-    'database': 'test_pypln',
-    'gridfs_collection': 'files',
-    'analysis_collection': 'analysis',
-    'monitoring_collection': 'monitoring',
+default_pipeline = {
+    Job("Extractor"): (Job("StanfordNER"), Job("Tokenizer")),
+    Job("Tokenizer"): (Job("POS"), Job("FreqDist")),
+    Job("FreqDist"): Job("Statistics")
 }
 
-# During tests, we should not depend on the router being available. The
-# behaviour of pypelinin should be mocked.
-ROUTER_API = 'dummy'
-ROUTER_BROADCAST = 'dummy'
-ROUTER_TIMEOUT = 5
+def create_pipeline(data):
+    manager = PipelineManager(settings.ROUTER_API, settings.ROUTER_BROADCAST)
+    pipeline = Pipeline(default_pipeline, data=data)
+    manager.start(pipeline)
+
+def get_config_from_router(api, timeout=5):
+    client = Client()
+    client.connect(api)
+    client.send_api_request({'command': 'get configuration'})
+    if client.api_poll(timeout):
+        result = client.get_api_reply()
+    else:
+        result = None
+    client.disconnect()
+    return result

@@ -17,20 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from pypln.web.settings.base import *
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+from django.contrib import admin
+from pypln.web.core.models import Corpus, Document
 
-MONGODB_CONFIG = {
-    'host': 'localhost',
-    'port': 27017,
-    'database': 'test_pypln',
-    'gridfs_collection': 'files',
-    'analysis_collection': 'analysis',
-    'monitoring_collection': 'monitoring',
-}
-
-# During tests, we should not depend on the router being available. The
-# behaviour of pypelinin should be mocked.
-ROUTER_API = 'dummy'
-ROUTER_BROADCAST = 'dummy'
-ROUTER_TIMEOUT = 5
+admin.site.register(Corpus)
+admin.site.register(Document)

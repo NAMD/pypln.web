@@ -1,0 +1,23 @@
+{% extends "rest_framework/base.html" %}
+{% load rest_framework %}
+
+{% block title %}PyPLN{% endblock %}
+{% block branding %}<a href="/">PyPLN</a>{% endblock %}
+
+{% block userlinks %}
+    {% if user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                {{ user }}
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="{% url 'auth_password_change' %}">Change password</a></li>
+                <li>{% optional_logout request %}</li>
+            </ul>
+        </li>
+    {% else %}
+        <li>{% optional_login request %}</li>
+        <li><a href="{% url 'registration_register' %}">Register</a></li>
+    {% endif %}
+{% endblock %}
