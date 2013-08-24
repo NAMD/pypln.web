@@ -6,7 +6,7 @@ Contact Information
 
 You can interact with us through:
 
-- Mail list: `pypln @ Google Groups <https://groups.google.com/group/pypln>`_
+- Mailling list: `pypln @ Google Groups <https://groups.google.com/group/pypln>`_
 - IRC: `#pypln @ irc.freenode.net <http://webchat.freenode.net?channels=pypln>`_
 
 
@@ -21,7 +21,7 @@ Code Guidelines
   names (``x`` is always wrong).
 - Use `Python's new-style formatting <http://docs.python.org/library/string.html#format-string-syntax>`_
   (``'{} = {}'.format(a, b)`` instead of ``'%s = %s' % (a, b)``).
-- All ``#TODO`` should be translated in issues (use our
+- All ``#TODO`` should be turned into issues (use
   `GitHub issue system <https://github.com/namd/pypln.web/issues>`_).
 - Run all tests before pushing (just execute ``make test``).
 - Try to write Python3-friendly code, so when we decide to support both Python2
