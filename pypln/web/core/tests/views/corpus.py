@@ -63,6 +63,17 @@ class CorpusListViewTest(TestCase):
         # but the view sets the request user as the owner anyway
         self.assertEqual(response.data["owner"], "user")
 
+    def test_cant_create_duplicate_corpus(self):
+        user = User.objects.get(username="user")
+        self.assertEqual(len(user.corpus_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        # A corpus with this information already exists (loaded by fixtures)
+        response = self.client.post(reverse('corpus-list'), {"name": "User Test Corpus",
+            "description": "description"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(user.corpus_set.all()), 1)
+
 
 class CorpusDetailViewTest(TestCase):
     fixtures = ['users', 'corpora']
@@ -104,6 +115,22 @@ class CorpusDetailViewTest(TestCase):
         updated_corpus = Corpus.objects.filter(owner__username="user")[0]
         self.assertEqual(updated_corpus.name, "New name")
         self.assertEqual(updated_corpus.description, "New description")
+
+    def test_cant_change_name_to_one_that_already_exists_for_this_user(self):
+        self.client.login(username="user", password="user")
+        user = User.objects.get(username="user")
+        conflicting_corpus = Corpus.objects.create(name="Conflicting name",
+                owner=user, description="This corpus is here to create a conflict")
+
+        corpus = Corpus.objects.filter(owner__username="user")[0]
+        response = self.client.put(reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), json.dumps({"name": "Conflicting name",
+            "description": "New description"}), content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+        not_updated_corpus = Corpus.objects.filter(owner__username="user")[0]
+        self.assertEqual(not_updated_corpus.name, "User Test Corpus")
+        self.assertEqual(not_updated_corpus.description, "This corpus belongs to the user 'user'")
 
     def test_cant_edit_other_peoples_corpora(self):
         """
