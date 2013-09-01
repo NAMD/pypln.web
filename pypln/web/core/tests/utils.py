@@ -52,7 +52,7 @@ class TestWithMongo(TestCase):
         filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/analysis.json')
         with open(filename, 'r') as mongo_fixture:
             for obj in json.load(mongo_fixture):
-                self.store._collection.insert(obj)
+                self.store[obj['_id']] = obj['value']
 
     def _post_teardown(self, *args, **kwargs):
         gridfs_storage._connection.drop_database(gridfs_storage.database)
