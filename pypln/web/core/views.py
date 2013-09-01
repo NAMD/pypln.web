@@ -22,6 +22,7 @@ from django.http import Http404
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ParseError
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework import serializers
@@ -47,7 +48,11 @@ class CorpusList(generics.ListCreateAPIView):
         return Corpus.objects.filter(owner=self.request.user)
 
     def pre_save(self, obj):
-        obj.owner = self.request.user
+        if Corpus.objects.filter(name=obj.name,
+                owner=self.request.user).exists():
+            raise ParseError(detail="Corpora names must be unique for each user.")
+        else:
+            obj.owner = self.request.user
 
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Corpus
@@ -58,7 +63,11 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
         return Corpus.objects.filter(owner=self.request.user)
 
     def pre_save(self, obj):
-        obj.owner = self.request.user
+        if Corpus.objects.filter(name=obj.name,
+                owner=self.request.user).exists():
+            raise ParseError(detail="Corpora names must be unique for each user.")
+        else:
+            obj.owner = self.request.user
 
 class DocumentList(generics.ListCreateAPIView):
     model = Document
