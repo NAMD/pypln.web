@@ -50,6 +50,11 @@ information:
      u'owner': u'demo',
      u'url': u'http://demo.pypln.org/corpora/1/'}
 
+> Beware that a user cannot have two corpora with the same name. If you're
+> getting a 400 (Bad Request) reply when trying to reproduce this step, please
+> check if the user doesn't already have a corpus with the same name you're
+> trying to create.
+
 Please note that the corpus information will definetly change when you run
 this code (the creation date will be different, so will the url and probably
 other data). If you have similar output, this means your corpus was created
