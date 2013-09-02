@@ -88,12 +88,12 @@ from each PDF. This can take a while.
 
 We can get information on all documents, by running:
 
-    response = requests.get('http://demo.pypln.org/documents/', auth=credentials)
+    documents_response = requests.get('http://demo.pypln.org/documents/', auth=credentials)
 
 `response` here will have a list of all the documents you have. So you can, for
 example, get the plain text extracted from them:
 
-    for document in response.json():
+    for document in documents_response.json():
         # we need to get the document's base property url
         properties_url = document['properties']
         plain_text_url = properties_url + 'text'
@@ -108,3 +108,54 @@ This should print the length of the text extracted from each of your PDFs. You
 can see all the available properties for each document in the `properties` url
 provided in it's information (what we called `properties_url` in the code
 above).
+
+You can get a list of all properties for each document in the url provided by
+'properties':
+
+    # Let's pick one document and work with it
+    document = documents_response.json()[0]
+    properties_response = requests.get(document['properties'],
+            auth=credentials)
+    print(properties_response.json()['properties'])
+
+You should see something like this:
+
+    {
+        "properties": [
+            "http://demo.pypln.org/documents/1/properties/mimetype/",
+            "http://demo.pypln.org/documents/1/properties/freqdist/",
+            "http://demo.pypln.org/documents/1/properties/average_sentence_repertoire/",
+            "http://demo.pypln.org/documents/1/properties/language/",
+            "http://demo.pypln.org/documents/1/properties/momentum_4/",
+            "http://demo.pypln.org/documents/1/properties/average_sentence_length/",
+            "http://demo.pypln.org/documents/1/properties/momentum_1/",
+            "http://demo.pypln.org/documents/1/properties/pos/",
+            "http://demo.pypln.org/documents/1/properties/momentum_3/",
+            "http://demo.pypln.org/documents/1/properties/file_metadata/",
+            "http://demo.pypln.org/documents/1/properties/tokens/",
+            "http://demo.pypln.org/documents/1/properties/repertoire/",
+            "http://demo.pypln.org/documents/1/properties/text/",
+            "http://demo.pypln.org/documents/1/properties/tagset/",
+            "http://demo.pypln.org/documents/1/properties/sentences/",
+            "http://demo.pypln.org/documents/1/properties/momentum_2/",
+            "http://demo.pypln.org/documents/1/properties/named_entities/"
+        ]
+    }
+
+
+> Note that, again, the exact result will depend on the document you have
+> uploaded, and whether all analysis are finished when you listed the
+> properties.
+
+So if you want, for example, the frequency of tokens in the analysed text, just
+get it from the provided url:
+
+    freqdist_response = requests.get("http://demo.pypln.org/documents/1/properties/freqdist/",
+            auth=credentials)
+
+    print(freqdist_response.json()['value'])
+
+And you should see a list containing pairs of tokens and it's number of
+occurrences in the document.
+
+<!-- add link to the documentation of the endpoints -->
