@@ -4,10 +4,7 @@ PyPLN
 PyPLN is a distributed pipeline for natural language processing, made in Python.
 We use `NLTK <http://nltk.org/>`_ and `ZeroMQ <http://www.zeromq.org/>`_ as
 our foundations. The goal of the project is to create an easy way to use NLTK
-for processing big corpora, with a Web interface.
-
-We don't have a production release yet, but it's scheduled on our
-`next milestone <https://github.com/namd/pypln.web/issues?milestone=1>`_.
+for processing big corpora, with a REST API.
 
 PyPLN is sponsored by `Fundação Getulio Vargas <http://portal.fgv.br/>`_.
 
@@ -17,24 +14,18 @@ License
 PyPLN is free software, released under the GPLv3
 `<https://gnu.org/licenses/gpl-3.0.html>`_.
 
+Using
+-----
 
-Documentation
--------------
+You can start by looking at our `quickstart guide
+<https://github.com/NAMD/pypln.web/wiki/Quickstart-guide>`_.
 
-Our documentation is hosted using `GitHub Pages <http://pages.github.com/>`_:
-
-- `PyPLN Documentation <http://pypln.org/docs>`_
-  (created using `Sphinx <http://sphinx.pocoo.org/>`_)
-- `Code reference <http://namd.github.com/pypln/reference/>`_
-  (created using `epydoc <http://epydoc.sourceforge.net/>`_)
-
-
-Requirements
-------------
+Installing
+----------
 
 To install dependencies (on a Debian-like GNU/Linux distribution)::
 
-    sudo apt-get install python-setuptools
+    sudo apt-get install python-setuptools mongodb
     pip install virtualenv virtualenvwrapper
     mkvirtualenv pypln.web
     pip install -r requirements/production.txt
@@ -53,13 +44,11 @@ To run tests::
     make test
 
 
-..  TODO: The PYTHONPATH issue should be fixed once we organize the directory
-    structure. As soon as this is fixed, we must update this instructions.
 
 To run the development webserver::
 
     workon pypln.web
     pip install -r requirements/project.txt
-    PYTHONPATH="../../:$PYTHONPATH" ./manage.py runserver --settings=settings.development
+    ./manage.py runserver --settings=pypln.web.settings.development
 
 See our `code guidelines <https://github.com/namd/pypln.web/blob/develop/CONTRIBUTING.rst>`_.
