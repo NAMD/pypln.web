@@ -36,8 +36,8 @@ So let's start. First, we need to create a new corpus:
 
     import requests
 
-    response = requests.post('http://demo.pypln.org/documents/',
-        data={'name': 'pdfs', 'description': 'My PDFs'}, auth=('demo', demo'))
+    response = requests.post('http://demo.pypln.org/corpora/',
+        data={'name': 'pdfs', 'description': 'My PDFs'}, auth=('demo', 'demo'))
 
 
 `response` should have a 201 (created) status code, and contain corpus
@@ -78,7 +78,6 @@ all the pdf files in a directory called `pdfs`:
 
     for filename in glob.glob('pdfs/*.pdf'):
         print('Sending {}...'.format(filename))
-
         with open(filename, 'r') as fp:
             files = {'blob': fp}
             resp = requests.post('http://demo.pypln.org/documents/', data=data,
@@ -101,13 +100,14 @@ We can get information on all documents, by running:
 `response` here will have a list of all the documents you have. So you can, for
 example, get the plain text extracted from them:
 
+.. code-block:: python
+
     for document in documents_response.json():
         # we need to get the document's base property url
         properties_url = document['properties']
         plain_text_url = properties_url + 'text'
         doc_text_info = requests.get(plain_text_url, auth=credentials)
         doc_text = doc_text_info.json()['value']
-
         # Let's just print the length of the text, otherwise we could have a
         # lot of output.
         print(len(doc_text))
@@ -133,8 +133,7 @@ You should see something like this:
 
 .. code-block:: python
 
-    {
-        "properties": [
+        [
             "http://demo.pypln.org/documents/1/properties/mimetype/",
             "http://demo.pypln.org/documents/1/properties/freqdist/",
             "http://demo.pypln.org/documents/1/properties/average_sentence_repertoire/",
@@ -153,7 +152,6 @@ You should see something like this:
             "http://demo.pypln.org/documents/1/properties/momentum_2/",
             "http://demo.pypln.org/documents/1/properties/named_entities/"
         ]
-    }
 
 
 .. note::
