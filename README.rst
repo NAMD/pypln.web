@@ -14,6 +14,11 @@ License
 PyPLN is free software, released under the GPLv3
 `<https://gnu.org/licenses/gpl-3.0.html>`_.
 
+Using
+-----
+
+You can start by looking at our `quickstart guide
+<https://github.com/NAMD/pypln.web/wiki/Quickstart-guide>`_.
 
 Installing
 ----------
