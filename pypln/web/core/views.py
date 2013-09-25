@@ -174,6 +174,11 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
         obj.owner = self.request.user
 
 class PropertyList(generics.RetrieveAPIView):
+    """
+    Lists all the available analysis results for a document. If a property is
+    not listed here, the analysis is either not yet complete or not applicable
+    to the specified document.
+    """
     serializer_class = PropertyListSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
