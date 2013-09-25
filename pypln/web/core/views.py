@@ -76,6 +76,7 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
 
     - `owner`: the user that owns the corpus.
     - `documents`: a list of all documents in this corpus.
+    <!-- TODO: add link to /documents/ -->
     - `url`: the fully qualified url for this corpus (which should be used as
       an argument when creating new documents).
     - `name`: the corpus name.
@@ -178,6 +179,7 @@ class PropertyList(generics.RetrieveAPIView):
     Lists all the available analysis results for a document. If a property is
     not listed here, the analysis is either not yet complete or not applicable
     to the specified document.
+    <!-- TODO: We need to warn the user when the analysis failed -->
     """
     serializer_class = PropertyListSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -191,6 +193,8 @@ class PropertyDetail(generics.RetrieveAPIView):
     always has one key named `value` and it will contain your result. A list of
     all possible analysis and the corresponding result formats is available in
     our documentation.
+    <!-- TODO: add link to the part of the documentation that specifies all the
+    available analysis -->
     """
     permission_classes = (permissions.IsAuthenticated, )
 
