@@ -69,6 +69,28 @@ class CorpusList(generics.ListCreateAPIView):
             obj.owner = self.request.user
 
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Show details of a specific corpus and allows the corpus to be edited.
+
+    `GET` requests will show all the corpus details:
+
+    - `owner`: the user that owns the corpus.
+    - `documents`: a list of all documents in this corpus.
+    - `url`: the fully qualified url for this corpus (which should be used as
+      an argument when creating new documents).
+    - `name`: the corpus name.
+    - `description`: the corpus description.
+    - `created_at`: the creation date of the corpus.
+
+
+    `PUT` requests will edit a corpus and require:
+
+    - `name`: A string that will be set as the corpus' name (at most 60 chars).
+    - `description`: A short (at most 255 chars) description of the corpus.
+
+    The owner is set automatically to the requesting user, so it is not
+    possible to change the owner using this resource.
+    """
     model = Corpus
     serializer_class = CorpusSerializer
     permission_classes = (permissions.IsAuthenticated, )
