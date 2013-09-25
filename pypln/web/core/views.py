@@ -139,6 +139,30 @@ class DocumentList(generics.ListCreateAPIView):
         create_pipeline(data)
 
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Show details of a specific document and allows the document to be edited.
+
+    `GET` requests will show the document details:
+
+    - `owner`: the user that owns the document.
+    - `corpus`: the fully qualified url for the corpus in which this document
+      is contained.
+    - `size`: the document size (in bytes).
+    - `properties`: the url for the list of document properties (the results of
+      the analysis will be available in this url when ready).
+    - `url`: the fully qualified url for this document.
+    - `uploaded_at`: the date this document was uploaded.
+
+
+    `PUT` requests will edit a document and require:
+
+    - `corpus`: fully qualified url of the corpus that should contain the
+      document.
+    - `blob`: the document to be processed.
+
+    The owner is set automatically to the requesting user, so it is not
+    possible to change the owner using this resource.
+    """
     model = Document
     serializer_class = DocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
