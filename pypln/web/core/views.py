@@ -40,6 +40,20 @@ def api_root(request, format=None):
     })
 
 class CorpusList(generics.ListCreateAPIView):
+    """
+    Lists all corpora available to the current user and creates new corpora.
+
+    `GET` requests will simply list all available corpora.
+
+    `POST` requests will create a new corpus and require:
+
+    - `name`: A string that will be used as the corpus' name (at most 60 chars).
+    - `description`: A short (at most 255 chars) description of the new corpus.
+
+    The list will only include corpora owned by the requesting user, and a
+    newly created corpus will always have the user that sent the `POST` request
+    as it's owner.
+    """
     model = Corpus
     serializer_class = CorpusSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -55,6 +69,29 @@ class CorpusList(generics.ListCreateAPIView):
             obj.owner = self.request.user
 
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Show details of a specific corpus and allows the corpus to be edited.
+
+    `GET` requests will show all the corpus details:
+
+    - `owner`: the user that owns the corpus.
+    - `documents`: a list of all documents in this corpus.
+    <!-- TODO: add link to /documents/ -->
+    - `url`: the fully qualified url for this corpus (which should be used as
+      an argument when creating new documents).
+    - `name`: the corpus name.
+    - `description`: the corpus description.
+    - `created_at`: the creation date of the corpus.
+
+
+    `PUT` requests will edit a corpus and require:
+
+    - `name`: A string that will be set as the corpus' name (at most 60 chars).
+    - `description`: A short (at most 255 chars) description of the corpus.
+
+    The owner is set automatically to the requesting user, so it is not
+    possible to change the owner using this resource.
+    """
     model = Corpus
     serializer_class = CorpusSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -70,6 +107,24 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
             obj.owner = self.request.user
 
 class DocumentList(generics.ListCreateAPIView):
+    """
+    Lists all documents available to the current user and creates new documents.
+
+    `GET` requests will simply list all available documents.
+
+    `POST` requests will create a new document and require:
+
+    - `corpus`: Fully qualified url of the corpus that will contain the new
+      document.
+    - `blob`: The document to be processed.
+
+    The list will only include documents owned by the requesting user, and a
+    newly created document will always have the user that sent the `POST` request
+    as it's owner.
+
+    As soon as a document is uploaded it will be processed and the results will
+    be available as soon as they are ready.
+    """
     model = Document
     serializer_class = DocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -85,6 +140,30 @@ class DocumentList(generics.ListCreateAPIView):
         create_pipeline(data)
 
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Show details of a specific document and allows the document to be edited.
+
+    `GET` requests will show the document details:
+
+    - `owner`: the user that owns the document.
+    - `corpus`: the fully qualified url for the corpus in which this document
+      is contained.
+    - `size`: the document size (in bytes).
+    - `properties`: the url for the list of document properties (the results of
+      the analysis will be available in this url when ready).
+    - `url`: the fully qualified url for this document.
+    - `uploaded_at`: the date this document was uploaded.
+
+
+    `PUT` requests will edit a document and require:
+
+    - `corpus`: fully qualified url of the corpus that should contain the
+      document.
+    - `blob`: the document to be processed.
+
+    The owner is set automatically to the requesting user, so it is not
+    possible to change the owner using this resource.
+    """
     model = Document
     serializer_class = DocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
@@ -96,6 +175,12 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
         obj.owner = self.request.user
 
 class PropertyList(generics.RetrieveAPIView):
+    """
+    Lists all the available analysis results for a document. If a property is
+    not listed here, the analysis is either not yet complete or not applicable
+    to the specified document.
+    <!-- TODO: We need to warn the user when the analysis failed -->
+    """
     serializer_class = PropertyListSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
@@ -103,6 +188,14 @@ class PropertyList(generics.RetrieveAPIView):
         return Document.objects.filter(owner=self.request.user)
 
 class PropertyDetail(generics.RetrieveAPIView):
+    """
+    Shows the result of an analysis for the specified document. The result
+    always has one key named `value` and it will contain your result. A list of
+    all possible analysis and the corresponding result formats is available in
+    our documentation.
+    <!-- TODO: add link to the part of the documentation that specifies all the
+    available analysis -->
+    """
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_object(self, *args, **kwargs):
