@@ -5,3 +5,4 @@ pymongo
 pypelinin
 gunicorn
 django-registration
+markdown
