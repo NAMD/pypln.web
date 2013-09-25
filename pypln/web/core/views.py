@@ -186,6 +186,12 @@ class PropertyList(generics.RetrieveAPIView):
         return Document.objects.filter(owner=self.request.user)
 
 class PropertyDetail(generics.RetrieveAPIView):
+    """
+    Shows the result of an analysis for the specified document. The result
+    always has one key named `value` and it will contain your result. A list of
+    all possible analysis and the corresponding result formats is available in
+    our documentation.
+    """
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_object(self, *args, **kwargs):
