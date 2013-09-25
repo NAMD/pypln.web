@@ -84,6 +84,24 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
             obj.owner = self.request.user
 
 class DocumentList(generics.ListCreateAPIView):
+    """
+    Lists all documents available to the current user and creates new documents.
+
+    `GET` requests will simply list all available documents.
+
+    `POST` requests will create a new document and require:
+
+    - `corpus`: Fully qualified url of the corpus that will contain the new
+      document.
+    - `blob`: The document to be processed.
+
+    The list will only include documents owned by the requesting user, and a
+    newly created document will always have the user that sent the `POST` request
+    as it's owner.
+
+    As soon as a document is uploaded it will be processed and the results will
+    be available as soon as they are ready.
+    """
     model = Document
     serializer_class = DocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
