@@ -40,6 +40,20 @@ def api_root(request, format=None):
     })
 
 class CorpusList(generics.ListCreateAPIView):
+    """
+    Lists all corpora available to the current user and creates new corpora.
+
+    `GET` requests will simply list all available corpora.
+
+    `POST` requests will create a new corpus and require:
+
+    - `name`: A string that will be used as the corpus' name (at most 60 chars).
+    - `description`: A short (at most 255 chars) description of the new corpus.
+
+    The list will only include corpora owned by the requesting user, and a
+    newly created corpus will always have the user that sent the `POST` request
+    as it's owner.
+    """
     model = Corpus
     serializer_class = CorpusSerializer
     permission_classes = (permissions.IsAuthenticated, )
