@@ -80,3 +80,20 @@ if CONFIGURATION is None:
     }
 else:
     MONGODB_CONFIG = CONFIGURATION['store']
+
+
+from django.core.exceptions import SuspiciousOperation
+
+def skip_suspicious_operations(record):
+    if record.exc_info:
+        exc_value = record.exc_info[0]
+        if isinstance(exc_value, SuspiciousOperation):
+            return False
+    return True
+
+LOGGING['filters']['skip_suspicious_operations'] = {
+    '()': 'django.utils.log.CallbackFilter',
+    'callback': skip_suspicious_operations,
+}
+
+LOGGING['handlers']['mail_admins']['filters'].append('skip_suspicious_operations')
