@@ -20,7 +20,7 @@ from django.conf import settings
 from pypelinin import Job, Pipeline, PipelineManager, Client
 
 default_pipeline = {
-    Job("Extractor"): (Job("StanfordNER"), Job("Tokenizer")),
+    Job("Extractor"): Job("Tokenizer"),
     Job("Tokenizer"): (Job("POS"), Job("FreqDist")),
     Job("FreqDist"): Job("Statistics")
 }
