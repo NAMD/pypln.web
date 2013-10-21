@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
+import ConfigParser
+
 from pypln.web.settings.base import *
 from pypln.web.backend_adapter.pipelines import get_config_from_router
 
@@ -69,17 +71,29 @@ ROUTER_API = 'tcp://127.0.0.1:5555'
 ROUTER_BROADCAST = 'tcp://127.0.0.1:5556'
 ROUTER_TIMEOUT = 5
 
-CONFIGURATION = get_config_from_router(ROUTER_API)
-if CONFIGURATION is None:
-    MONGODB_CONFIG = {'host': 'localhost',
-                      'port': 27017,
-                      'database': 'pypln',
-                      'gridfs_collection': 'files',
-                      'analysis_collection': 'analysis',
-                      'monitoring_collection': 'monitoring',
+
+def get_store_config():
+    """Code originally from pypln.backend.router"""
+
+    config_filename = os.path.expanduser('~/.pypln_store_config')
+    defaults = {'host': 'localhost',
+                'port': '27017',
+                'database': 'pypln',
+                'analysis_collection': 'analysis',
+                'gridfs_collection': 'files',
+                'monitoring_collection': 'monitoring',
     }
-else:
-    MONGODB_CONFIG = CONFIGURATION['store']
+    config = ConfigParser.ConfigParser(defaults=defaults)
+    config.add_section('store')
+    config.read(config_filename)
+    store_config = dict(config.items('store'))
+    # The database port needs to be an integer, but ConfigParser will treat
+    # everything as a string unless you use the specific method to retrieve the
+    # value.
+    store_config['port'] = config.getint('store', 'port')
+    return store_config
+
+MONGODB_CONFIG = get_store_config()
 
 
 from django.core.exceptions import SuspiciousOperation
