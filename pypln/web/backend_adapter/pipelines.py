@@ -21,7 +21,8 @@ from pypelinin import Job, Pipeline, PipelineManager, Client
 
 default_pipeline = {
     Job("Extractor"): (Job("PalavrasRaw"), Job("Tokenizer")),
-    Job("PalavrasRaw"): (Job("POS"), Job("FreqDist"), Job("Lemmatizer")),
+    Job("PalavrasRaw"): (Job("POS"), Job("FreqDist"),
+                         Job("Lemmatizer"), Job("NounPhrase")),
     Job("FreqDist"): Job("Statistics")
 }
 
