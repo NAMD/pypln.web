@@ -66,6 +66,9 @@ class PropertyListSerializer(serializers.Serializer):
 
     def get_property_urls(self, obj):
         request = self.context['request']
-        return [reverse('property-detail', kwargs={"pk": obj.id,
-            "property": prop}, request=request) for prop
-            in obj.properties.keys()]
+        try:
+            return [reverse('property-detail', kwargs={"pk": obj.id,
+                "property": prop}, request=request) for prop
+                in obj.properties.keys()]
+        except KeyError:
+            return []
