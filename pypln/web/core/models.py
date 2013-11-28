@@ -19,10 +19,13 @@
 from UserDict import DictMixin
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.dispatch import receiver
 from django.db import models
 
 from mongodict import MongoDict
 from rest_framework.reverse import reverse
+from rest_framework.authtoken.models import Token
 
 from pypln.web.core.storage import GridFSStorage
 
@@ -91,3 +94,10 @@ class Document(models.Model):
                    database=settings.MONGODB_CONFIG['database'],
                    collection=settings.MONGODB_CONFIG['analysis_collection'])
         return StoreProxy(self.id, self._store)
+
+
+# Create a authentication Token for each user it's created.
+@receiver(models.signals.post_save, sender=User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
