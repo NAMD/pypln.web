@@ -21,7 +21,8 @@ from django.http import Http404
 
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework.decorators import api_view
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ParseError
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -38,6 +39,23 @@ def api_root(request, format=None):
         'corpora': reverse('corpus-list', request=request),
         'documents': reverse('document-list', request=request),
     })
+
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def auth_token(request, format=None):
+    """
+    Lists the current user's API Authentication Token.
+
+    To authenticate using this token the user needs to send a header in the
+    form `Authorization: Token <token>`.  Suposing a token with the value
+    `deadbeef` you could access the API using the following command: `curl
+    http://demo.pypln.org/documents/ -H "Authorization: Token deadbeef"`.
+    """
+    token = Token.objects.get(user=request.user).key
+    return Response({
+        'token': token,
+    })
+
 
 class CorpusList(generics.ListCreateAPIView):
     """

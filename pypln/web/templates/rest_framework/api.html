@@ -12,6 +12,7 @@
                 <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
+                <li><a href="{% url 'auth_token' %}">API Token</a></li>
                 <li><a href="{% url 'auth_password_change' %}">Change password</a></li>
                 <li>{% optional_logout request %}</li>
             </ul>
