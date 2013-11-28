@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 import os
+from StringIO import StringIO
 import sys
 
 from pypln.web.core.models import Document, gridfs_storage
@@ -35,5 +36,5 @@ sys.stdout.write("Adding files to gridfs collection and executing pipelines ...\
 
 for doc in Document.objects.all():
     gridfs_storage.save(os.path.basename(doc.blob.name),
-            "This is a test file with some test text.")
+            StringIO("This is a test file with some test text."))
     create_pipeline({"_id": str(doc.blob.file._id), "id": doc.id})
