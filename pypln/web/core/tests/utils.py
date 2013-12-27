@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 import json
 import os
 
@@ -42,7 +43,7 @@ class TestWithMongo(TestCase):
 
         for doc in Document.objects.all():
             gridfs_storage.save(os.path.basename(doc.blob.name),
-                    "This is a test file with some test text.")
+                    StringIO("This is a test file with some test text."))
 
         self.store = MongoDict(host=settings.MONGODB_CONFIG['host'],
                port=settings.MONGODB_CONFIG['port'],

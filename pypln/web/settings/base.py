@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'registration',
 
     'pypln.web.core',
@@ -193,6 +194,11 @@ LOGGING = {
 ACCOUNT_ACTIVATION_DAYS = 7
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
     "PAGINATE_BY": 100,
     "PAGINATE_BY_PARAM": "page_size",
 }

@@ -25,6 +25,7 @@ from pypln.web.core.views import PropertyList, PropertyDetail
 
 urlpatterns = patterns('pypln.web.core.views',
     url(r'^$', 'api_root'),
+    url(r'^user/api-token/$', 'auth_token', name='auth_token'),
     url(r'^corpora/$', CorpusList.as_view(), name='corpus-list'),
     url(r'^corpora/(?P<pk>\d+)/$', CorpusDetail.as_view(), name='corpus-detail'),
     url(r'^documents/$', DocumentList.as_view(), name='document-list'),
