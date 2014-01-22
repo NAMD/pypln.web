@@ -25,7 +25,7 @@ default_pipeline = {
                          Job("Lemmatizer"), Job("NounPhrase"),
                          Job("SemanticTagger")),
     Job("Tokenizer"): Job("FreqDist"),
-    Job("FreqDist"): Job("Statistics")
+    Job("FreqDist"): (Job("Statistics"), Job("WordCloud")),
 }
 
 def create_pipeline(data):
