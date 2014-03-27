@@ -1,5 +1,8 @@
 django
-djangorestframework
+# This version is hardcoded because of a bug
+# (https://github.com/tomchristie/django-rest-framework/issues/1237). As soon
+# as it is fixed we should relax this requirement.
+djangorestframework=2.3.6
 mongodict
 pymongo
 pypelinin
