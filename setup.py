@@ -26,6 +26,8 @@ def get_requirements():
     packages = []
     for package in requirements:
         package = package.split('#')[0].strip()
+        if '==' in package:
+            package = package.split('==')[0].strip()
         if package:
             packages.append(package)
     return packages
