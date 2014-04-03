@@ -20,9 +20,27 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.core.urlresolvers import reverse_lazy
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    # workaround for dango-registrantion's incompatibility with django 1.6.
+    # this was taken from https://bitbucket.org/ubernostrum/django-registration/pull-request/63/django-16-compatibility-fix-auth-views/diff
+    # and should be removed as soon as this is merged upstream
+    url(r'^accounts/password/change/$', auth_views.password_change,
+        {'post_change_redirect': reverse_lazy('auth_password_change_done')},
+        name='auth_password_change'),
+    url(r'^accounts/password/reset/$', auth_views.password_reset,
+        {'post_reset_redirect': reverse_lazy('auth_password_reset_done')},
+        name='auth_password_reset'),
+    url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        auth_views.password_reset_confirm,
+        {'post_reset_redirect': reverse_lazy('auth_password_reset_complete')},
+        name='auth_password_reset_confirm'),
+    # endworkaround
+
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^', include('pypln.web.core.urls')),
