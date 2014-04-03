@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
         auth_views.password_reset_confirm,
         {'post_reset_redirect': reverse_lazy('auth_password_reset_complete')},
-        name='auth_password_reset_confirm'),
+        name='password_reset_confirm'),
     # endworkaround
 
     url(r'^accounts/', include('registration.backends.default.urls')),
