@@ -1,4 +1,7 @@
-django
+# django-registration throws `django.core.exceptions.AppRegistryNotReady` with
+# django 1.7, so we'll pin django to 1.6 for now until it's fixed upstream or
+# we remove django-registration as a dependecy.
+django==1.6
 # This version is hardcoded because of a bug
 # (https://github.com/tomchristie/django-rest-framework/issues/1237). As soon
 # as it is fixed we should relax this requirement.
