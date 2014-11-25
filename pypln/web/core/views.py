@@ -49,7 +49,7 @@ def auth_token(request, format=None):
     To authenticate using this token the user needs to send a header in the
     form `Authorization: Token <token>`.  Suposing a token with the value
     `deadbeef` you could access the API using the following command: `curl
-    http://demo.pypln.org/documents/ -H "Authorization: Token deadbeef"`.
+    http://fgv.pypln.org/documents/ -H "Authorization: Token deadbeef"`.
     """
     token = Token.objects.get(user=request.user).key
     return Response({

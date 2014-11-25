@@ -4,13 +4,13 @@ Getting Started
 
 
 For this quick start guide we will use our demonstration instalation located at
-http://demo.pypln.org . You may use it to test PyPLN, but be aware that any data
+http://fgv.pypln.org . You may use it to test PyPLN, but be aware that any data
 you upload there will possibly be available to other users and that data will
 be periodically deleted.
 
 
 To start using PyPLN you need to create an user account. Just click the
-`Register <http://demo.pypln.org/accounts/register/>`_ link on the top menu.
+`Register <http://fgv.pypln.org/accounts/register/>`_ link on the top menu.
 During this tutorial we will use the user `demo` (the password is also `demo`).
 
 
@@ -36,7 +36,7 @@ So let's start. First, we need to create a new corpus:
 
     import requests
 
-    response = requests.post('http://demo.pypln.org/corpora/',
+    response = requests.post('http://fgv.pypln.org/corpora/',
         data={'name': 'pdfs', 'description': 'My PDFs'}, auth=('demo', 'demo'))
 
 
@@ -51,7 +51,7 @@ information:
  u'documents': [],
  u'name': u'pdfs',
  u'owner': u'demo',
- u'url': u'http://demo.pypln.org/corpora/1/'}
+ u'url': u'http://fgv.pypln.org/corpora/1/'}
 
 .. note::
     A user cannot have two corpora with the same name. If you're getting a 400
@@ -80,7 +80,7 @@ all the pdf files in a directory called `pdfs`:
         print('Sending {}...'.format(filename))
         with open(filename, 'r') as fp:
             files = {'blob': fp}
-            resp = requests.post('http://demo.pypln.org/documents/', data=data,
+            resp = requests.post('http://fgv.pypln.org/documents/', data=data,
                 files=files, auth=credentials)
             print(resp.status_code)
 
@@ -95,7 +95,7 @@ We can get information on all documents, by running:
 
 .. code-block:: python
 
-    documents_response = requests.get('http://demo.pypln.org/documents/', auth=credentials)
+    documents_response = requests.get('http://fgv.pypln.org/documents/', auth=credentials)
 
 `response` here will have a list of all the documents you have. So you can, for
 example, get the plain text extracted from them:
@@ -134,23 +134,23 @@ You should see something like this:
 .. code-block:: python
 
         [
-            "http://demo.pypln.org/documents/1/properties/mimetype/",
-            "http://demo.pypln.org/documents/1/properties/freqdist/",
-            "http://demo.pypln.org/documents/1/properties/average_sentence_repertoire/",
-            "http://demo.pypln.org/documents/1/properties/language/",
-            "http://demo.pypln.org/documents/1/properties/momentum_4/",
-            "http://demo.pypln.org/documents/1/properties/average_sentence_length/",
-            "http://demo.pypln.org/documents/1/properties/momentum_1/",
-            "http://demo.pypln.org/documents/1/properties/pos/",
-            "http://demo.pypln.org/documents/1/properties/momentum_3/",
-            "http://demo.pypln.org/documents/1/properties/file_metadata/",
-            "http://demo.pypln.org/documents/1/properties/tokens/",
-            "http://demo.pypln.org/documents/1/properties/repertoire/",
-            "http://demo.pypln.org/documents/1/properties/text/",
-            "http://demo.pypln.org/documents/1/properties/tagset/",
-            "http://demo.pypln.org/documents/1/properties/sentences/",
-            "http://demo.pypln.org/documents/1/properties/momentum_2/",
-            "http://demo.pypln.org/documents/1/properties/named_entities/"
+            "http://fgv.pypln.org/documents/1/properties/mimetype/",
+            "http://fgv.pypln.org/documents/1/properties/freqdist/",
+            "http://fgv.pypln.org/documents/1/properties/average_sentence_repertoire/",
+            "http://fgv.pypln.org/documents/1/properties/language/",
+            "http://fgv.pypln.org/documents/1/properties/momentum_4/",
+            "http://fgv.pypln.org/documents/1/properties/average_sentence_length/",
+            "http://fgv.pypln.org/documents/1/properties/momentum_1/",
+            "http://fgv.pypln.org/documents/1/properties/pos/",
+            "http://fgv.pypln.org/documents/1/properties/momentum_3/",
+            "http://fgv.pypln.org/documents/1/properties/file_metadata/",
+            "http://fgv.pypln.org/documents/1/properties/tokens/",
+            "http://fgv.pypln.org/documents/1/properties/repertoire/",
+            "http://fgv.pypln.org/documents/1/properties/text/",
+            "http://fgv.pypln.org/documents/1/properties/tagset/",
+            "http://fgv.pypln.org/documents/1/properties/sentences/",
+            "http://fgv.pypln.org/documents/1/properties/momentum_2/",
+            "http://fgv.pypln.org/documents/1/properties/named_entities/"
         ]
 
 
@@ -163,7 +163,7 @@ get it from the provided url:
 
 .. code-block:: python
 
-    freqdist_response = requests.get("http://demo.pypln.org/documents/1/properties/freqdist/",
+    freqdist_response = requests.get("http://fgv.pypln.org/documents/1/properties/freqdist/",
             auth=credentials)
 
     print(freqdist_response.json()['value'])
