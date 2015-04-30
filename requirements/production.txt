@@ -8,7 +8,7 @@ django==1.6
 djangorestframework==2.3.6
 mongodict
 pymongo
-pypelinin
+pypln.backend
 gunicorn
 django-registration
 markdown
