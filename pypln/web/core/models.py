@@ -16,17 +16,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
-from UserDict import DictMixin
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db import models
 
-from mongodict import MongoDict
 from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 
+from pypln.backend.mongodict_adapter import MongoDictAdapter
 from pypln.web.core.storage import GridFSStorage
 
 
@@ -50,26 +48,9 @@ class Corpus(models.Model):
     def __unicode__(self):
         return self.name
 
-class StoreProxy(DictMixin, dict):
-    def __init__(self, document_id, store):
-        self._store = store
-        self.document_id = document_id
-
-    def __getitem__(self, key):
-        try:
-            return self._store['id:{}:{}'.format(self.document_id, key)]
-        except KeyError:
-            if key == "_properties":
-                msg = "Can't find information for document with id {document_id}"
-            else:
-                msg = "Can't find key {key} for document with id {document_id}"
-            raise KeyError(msg.format(key=key, document_id=self.document_id))
-
-    def __setitem__(self, key, value):
-        raise AttributeError("StoreProxy is read-only.")
-
-    def keys(self, *args, **kwargs):
-        return self['_properties']
+class MongoDictProxy(MongoDictAdapter):
+    def __getattr__(self, key):
+        return self[key]
 
 
 class Document(models.Model):
@@ -85,15 +66,8 @@ class Document(models.Model):
 
     @property
     def properties(self):
-        if self.id is None:
-            raise ValueError("This document was not saved, so you cannot "
-                    "retrieve it's information from the backend.")
-        if self._store is None:
-            self._store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                   port=settings.MONGODB_CONFIG['port'],
-                   database=settings.MONGODB_CONFIG['database'],
-                   collection=settings.MONGODB_CONFIG['analysis_collection'])
-        return StoreProxy(self.id, self._store)
+        return MongoDictProxy(doc_id=self.id,
+                database=settings.MONGODB_CONFIG['database'])
 
 
 # Create a authentication Token for each user it's created.
