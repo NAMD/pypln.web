@@ -18,7 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf import settings
 from pypelinin import Job, Pipeline, PipelineManager, Client
-from pypln.backend.workers import GridFSDataRetriever
+from pypln.backend.workers import GridFSDataRetriever, Extractor
 from pypln.backend.mongodict_adapter import MongoDictAdapter
 
 default_pipeline = {
@@ -36,7 +36,7 @@ def create_pipeline(data):
     document = MongoDictAdapter(doc_id=data['id'],
             database=settings.MONGODB_CONFIG['database'])
     document['file_id'] = data['_id']
-    GridFSDataRetriever().delay(data['id'])
+    (GridFSDataRetriever().si(data['id']) | Extractor().si(data['id']))()
 
 
 def get_config_from_router(api, timeout=5):
