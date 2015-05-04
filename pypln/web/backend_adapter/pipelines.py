@@ -16,19 +16,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from celery import group
 from django.conf import settings
-from pypelinin import Job, Pipeline, PipelineManager, Client
-from pypln.backend.workers import GridFSDataRetriever, Extractor
+from pypln.backend.workers import *
 from pypln.backend.mongodict_adapter import MongoDictAdapter
 
-default_pipeline = {
-    Job("Extractor"): (Job("PalavrasRaw"), Job("Tokenizer")),
-    Job("PalavrasRaw"): (Job("POS"),
-                         Job("Lemmatizer"), Job("NounPhrase"),
-                         Job("SemanticTagger")),
-    Job("Tokenizer"): Job("FreqDist"),
-    Job("FreqDist"): (Job("Statistics"), Job("WordCloud")),
-}
+def call_default_pipeline(doc_id):
+    palavras_dependent_tasks = group(
+        POS().si(doc_id), Lemmatizer().si(doc_id),
+        NounPhrase().si(doc_id), SemanticTagger().si(doc_id)
+    )
+
+    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) |
+        group(
+            (PalavrasRaw().si(doc_id) | palavras_dependent_tasks),
+            (Tokenizer().si(doc_id) | FreqDist().si(doc_id) |
+                group(Statistics().si(doc_id) | WordCloud().si(doc_id))
+            )
+        )
+    )()
 
 def create_pipeline(data):
     # Add file_id as a property to the document before starting
@@ -36,7 +42,7 @@ def create_pipeline(data):
     document = MongoDictAdapter(doc_id=data['id'],
             database=settings.MONGODB_CONFIG['database'])
     document['file_id'] = data['_id']
-    (GridFSDataRetriever().si(data['id']) | Extractor().si(data['id']))()
+    call_default_pipeline(data['id'])
 
 
 def get_config_from_router(api, timeout=5):
