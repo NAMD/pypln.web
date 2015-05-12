@@ -40,6 +40,8 @@ def create_pipeline(data):
     # Add file_id as a property to the document before starting
     # to process it. The first worker will need this property
     document = MongoDictAdapter(doc_id=data['id'],
+            host=settings.MONGODB_CONFIG['host'],
+            port=settings.MONGODB_CONFIG['port'],
             database=settings.MONGODB_CONFIG['database'])
     document['file_id'] = data['_id']
     call_default_pipeline(data['id'])

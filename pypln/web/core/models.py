@@ -67,6 +67,8 @@ class Document(models.Model):
     @property
     def properties(self):
         return MongoDictProxy(doc_id=self.id,
+                host=settings.MONGODB_CONFIG['host'],
+                port=settings.MONGODB_CONFIG['port'],
                 database=settings.MONGODB_CONFIG['database'])
 
 
