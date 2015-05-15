@@ -18,7 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 PYPLN_HOME="/srv/pypln"
-NUM_WORKERS=4
+NUM_WORKERS=8
 WSGI_HOST="127.0.0.1"
 WSGI_PORT="8000"
 ERRLOG="$PYPLN_HOME/logs/wsgi_server.err"
