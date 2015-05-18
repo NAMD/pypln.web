@@ -27,15 +27,9 @@ __all__ = ["CreatePipelineTest"]
 
 class CreatePipelineTest(TestCase):
 
-    @patch('pypln.web.backend_adapter.pipelines.PipelineManager', autospec=True)
-    @patch('pypln.web.backend_adapter.pipelines.Pipeline', autospec=True)
-    def test_should_create_pipelines_for_document(self, pipeline, pipeline_manager):
+    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
+    def test_should_create_pipelines_for_document(self, gridfs_data_retriever):
         pipeline_data = {"_id": "123", "id": 1}
         create_pipeline(pipeline_data)
-        pipeline_manager.assert_called_with(settings.ROUTER_API,
-                settings.ROUTER_BROADCAST)
-
-        pipeline.assert_called_with(default_pipeline, data=pipeline_data)
-
-        manager_instance = pipeline_manager.return_value
-        manager_instance.start.assert_called_with(pipeline.return_value)
+        gridfs_data_retriever.assert_called_with()
+        gridfs_data_retriever.return_value.delay.assert_called_with(1)

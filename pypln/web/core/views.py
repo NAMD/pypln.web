@@ -205,6 +205,22 @@ class PropertyList(generics.RetrieveAPIView):
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user)
 
+class CorpusDocumentList(generics.ListAPIView):
+    """
+    Lists all the documents contained in a Corpus.
+
+    `GET` requests will list all documents contained in the corpus with the id
+    provided in the url.
+    """
+    model = Document
+    serializer_class = DocumentSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        corpus_id = self.kwargs['pk']
+        return Document.objects.filter(owner=self.request.user,
+                corpus_id=corpus_id)
+
 class PropertyDetail(generics.RetrieveAPIView):
     """
     Shows the result of an analysis for the specified document. The result

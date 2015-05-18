@@ -5,6 +5,7 @@
 # License: 2-clause BSD
 
 import os
+import time
 import urlparse
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
@@ -100,6 +101,13 @@ class GridFSStorage(Storage):
             gridfs.delete(gridfs.get_last_version(filename=filename)._id)
         except NoFile:
             pass
+
+    def get_available_name(self, name):
+        # We cannot afford to keep testing if the provided name exist when many
+        # files have the same name. The timestamp is an effort to create a more
+        # unique name that won't clash.
+        new_name = "%s_%s".format(name, time.time())
+        return new_name
 
     def exists(self, path):
         """
