@@ -6,8 +6,8 @@ django==1.6
 # (https://github.com/tomchristie/django-rest-framework/issues/1237). As soon
 # as it is fixed we should relax this requirement.
 djangorestframework==2.3.6
+pymongo==2.8.1
 mongodict
-pymongo
 pypln.backend
 gunicorn
 django-registration
