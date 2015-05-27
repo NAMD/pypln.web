@@ -51,12 +51,6 @@ class CorpusModelTest(TestCase):
 class DocumentModelTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
-    def test_document_should_instantiate_a_store_when_needed(self):
-        document = Document.objects.all()[0]
-        self.assertIsNone(document._store)
-        document.properties.keys()
-        self.assertEqual(document._store, self.store)
-
     def test_get_properties_from_store(self):
         expected_data = ["mimetype", "freqdist", "average_sentence_repertoire",
             "language", "average_sentence_length", "sentences", "momentum_1",
