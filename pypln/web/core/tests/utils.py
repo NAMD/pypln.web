@@ -49,7 +49,7 @@ class TestWithMongo(TestCase):
                 gridfs_storage._connection[settings.MONGODB_CONFIG['database']].main.insert(obj)
 
 
-        with mock.patch('pypln.web.core.models.gridfs_storage.get_available_name', new=lambda x: x) as mocked_method:
+        with mock.patch('pypln.web.core.models.gridfs_storage.get_available_name', new=lambda x: x):
             for doc in Document.objects.all():
                 gridfs_storage.save(os.path.basename(doc.blob.name),
                                     StringIO("This is a test file."))
