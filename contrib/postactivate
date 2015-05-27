@@ -21,7 +21,7 @@
 # from) $VIRTUAL_ENV and it will add some helper functions to your
 # environment when the virtualenv is activated
 
-export PYPLN_ROOT=$(dirname $(find -L "$VIRTUAL_ENV" -type d -name '.git'))
+export PYPLN_ROOT=$(dirname $(find -L "$VIRTUAL_ENV" -type d -name '.git') | sort | head -n1)
 
 function manage_with_settings() {
 	 SETTINGS=$1
