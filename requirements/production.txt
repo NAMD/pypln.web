@@ -10,5 +10,5 @@ pymongo==2.8.1
 mongodict
 pypln.backend
 gunicorn
-django-registration
+django-registration-redux
 markdown
