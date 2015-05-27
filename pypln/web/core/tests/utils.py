@@ -45,14 +45,14 @@ class TestWithMongo(TestCase):
 
         filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/analysis.json')
         with open(filename, 'r') as mongo_fixture:
-            objs = json_util.loads(mongo_fixture.read())
+            for obj in json_util.loads(mongo_fixture.read()):
+                gridfs_storage._connection[settings.MONGODB_CONFIG['database']].main.insert(obj)
 
 
         with mock.patch('pypln.web.core.models.gridfs_storage.get_available_name', new=lambda x: x) as mocked_method:
             for doc in Document.objects.all():
                 gridfs_storage.save(os.path.basename(doc.blob.name),
-                                    StringIO("This is a test file with some test text."))
-
+                                    StringIO("This is a test file."))
 
     def _post_teardown(self, *args, **kwargs):
         gridfs_storage._connection.drop_database(gridfs_storage.database)

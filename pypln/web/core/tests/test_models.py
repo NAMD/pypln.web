@@ -66,7 +66,7 @@ class DocumentModelTest(TestWithMongo):
         self.assertEqual(document.properties.keys(), expected_data)
 
     def test_get_text_from_store(self):
-        expected_data = u'This is a test file with some test text.'
+        expected_data = u'This is a test file.'
         document = Document.objects.all()[0]
         self.assertEqual(document.properties['text'], expected_data)
 
