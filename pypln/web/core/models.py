@@ -59,8 +59,6 @@ class Document(models.Model):
     owner = models.ForeignKey('auth.User')
     corpus = models.ForeignKey(Corpus)
 
-    _store = None
-
     def __unicode__(self):
         return self.blob.name
 

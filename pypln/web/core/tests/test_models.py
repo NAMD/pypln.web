@@ -51,37 +51,16 @@ class CorpusModelTest(TestCase):
 class DocumentModelTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
-    def test_document_should_instantiate_a_store_when_needed(self):
-        document = Document.objects.all()[0]
-        self.assertIsNone(document._store)
-        document.properties.keys()
-        self.assertEqual(document._store, self.store)
-
     def test_get_properties_from_store(self):
-        expected_data = ["mimetype", "freqdist", "average_sentence_repertoire",
-            "language", "average_sentence_length", "sentences", "momentum_1",
-            "pos", "momentum_3", "file_metadata", "tokens", "repertoire",
-            "text", "tagset", "momentum_4", "momentum_2"]
+        expected_data = ["average_sentence_length", "average_sentence_repertoire",
+            "contents", "file_id", "file_metadata", "filename", "forced_decoding",
+            "freqdist", "language", "length", "md5", "mimetype", "momentum_1",
+            "momentum_2", "momentum_3", "momentum_4", "palavras_raw_ran", "pos",
+            "repertoire", "sentences", "tagset", "text", "tokens", "upload_date"]
         document = Document.objects.all()[0]
         self.assertEqual(document.properties.keys(), expected_data)
 
     def test_get_text_from_store(self):
-        expected_data = u'This is a test file with some test text.'
+        expected_data = u'This is a test file.'
         document = Document.objects.all()[0]
         self.assertEqual(document.properties['text'], expected_data)
-
-    def test_access_store_for_a_document_that_has_no_id_yet(self):
-        corpus = Corpus.objects.all()[0]
-        document = Document(blob=File(StringIO(), "filename"), owner=corpus.owner,
-                corpus=corpus)
-
-        with self.assertRaises(ValueError):
-            document.properties.keys()
-
-    def test_access_store_for_a_document_that_does_not_have_entries_in_mongo(self):
-        corpus = Corpus.objects.all()[0]
-        document = Document.objects.create(blob=File(StringIO(), "filename"),
-                owner=corpus.owner, corpus=corpus)
-
-        with self.assertRaises(KeyError):
-            document.properties.keys()

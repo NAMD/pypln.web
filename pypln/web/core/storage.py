@@ -106,7 +106,7 @@ class GridFSStorage(Storage):
         # We cannot afford to keep testing if the provided name exist when many
         # files have the same name. The timestamp is an effort to create a more
         # unique name that won't clash.
-        new_name = "%s_%s".format(name, time.time())
+        new_name = "{}_{}".format(name, time.time())
         return new_name
 
     def exists(self, path):
