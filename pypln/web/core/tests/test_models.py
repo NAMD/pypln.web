@@ -64,19 +64,3 @@ class DocumentModelTest(TestWithMongo):
         expected_data = u'This is a test file.'
         document = Document.objects.all()[0]
         self.assertEqual(document.properties['text'], expected_data)
-
-    def test_access_store_for_a_document_that_has_no_id_yet(self):
-        corpus = Corpus.objects.all()[0]
-        document = Document(blob=File(StringIO(), "filename"), owner=corpus.owner,
-                corpus=corpus)
-
-        with self.assertRaises(ValueError):
-            document.properties.keys()
-
-    def test_access_store_for_a_document_that_does_not_have_entries_in_mongo(self):
-        corpus = Corpus.objects.all()[0]
-        document = Document.objects.create(blob=File(StringIO(), "filename"),
-                owner=corpus.owner, corpus=corpus)
-
-        with self.assertRaises(KeyError):
-            document.properties.keys()
