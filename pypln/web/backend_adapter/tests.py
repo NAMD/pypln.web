@@ -21,7 +21,7 @@ from django.conf import settings
 from django.test import TestCase
 from mock import patch
 
-from pypln.web.backend_adapter.pipelines import create_pipeline, default_pipeline
+from pypln.web.backend_adapter.pipelines import create_pipeline
 
 __all__ = ["CreatePipelineTest"]
 
@@ -32,4 +32,4 @@ class CreatePipelineTest(TestCase):
         pipeline_data = {"_id": "123", "id": 1}
         create_pipeline(pipeline_data)
         gridfs_data_retriever.assert_called_with()
-        gridfs_data_retriever.return_value.delay.assert_called_with(1)
+        gridfs_data_retriever.return_value.si.assert_called_with(1)
