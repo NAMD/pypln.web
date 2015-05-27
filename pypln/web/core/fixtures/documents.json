@@ -4,9 +4,9 @@
     "model": "core.document",
     "fields": {
         "owner": 2,
-        "uploaded_at": "2013-03-05T19:54:46.518Z",
-        "blob": "/test_file.txt",
-        "corpus": 2
+        "corpus": 2,
+        "uploaded_at": "2015-05-27T02:22:42.559Z",
+        "blob": "/test_file.txt_1432693362.3"
     }
 },
 {
@@ -14,9 +14,9 @@
     "model": "core.document",
     "fields": {
         "owner": 1,
-        "uploaded_at": "2013-03-05T19:55:18.195Z",
-        "blob": "/test_file_1.txt",
-        "corpus": 1
+        "corpus": 1,
+        "uploaded_at": "2015-05-27T02:23:25.547Z",
+        "blob": "/test_file_1.txt_1432693405.55"
     }
 }
 ]
