@@ -52,10 +52,11 @@ class DocumentModelTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
     def test_get_properties_from_store(self):
-        expected_data = ["mimetype", "freqdist", "average_sentence_repertoire",
-            "language", "average_sentence_length", "sentences", "momentum_1",
-            "pos", "momentum_3", "file_metadata", "tokens", "repertoire",
-            "text", "tagset", "momentum_4", "momentum_2"]
+        expected_data = ["average_sentence_length", "average_sentence_repertoire",
+            "contents", "file_id", "file_metadata", "filename", "forced_decoding",
+            "freqdist", "language", "length", "md5", "mimetype", "momentum_1",
+            "momentum_2", "momentum_3", "momentum_4", "palavras_raw_ran", "pos",
+            "repertoire", "sentences", "tagset", "text", "tokens", "upload_date"]
         document = Document.objects.all()[0]
         self.assertEqual(document.properties.keys(), expected_data)
 
