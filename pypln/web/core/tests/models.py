@@ -26,10 +26,10 @@ from django.test import TestCase
 
 from mongodict import MongoDict
 
-from pypln.web.core.models import Corpus, Document, StoreProxy
+from pypln.web.core.models import Corpus, Document
 from pypln.web.core.tests.utils import TestWithMongo
 
-__all__ = ["CorpusModelTest", "DocumentModelTest", "StoreProxyTest"]
+__all__ = ["CorpusModelTest", "DocumentModelTest"]
 
 class CorpusModelTest(TestCase):
     fixtures = ['users']
@@ -85,54 +85,3 @@ class DocumentModelTest(TestWithMongo):
 
         with self.assertRaises(KeyError):
             document.properties.keys()
-
-
-class StoreProxyTest(TestWithMongo):
-    fixtures = ['users', 'corpora', 'documents']
-
-    def setUp(self):
-        self.document = Document.objects.all()[0]
-        self.base_store = MongoDict(host=settings.MONGODB_CONFIG['host'],
-                   port=settings.MONGODB_CONFIG['port'],
-                   database=settings.MONGODB_CONFIG['database'],
-                   collection=settings.MONGODB_CONFIG['analysis_collection'])
-        self.proxy = StoreProxy(self.document.id, self.base_store)
-
-    def test_access_store_data_without_formating_the_key_with_document_id(self):
-        self.assertEqual(self.proxy['text'],
-                self.base_store['id:{}:text'.format(self.document.id)])
-
-    def test_list_keys_based_on_the_available_properties(self):
-        self.assertEqual(self.proxy.keys(),
-                self.base_store['id:{}:_properties'.format(self.document.id)])
-
-    def test_only_lists_items_in_store_that_are_related_from_this_document(self):
-        """
-        Since we're using UserDict.DictMixin as a parent class of
-        StoreProxy, this behaviour comes from implementing the `keys` method.
-        """
-        expected_items = [(k.split(':')[-1], v) for k, v in self.base_store.items() if
-                int(k.split(':')[1]) == self.document.id and k.split(':')[-1]
-                != u'_properties']
-
-        self.assertItemsEqual(self.proxy.items(), expected_items)
-
-    def test_proxy_is_read_only(self):
-        with self.assertRaises(AttributeError):
-            self.proxy["new key"] = "new value"
-
-    def test_access_store_keys_for_a_document_that_does_not_have_entries_in_mongo(self):
-        corpus = Corpus.objects.all()[0]
-        document = Document.objects.create(blob=File(StringIO(), "filename"),
-                owner=corpus.owner, corpus=corpus)
-
-        with self.assertRaisesRegexp(KeyError, "Can't find information for "
-                "document with id"):
-            document.properties.keys()
-
-    def test_access_inexistent_key_for_a_document_that_has_entries_in_mongo(self):
-        document = Document.objects.all()[0]
-
-        with self.assertRaisesRegexp(KeyError, "Can't find key .* for "
-                "document with id .*$"):
-            document.properties['invalid_key']
