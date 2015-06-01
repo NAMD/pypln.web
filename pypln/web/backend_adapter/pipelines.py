@@ -36,6 +36,10 @@ def call_default_pipeline(doc_id):
         )
     )()
 
+def create_pipeline_from_document(doc):
+    data = {"_id": str(doc.blob.file._id), "id": doc.id}
+    create_pipeline(data)
+
 def create_pipeline(data):
     # Add file_id as a property to the document before starting
     # to process it. The first worker will need this property
