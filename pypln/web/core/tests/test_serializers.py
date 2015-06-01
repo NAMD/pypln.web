@@ -21,6 +21,9 @@ from StringIO import StringIO
 
 from django.contrib.auth.models import User
 
+from rest_framework.reverse import reverse as rest_framework_reverse
+from rest_framework.test import APIRequestFactory, force_authenticate
+
 from pypln.web.core.models import Document
 from pypln.web.core.serializers import DocumentSerializer
 from pypln.web.core.tests.utils import TestWithMongo
@@ -57,7 +60,10 @@ class DocumentSerializerTest(TestWithMongo):
 
     def test_serialized_data_should_include_file_size(self):
         document = Document.objects.all()[0]
-        serializer = DocumentSerializer(document)
-
+        factory = APIRequestFactory()
+        request = factory.get(rest_framework_reverse('document-detail',
+            kwargs={'pk': document.id}))
+        request.user = document.owner
+        serializer = DocumentSerializer(document, context={'request': request})
         self.assertIn("size", serializer.data)
         self.assertEqual(serializer.data["size"], document.blob.size)

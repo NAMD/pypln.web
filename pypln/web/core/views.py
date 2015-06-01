@@ -28,7 +28,7 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework import serializers
 
-from pypln.web.backend_adapter.pipelines import create_pipeline
+from pypln.web.backend_adapter.pipelines import create_pipeline_from_document
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 from pypln.web.core.serializers import PropertyListSerializer
@@ -150,12 +150,10 @@ class DocumentList(generics.ListCreateAPIView):
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user)
 
-    def pre_save(self, obj):
-        obj.owner = self.request.user
+    def perform_create(self, serializer):
+        instance = serializer.save(owner=self.request.user)
+        create_pipeline_from_document(instance)
 
-    def post_save(self, obj, created):
-        data = {"_id": str(obj.blob.file._id), "id": obj.id}
-        create_pipeline(data)
 
 class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -189,8 +187,9 @@ class DocumentDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Document.objects.filter(owner=self.request.user)
 
-    def pre_save(self, obj):
-        obj.owner = self.request.user
+    def perform_update(self, serializer):
+        instance = serializer.save(owner=self.request.user)
+        create_pipeline_from_document(instance)
 
 class PropertyList(generics.RetrieveAPIView):
     """
@@ -246,6 +245,6 @@ class PropertyDetail(generics.RetrieveAPIView):
 
     def get_serializer_class(self, *args, **kwargs):
         class PropertySerializer(serializers.Serializer):
-            value = serializers.Field(source="properties.{}".format(
+            value = serializers.ReadOnlyField(source="properties.{}".format(
                 self.kwargs['property']))
         return PropertySerializer
