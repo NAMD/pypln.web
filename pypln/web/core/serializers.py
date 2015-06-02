@@ -23,11 +23,19 @@ from rest_framework.reverse import reverse
 from pypln.web.core.models import Corpus, Document
 
 class CorpusSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.Field(source="owner.username")
+    owner = serializers.ReadOnlyField(source="owner.username")
     documents = serializers.HyperlinkedIdentityField(
             view_name="corpus-document-list", )
     class Meta:
         model = Corpus
+
+    def validate_name(self, value):
+        if Corpus.objects.filter(name=value,
+                                 owner=self.context['request'].user).exists():
+            raise serializers.ValidationError("Corpora names must be unique for each user.")
+        else:
+            return value
+
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.username")

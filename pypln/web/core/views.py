@@ -79,12 +79,8 @@ class CorpusList(generics.ListCreateAPIView):
     def get_queryset(self):
         return Corpus.objects.filter(owner=self.request.user)
 
-    def pre_save(self, obj):
-        if Corpus.objects.filter(name=obj.name,
-                owner=self.request.user).exists():
-            raise ParseError(detail="Corpora names must be unique for each user.")
-        else:
-            obj.owner = self.request.user
+    def perform_create(self, serializer):
+        instance = serializer.save(owner=self.request.user)
 
 class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -117,12 +113,8 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Corpus.objects.filter(owner=self.request.user)
 
-    def pre_save(self, obj):
-        if Corpus.objects.filter(name=obj.name,
-                owner=self.request.user).exists():
-            raise ParseError(detail="Corpora names must be unique for each user.")
-        else:
-            obj.owner = self.request.user
+    def perform_update(self, serializer):
+        instance = serializer.save(owner=self.request.user)
 
 class DocumentList(generics.ListCreateAPIView):
     """
