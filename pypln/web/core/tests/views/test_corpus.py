@@ -41,7 +41,7 @@ class CorpusListViewTest(TestCase):
 
         expected_data = Corpus.objects.filter(
                 owner=User.objects.get(username="user"))
-        object_list = response.renderer_context['view'].object_list
+        object_list = response.renderer_context['view'].get_queryset()
 
         self.assertEqual(list(expected_data), list(object_list))
 
@@ -89,7 +89,7 @@ class CorpusDetailViewTest(TestCase):
             kwargs={'pk': corpus.id}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.renderer_context['view'].object, corpus)
+        self.assertEqual(response.renderer_context['view'].get_object(), corpus)
 
     def test_returns_404_for_inexistent_corpus(self):
         self.client.login(username="user", password="user")
@@ -143,10 +143,7 @@ class CorpusDetailViewTest(TestCase):
         response = self.client.put(reverse('corpus-detail',
             kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
             "description": "New description"}), content_type="application/json")
-
-        new_corpus = response.renderer_context['view'].object
-        self.assertEqual(response.status_code, 201)
-        self.assertNotEqual(new_corpus.id, corpus.id)
+        self.assertEqual(response.status_code, 404)
 
         reloaded_corpus = Corpus.objects.filter(owner__username="admin")[0]
         self.assertNotEqual(reloaded_corpus.name, "New name")

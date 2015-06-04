@@ -49,11 +49,11 @@ class DocumentListViewTest(TestWithMongo):
 
         expected_data = Document.objects.filter(
                 owner=User.objects.get(username="user"))
-        object_list = response.renderer_context['view'].object_list
+        object_list = response.renderer_context['view'].get_queryset()
 
         self.assertEqual(list(expected_data), list(object_list))
 
-    @patch('pypln.web.core.views.create_pipeline')
+    @patch('pypln.web.core.views.create_pipeline_from_document')
     def test_create_new_document(self, create_pipelines):
         self.assertEqual(len(self.user.document_set.all()), 1)
         self.client.login(username="user", password="user")
@@ -66,7 +66,7 @@ class DocumentListViewTest(TestWithMongo):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(self.user.document_set.all()), 2)
 
-    @patch('pypln.web.core.views.create_pipeline')
+    @patch('pypln.web.core.views.create_pipeline_from_document')
     def test_cant_create_document_for_another_user(self, create_pipeline):
         self.client.login(username="user", password="user")
 
@@ -88,7 +88,7 @@ class DocumentListViewTest(TestWithMongo):
 
         self.assertEqual(response.status_code, 400)
 
-    @patch('pypln.web.core.views.create_pipeline')
+    @patch('pypln.web.core.views.create_pipeline_from_document')
     def test_cant_create_document_in_another_users_corpus(self, create_pipelines):
         self.client.login(username="user", password="user")
 
@@ -101,7 +101,7 @@ class DocumentListViewTest(TestWithMongo):
 
         self.assertEqual(response.status_code, 400)
 
-    @patch('pypln.web.core.views.create_pipeline')
+    @patch('pypln.web.backend_adapter.pipelines.create_pipeline')
     def test_creating_a_document_should_create_a_pipeline_for_it(self, create_pipeline):
         self.assertEqual(len(self.user.document_set.all()), 1)
         self.client.login(username="user", password="user")
@@ -113,7 +113,8 @@ class DocumentListViewTest(TestWithMongo):
 
         self.assertEqual(response.status_code, 201)
         self.assertTrue(create_pipeline.called)
-        document = response.renderer_context['view'].object
+        doc_id = int(response.data['url'].split('/')[-2])
+        document = Document.objects.get(pk=doc_id)
         pipeline_data = {"_id": str(document.blob.file._id), "id": document.id}
         create_pipeline.assert_called_with(pipeline_data)
 
@@ -143,7 +144,7 @@ class DocumentDetailViewTest(TestWithMongo):
             kwargs={'pk': document.id}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.renderer_context['view'].object, document)
+        self.assertEqual(response.renderer_context['view'].get_object(), document)
 
     def test_returns_404_for_inexistent_document(self):
         self.client.login(username="user", password="user")
@@ -182,7 +183,10 @@ class DocumentDetailViewTest(TestWithMongo):
         response = self.client.put(reverse('document-detail',
             kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
 
-        self.assertEqual(response.status_code, 400)
+        # Since this document belongs to another user, it's getting
+        # filtered out of the queryset in `view.get_queryset()` and it
+        # appears not to exist.
+        self.assertEqual(response.status_code, 404)
 
     def test_cant_change_the_owner_of_a_document(self):
         self.client.login(username="user", password="user")
@@ -219,3 +223,21 @@ class DocumentDetailViewTest(TestWithMongo):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(len(Corpus.objects.filter(owner__username="admin")), 1)
+
+    @patch('pypln.web.backend_adapter.pipelines.create_pipeline')
+    def test_updating_a_document_should_create_a_pipeline_for_it(self, create_pipeline):
+        self.client.login(username="user", password="user")
+        document = self.user.document_set.all()[0]
+        corpus = self.user.corpus_set.all()[0]
+        # We try to set 'admin' as the owner (id=1)
+        data = encode_multipart(BOUNDARY, {"blob": self.fp,
+                    "corpus": self._get_corpus_url(document.corpus.id), "owner": 2})
+
+        response = self.client.put(reverse('document-detail',
+            kwargs={'pk': document.id}), data, content_type=MULTIPART_CONTENT)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(create_pipeline.called)
+        document = response.renderer_context['view'].get_object()
+        pipeline_data = {"_id": str(document.blob.file._id), "id": document.id}
+        create_pipeline.assert_called_with(pipeline_data)

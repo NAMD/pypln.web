@@ -45,7 +45,7 @@ class DocumentListTest(TestWithMongo):
             kwargs={'pk': self.document.id}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.renderer_context['view'].object, self.document)
+        self.assertEqual(response.renderer_context['view'].get_object(), self.document)
         fake_request = RequestFactory().get(reverse('property-list',
             kwargs={'pk': self.document.id}))
 
@@ -102,7 +102,8 @@ class DocumentDetailTest(TestWithMongo):
             kwargs={'pk': self.document.id, 'property': 'text'}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.renderer_context['view'].object, self.document)
+        self.assertEqual(response.renderer_context['view'].get_object(),
+                         self.document)
         self.assertEqual(response.data['value'],
                 self.document.properties['text'])
 

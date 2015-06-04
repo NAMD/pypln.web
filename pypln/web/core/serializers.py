@@ -23,30 +23,40 @@ from rest_framework.reverse import reverse
 from pypln.web.core.models import Corpus, Document
 
 class CorpusSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.Field(source="owner.username")
+    owner = serializers.ReadOnlyField(source="owner.username")
     documents = serializers.HyperlinkedIdentityField(
             view_name="corpus-document-list", )
     class Meta:
         model = Corpus
 
+    def validate_name(self, value):
+        if Corpus.objects.filter(name=value,
+                                 owner=self.context['request'].user).exists():
+            raise serializers.ValidationError("Corpora names must be unique for each user.")
+        else:
+            return value
+
+
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.Field(source="owner.username")
-    corpus = serializers.HyperlinkedRelatedField(view_name="corpus-detail")
-    size = serializers.Field(source="blob.size")
+    owner = serializers.ReadOnlyField(source="owner.username")
+    corpus = serializers.HyperlinkedRelatedField(view_name="corpus-detail", queryset=Corpus.objects.all())
+    size = serializers.ReadOnlyField(source="blob.size")
+    blob = serializers.FileField(use_url=False)
     properties = serializers.HyperlinkedIdentityField(view_name="property-list")
 
     def __init__(self, *args, **kwargs):
+        super(DocumentSerializer, self).__init__(*args, **kwargs)
         # If the serializer is treating input from a view, there will be a
         # context from which we can take the owner, and filter the possible
         # corpora with it.
         if 'context' in kwargs:
             user = kwargs['context']['request'].user
-            self.base_fields['corpus'].queryset = Corpus.objects.filter(owner=user)
+            self.fields['corpus'].queryset = Corpus.objects.filter(owner=user)
         # If we get a document that already exists, we can filter based on it's
         # owner.
         elif args:
             document = args[0]
-            self.base_fields['corpus'].queryset = Corpus.objects.filter(
+            self.fields['corpus'].queryset = Corpus.objects.filter(
                     owner=document.owner)
         # In other cases we don't filter the queryset. All the user input
         # should come through a view, and this view needs to send us a
@@ -56,7 +66,15 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         else:
             raise ValueError("DocumentSerializer needs either a Document or a "
                     "context.")
-        super(DocumentSerializer, self).__init__(*args, **kwargs)
+
+    def create(self, validated_data):
+        validated_data['owner'] = self.context['request'].user
+        return super(DocumentSerializer, self).create(validated_data)
+
+    def validate_corpus(self, value):
+        if value.owner != self.context['request'].user:
+            raise serializers.ValidationError("The corpus must belong to the user that is creating the document.")
+        return value
 
     class Meta:
         model = Document
