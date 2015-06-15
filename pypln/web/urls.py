@@ -43,5 +43,6 @@ urlpatterns = patterns('',
 
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^indexing/', include('pypln.web.indexing.urls')),
     url(r'^', include('pypln.web.core.urls')),
 )

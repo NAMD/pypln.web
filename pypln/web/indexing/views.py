@@ -16,3 +16,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <https://www.gnu.org/licenses/>.
+
+from rest_framework import generics
+from rest_framework import permissions
+
+from pypln.web.core.models import Document
+from pypln.web.core.serializers import DocumentSerializer
+from pypln.web.backend_adapter.pipelines import create_indexing_pipeline
+
+class IndexDocument(generics.CreateAPIView):
+    """
+    Create a new Document and runs the backend workers necessary to index it in
+    elasticsearch. The index will be accessible by the index querying endpoint
+    of this API.
+
+    `POST` requests will create and index a new document using the indexing
+    pipeline. They should include:
+
+    - `corpus`: Fully qualified url of the corpus that will contain the new
+      document.
+    - `blob`: The document to be processed.
+    - `doc_type`: The type of the document (to be passed on to elastic)
+    - `index_name`: The name of the index inclu
+    """
+    #model = Document
+    serializer_class = DocumentSerializer
+    permission_classes = (permissions.IsAuthenticated, )

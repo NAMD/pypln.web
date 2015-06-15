@@ -17,4 +17,77 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <https://www.gnu.org/licenses/>.
 
+from StringIO import StringIO
+
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.test import TestCase
+
+from mock import patch
+from rest_framework.reverse import reverse as rest_framework_reverse
+
+from pypln.web.core.models import Corpus, Document
+from pypln.web.core.tests.utils import TestWithMongo
+
+
+class IndexDocumentViewTest(TestWithMongo):
+    fixtures = ['users', 'corpora', 'documents']
+
+    def setUp(self):
+        self.user = User.objects.get(username="user")
+        self.fp = StringIO("Content")
+        self.fp.name = "document.txt"
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('index-document'))
+        self.assertEqual(response.status_code, 403)
+
+    @patch('pypln.web.indexing.views.create_indexing_pipeline')
+    def test_create_new_document(self, create_indexing_pipelines):
+        self.assertEqual(len(self.user.document_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        data = {"corpus": rest_framework_reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), "blob": self.fp}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(self.user.document_set.all()), 2)
+
+    @patch('pypln.web.indexing.views.create_indexing_pipeline')
+    def test_cant_create_document_for_another_user(self, create_indexing_pipeline):
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        corpus_url = rest_framework_reverse('corpus-detail', kwargs={'pk': corpus.id})
+        data = {"corpus": corpus_url, "blob": self.fp, "owner": 1}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 201)
+        document = self.user.document_set.all()[1]
+        self.assertEqual(document.owner, self.user)
+
+    def test_cant_create_document_for_inexistent_corpus(self):
+        self.client.login(username="user", password="user")
+
+        corpus_url = rest_framework_reverse('corpus-detail', kwargs={'pk': 9999})
+        data = {"corpus": corpus_url, "blob": self.fp}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 400)
+
+    @patch('pypln.web.indexing.views.create_indexing_pipeline')
+    def test_cant_create_document_in_another_users_corpus(self,
+            create_indexing_pipeline):
+        self.client.login(username="user", password="user")
+
+        # We'll try to associate this document to a corpus that belongs to
+        # 'admin'
+        corpus = Corpus.objects.filter(owner__username="admin")[0]
+        corpus_url = rest_framework_reverse('corpus-detail',
+                kwargs={'pk': corpus.id})
+        data = {"corpus": corpus_url, "blob": self.fp}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 400)

@@ -50,6 +50,8 @@ def create_pipeline(data):
     document['file_id'] = data['_id']
     call_default_pipeline(data['id'])
 
+def create_indexing_pipeline(doc):
+    pass
 
 def get_config_from_router(api, timeout=5):
     client = Client()
