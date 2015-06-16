@@ -22,10 +22,11 @@ from django.test import TestCase
 from mock import patch
 
 from pypln.web.backend_adapter.pipelines import create_pipeline
+from pypln.backend.mongodict_adapter import MongoDictAdapter
 
 __all__ = ["CreatePipelineTest"]
 
-class CreatePipelineTest(TestCase):
+class CreatePipelineTest(TestWithMongo):
 
     @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
     def test_should_create_pipelines_for_document(self, gridfs_data_retriever):
@@ -33,3 +34,14 @@ class CreatePipelineTest(TestCase):
         create_pipeline(pipeline_data)
         gridfs_data_retriever.assert_called_with()
         gridfs_data_retriever.return_value.si.assert_called_with(1)
+
+    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
+    def test_should_add_file_id_to_the_document_in_mongo(self,
+            gridfs_data_retriever):
+        pipeline_data = {"_id": "123", "id": 1}
+        create_pipeline(pipeline_data)
+        document = MongoDictAdapter(doc_id=pipeline_data['id'],
+                host=settings.MONGODB_CONFIG['host'],
+                port=settings.MONGODB_CONFIG['port'],
+                database=settings.MONGODB_CONFIG['database'])
+        self.assertEqual(document['file_id'], pipeline_data['_id'])
