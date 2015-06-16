@@ -21,7 +21,7 @@ from rest_framework import generics
 from rest_framework import permissions
 
 from pypln.web.core.models import Document
-from pypln.web.core.serializers import DocumentSerializer
+from pypln.web.core.serializers import IndexedDocumentSerializer
 from pypln.web.backend_adapter.pipelines import create_indexing_pipeline
 
 class IndexDocument(generics.CreateAPIView):
@@ -39,6 +39,9 @@ class IndexDocument(generics.CreateAPIView):
     - `doc_type`: The type of the document (to be passed on to elastic)
     - `index_name`: The name of the index inclu
     """
-    #model = Document
-    serializer_class = DocumentSerializer
+    serializer_class = IndexedDocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
+    def perform_create(self, serializer):
+        instance = serializer.save(owner=self.request.user)
+        create_indexing_pipeline(instance)
