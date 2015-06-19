@@ -37,11 +37,19 @@ class IndexDocument(generics.CreateAPIView):
       document.
     - `blob`: The document to be processed.
     - `doc_type`: The type of the document (to be passed on to elastic)
-    - `index_name`: The name of the index inclu
+    - `index_name`: The name of the index. If the name does not start with your
+      username, it will be automatically prefixed to include it.
     """
     serializer_class = IndexedDocumentSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
     def perform_create(self, serializer):
-        instance = serializer.save(owner=self.request.user)
+        username = self.request.user.username
+        provided_index_name = serializer.validated_data['index_name']
+
+        if not provided_index_name.startswith(username):
+            provided_index_name = "{}_{}".format(username, provided_index_name)
+
+        instance = serializer.save(owner=self.request.user,
+                index_name=provided_index_name)
         create_indexing_pipeline(instance)

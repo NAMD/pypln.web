@@ -57,6 +57,38 @@ class IndexDocumentViewTest(TestWithMongo):
         self.assertEqual(len(self.user.document_set.all()), 2)
 
     @patch('pypln.web.indexing.views.create_indexing_pipeline')
+    def test_index_name_should_be_prefixed_with_username_if_its_not_already(self, create_indexing_pipelines):
+        self.assertEqual(len(self.user.document_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        data = {"corpus": rest_framework_reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), "blob": self.fp,
+                "index_name": "test_pypln", "doc_type": "article"}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 201)
+        doc_id = int(response.data['url'].rsplit('/')[-2])
+        created_document = IndexedDocument.objects.get(pk=doc_id)
+        self.assertEqual(created_document.index_name, "user_test_pypln")
+
+    @patch('pypln.web.indexing.views.create_indexing_pipeline')
+    def test_index_name_that_start_with_username_dont_need_prefix(self, create_indexing_pipelines):
+        self.assertEqual(len(self.user.document_set.all()), 1)
+        self.client.login(username="user", password="user")
+
+        corpus = self.user.corpus_set.all()[0]
+        data = {"corpus": rest_framework_reverse('corpus-detail',
+            kwargs={'pk': corpus.id}), "blob": self.fp,
+                "index_name": "user_test_pypln", "doc_type": "article"}
+        response = self.client.post(reverse('index-document'), data)
+
+        self.assertEqual(response.status_code, 201)
+        doc_id = int(response.data['url'].rsplit('/')[-2])
+        created_document = IndexedDocument.objects.get(pk=doc_id)
+        self.assertEqual(created_document.index_name, "user_test_pypln")
+
+    @patch('pypln.web.indexing.views.create_indexing_pipeline')
     def test_cant_create_document_without_index_name(self, create_indexing_pipelines):
         self.assertEqual(len(self.user.document_set.all()), 1)
         self.client.login(username="user", password="user")
