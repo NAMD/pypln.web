@@ -70,6 +70,10 @@ class Document(models.Model):
                 database=settings.MONGODB_CONFIG['database'])
 
 
+class IndexedDocument(Document):
+    doc_type = models.CharField(max_length=100)
+    index_name = models.CharField(max_length=100)
+
 # Create a authentication Token for each user it's created.
 @receiver(models.signals.post_save, sender=User)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

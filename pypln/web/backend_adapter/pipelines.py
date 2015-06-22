@@ -50,6 +50,18 @@ def create_pipeline(data):
     document['file_id'] = data['_id']
     call_default_pipeline(data['id'])
 
+def create_indexing_pipeline(doc):
+    doc_id = doc.id
+    document = MongoDictAdapter(doc_id=doc_id,
+            host=settings.MONGODB_CONFIG['host'],
+            port=settings.MONGODB_CONFIG['port'],
+            database=settings.MONGODB_CONFIG['database'])
+
+    document["file_id"] = str(doc.blob.file._id)
+    document["index_name"] = doc.index_name
+    document["doc_type"] = doc.doc_type
+    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) |
+            ElasticIndexer().si(doc_id) | GridFSFileDeleter().si(doc_id))()
 
 def get_config_from_router(api, timeout=5):
     client = Client()

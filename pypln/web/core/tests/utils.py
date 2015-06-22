@@ -43,27 +43,28 @@ class TestWithMongo(TestCase):
 
         gridfs_storage._connection.drop_database(gridfs_storage.database)
 
-        filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/analysis.json')
-        with open(filename, 'r') as mongo_fixture:
-            for obj in json_util.loads(mongo_fixture.read()):
-                gridfs_storage._connection[settings.MONGODB_CONFIG['database']].main.insert(obj)
+        if hasattr(self, 'fixtures') and self.fixtures is not None and 'documents' in self.fixtures:
+            filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/analysis.json')
+            with open(filename, 'r') as mongo_fixture:
+                for obj in json_util.loads(mongo_fixture.read()):
+                    gridfs_storage._connection[settings.MONGODB_CONFIG['database']].main.insert(obj)
 
-        # `GridFSStorage.save()` uses `.get_available_name()` to get a
-        # unique name from the filename we provide. In commit
-        # dac93bdfd6c we changed the way it behaves to use the current
-        # timestamp (the reasoning behind this is the commit message
-        # for the original buggy commit: a5997bc94d). This means that
-        # we cannot use the real behaviour to generate the filename we
-        # get from our fixtures (since it will be appended with the
-        # current timestamp), so here we briefly change the behaviour
-        # of `.get_available_name()` to return the filename we gave
-        # it, so we can create the correct files that are needed to
-        # work with our fixtures. After the `with` block is over, the
-        # behaviour of the method returns to normal.
-        with mock.patch('pypln.web.core.models.gridfs_storage.get_available_name', new=lambda x: x):
-            for doc in Document.objects.all():
-                gridfs_storage.save(os.path.basename(doc.blob.name),
-                                    StringIO("This is a test file."))
+            # `GridFSStorage.save()` uses `.get_available_name()` to get a
+            # unique name from the filename we provide. In commit
+            # dac93bdfd6c we changed the way it behaves to use the current
+            # timestamp (the reasoning behind this is the commit message
+            # for the original buggy commit: a5997bc94d). This means that
+            # we cannot use the real behaviour to generate the filename we
+            # get from our fixtures (since it will be appended with the
+            # current timestamp), so here we briefly change the behaviour
+            # of `.get_available_name()` to return the filename we gave
+            # it, so we can create the correct files that are needed to
+            # work with our fixtures. After the `with` block is over, the
+            # behaviour of the method returns to normal.
+            with mock.patch('pypln.web.core.models.gridfs_storage.get_available_name', new=lambda x: x):
+                for doc in Document.objects.all():
+                    gridfs_storage.save(os.path.basename(doc.blob.name),
+                                        StringIO("This is a test file."))
 
     def _post_teardown(self, *args, **kwargs):
         gridfs_storage._connection.drop_database(gridfs_storage.database)

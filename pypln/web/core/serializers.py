@@ -20,7 +20,7 @@ from django.forms.models import ModelChoiceIterator
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from pypln.web.core.models import Corpus, Document
+from pypln.web.core.models import Corpus, Document, IndexedDocument
 
 class CorpusSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.username")
@@ -78,6 +78,14 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Document
+
+class IndexedDocumentSerializer(DocumentSerializer):
+
+    url = serializers.HyperlinkedIdentityField(view_name="document-detail")
+
+    class Meta:
+        model = IndexedDocument
+
 
 class PropertyListSerializer(serializers.Serializer):
     properties = serializers.SerializerMethodField("get_property_urls")
