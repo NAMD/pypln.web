@@ -16,14 +16,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from rest_framework import serializers
+from rest_framework.reverse import reverse
 
-from django.conf.urls import patterns, url, include
-from rest_framework.urlpatterns import format_suffix_patterns
-from pypln.web.indexing.views import IndexDocument, IndexQuery
+INDEX_NAME_ERROR_MSG = ("Invalid index_name. "
+                "Remember stored index names are always prefixed with your "
+                "username. See the documentation for indexing documents for "
+                "details")
 
-urlpatterns = patterns('pypln.web.indexing.views',
-    url(r'^index-document/$', IndexDocument.as_view(), name='index-document'),
-    url(r'^query/$', IndexQuery.as_view(), name='index-query'),
-)
+class QuerySerializer(serializers.Serializer):
+    index_name = serializers.CharField(max_length=100)
+    q = serializers.CharField(max_length=256, allow_blank=True)
 
-urlpatterns = format_suffix_patterns(urlpatterns, allowed=['json', 'api'])
+    def validate_index_name(self, value):
+        if not value.startswith(self.context['request'].user.username):
+            raise serializers.ValidationError(INDEX_NAME_ERROR_MSG)
+        return value

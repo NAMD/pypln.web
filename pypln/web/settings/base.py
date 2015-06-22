@@ -202,3 +202,8 @@ REST_FRAMEWORK = {
     "PAGINATE_BY": 100,
     "PAGINATE_BY_PARAM": "page_size",
 }
+
+
+ELASTICSEARCH_CONFIG = {
+    'hosts': ['127.0.0.1'],
+}
