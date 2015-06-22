@@ -61,7 +61,7 @@ def create_indexing_pipeline(doc):
     document["index_name"] = doc.index_name
     document["doc_type"] = doc.doc_type
     (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) |
-            ElasticIndexer().si(doc_id))()
+            ElasticIndexer().si(doc_id) | GridFSFileDeleter().si(doc_id))()
 
 def get_config_from_router(api, timeout=5):
     client = Client()
