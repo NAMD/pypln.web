@@ -2,7 +2,7 @@ django~=1.8.0
 djangorestframework~=3.1.0
 pymongo~=2.8.1
 mongodict~=0.3.1
-pypln.backend
+-e git+https://github.com/NAMD/pypln.backend.git#egg=pypln.backend
 gunicorn~=19.3.0
 django-registration-redux
 markdown~=2.6.2
