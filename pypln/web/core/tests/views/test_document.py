@@ -159,7 +159,8 @@ class DocumentDetailViewTest(TestWithMongo):
             kwargs={'pk': document.id}))
         self.assertEqual(response.status_code, 404)
 
-    def test_edit_document(self):
+    @patch('pypln.web.backend_adapter.pipelines.create_pipeline')
+    def test_edit_document(self, create_pipeline):
         self.client.login(username="user", password="user")
 
         document = self.user.document_set.all()[0]
@@ -188,7 +189,8 @@ class DocumentDetailViewTest(TestWithMongo):
         # appears not to exist.
         self.assertEqual(response.status_code, 404)
 
-    def test_cant_change_the_owner_of_a_document(self):
+    @patch('pypln.web.backend_adapter.pipelines.create_pipeline')
+    def test_cant_change_the_owner_of_a_document(self, create_pipeline):
         self.client.login(username="user", password="user")
         document = self.user.document_set.all()[0]
         # We try to set 'admin' as the owner (id=1)
