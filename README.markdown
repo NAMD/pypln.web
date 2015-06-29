@@ -25,7 +25,10 @@ To install dependencies (on a Debian-like GNU/Linux distribution), execute:
 
 ## Developing
 
-To run tests:
+To run all tests, you'll need the elasticsearch server running. You can find
+[detailed instructions for your platform in their
+documentation](https://www.elastic.co/downloads/elasticsearch). After that, you
+can just run:
 
     workon pypln.web
     pip install -r requirements/development.txt
