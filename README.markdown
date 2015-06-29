@@ -25,19 +25,29 @@ To install dependencies (on a Debian-like GNU/Linux distribution), execute:
 
 ## Developing
 
-To run tests:
+To run all tests, you'll need the elasticsearch server running. You can find
+[detailed instructions for your platform in their
+documentation](https://www.elastic.co/downloads/elasticsearch). After that, you
+can just run:
 
     workon pypln.web
     pip install -r requirements/development.txt
-    source contrib/postactivate
-    run_tests # it's an alias created by postactivate script
+    python manage.py test --settings=pypln.web.settings.test
 
 
 To run the development webserver:
 
     workon pypln.web
-    source contrib/postactivate
-    manage_dev runserver # it's an alias created by postactivate script
+    python manage.py runserver --settings=pypln.web.settings.development
+
+
+If your repository is inside the virtualenv directory, there are some helpers:
+
+    source contrib/postactivate # load the helper functions
+    manage_test test # `manage_test` will run any comand (`test` in this case)
+                     # with the test settings.
+    manage_dev runserver # `manage_dev` is similar, but uses the development
+                         # settings
 
 See our [code guidelines](https://github.com/namd/pypln.web/blob/develop/CONTRIBUTING.rst).
 
