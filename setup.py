@@ -25,7 +25,9 @@ def get_requirements():
         requirements = requirements_fp.readlines()
     packages = []
     for package in requirements:
-        package = package.split('#')[0].strip()
+        package = package.strip()
+        if "#egg=" in package:
+            package = package.split('#egg=')[1].strip()
         if '==' in package:
             package = package.split('==')[0].strip()
         if package:
