@@ -30,6 +30,8 @@ def get_requirements():
             package = package.split('#egg=')[1].strip()
         if '==' in package:
             package = package.split('==')[0].strip()
+        if '~=' in package:
+            package = package.split('~=')[0].strip()
         if package:
             packages.append(package)
     return packages
