@@ -102,10 +102,10 @@ example, get the plain text extracted from them:
 
 .. code-block:: python
 
-    for document in documents_response.json():
+    for document in documents_response.json()['results']:
         # we need to get the document's base property url
         properties_url = document['properties']
-        plain_text_url = properties_url + 'text'
+        plain_text_url = properties_url + 'text/'
         doc_text_info = requests.get(plain_text_url, auth=credentials)
         doc_text = doc_text_info.json()['value']
         # Let's just print the length of the text, otherwise we could have a
