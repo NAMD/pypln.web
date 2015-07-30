@@ -1,9 +1,14 @@
 {% extends "registration/base.html" %}
 {% block content %}
+  <ul class="breadcrumb">
+    <li class="active">Register</li>
+  </ul>
+  <div class="content-main">
+  <h1>PyPLN</h1>
   <form action="{% url 'registration_register' %}" method="post" class="well form-horizontal">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-      <div class="control-group {% if field.errors %}error{% endif %}">
+      <div class="form-group {% if field.errors %}error{% endif %}">
         {{ field.label_tag }}
         {{ field }}
         {% for error in field.errors %}
@@ -11,6 +16,9 @@
         {% endfor %}
       </div>
     {% endfor %}
-    <input type="submit" name="submit" value="Change Password" class="btn btn-primary">
+    <div class="form-actions">
+      <input type="submit" name="submit" value="Change Password" class="btn btn-primary">
+    </div>
   </form>
+  </div>
 {% endblock %}
