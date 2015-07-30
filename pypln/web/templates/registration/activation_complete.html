@@ -4,6 +4,12 @@
 {% endblock %}
 
 {% block content %}
+<ul class="breadcrumb">
+  <li class="active">Register</li>
+  <li class="active">Activate account</li>
+  <li class="active">Activation complete</li>
+</ul>
+<h3>Registration complete</h3>
 <p>Thank you for registering. You can now
 <a href="{% url 'rest_framework:login' %}?next=/">login</a> and use PyPLN.</p>
 {% endblock %}
