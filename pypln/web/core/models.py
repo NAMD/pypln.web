@@ -34,7 +34,6 @@ gridfs_storage = GridFSStorage(location='/',
                                database=settings.MONGODB_CONFIG['database'],
                                collection=settings.MONGODB_CONFIG['gridfs_collection'])
 
-
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
     description = models.CharField(max_length=255, blank=True)
@@ -52,7 +51,27 @@ class MongoDictProxy(MongoDictAdapter):
 
     def __getitem__(self, key):
         if key == "all_data":
-            return {k: v for k, v in self.items()}
+            # This code is here because of the way MongoDict stores its values.
+            # We need to pass all values as unicode strings to the serializer
+            # so it gets rendered correctly. This code will be removed as soon
+            # as MongoDict is not a part of this codebase anymore (this work
+            # has been done in pypln.backend and should be done soon here).
+            result = {}
+
+            decode_list = lambda l: map(lambda s: s.decode('utf-8'), l)
+
+            for k in self.keys():
+                value = self[k]
+                if isinstance(value, str):
+                    value = value.decode('utf-8')
+                elif k == u"lemmas":
+                    value = decode_list(value)
+                elif k == u"semantic_tags":
+                    value = {tag: decode_list(tagged) for tag, tagged in
+                            value.items()}
+                result[k] = value
+            return result
+
         return super(MongoDictProxy, self).__getitem__(key)
 
     def __getattr__(self, key):
