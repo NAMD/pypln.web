@@ -49,6 +49,12 @@ class Corpus(models.Model):
         return self.name
 
 class MongoDictProxy(MongoDictAdapter):
+
+    def __getitem__(self, key):
+        if key == "all_data":
+            return {k: v for k, v in self.items()}
+        return super(MongoDictProxy, self).__getitem__(key)
+
     def __getattr__(self, key):
         return self[key]
 

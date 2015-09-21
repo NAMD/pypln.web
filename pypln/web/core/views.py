@@ -226,7 +226,7 @@ class PropertyDetail(generics.RetrieveAPIView):
     def get_object(self, *args, **kwargs):
         doc = super(PropertyDetail, self).get_object(*args, **kwargs)
         prop = self.kwargs['property']
-        if prop in doc.properties:
+        if prop == "all_data" or prop in doc.properties:
             return doc
         else:
             raise Http404("Property '{}' does not exist for document "
