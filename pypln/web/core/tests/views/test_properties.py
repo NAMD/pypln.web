@@ -141,3 +141,17 @@ class DocumentDetailTest(TestWithMongo):
         response = self.client.delete(reverse('property-detail',
             kwargs={'pk': self.document.id, 'property': 'text'}))
         self.assertEqual(response.status_code, 405)
+
+    def test_shows_all_properties_for_all_data(self):
+        self.client.login(username="user", password="user")
+        response = self.client.get(reverse('property-detail',
+            kwargs={'pk': self.document.id, 'property': 'all_data'}))
+
+        expected_result = {k: self.document.properties[k] for k in
+                self.document.properties.keys()}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.renderer_context['view'].get_object(),
+                         self.document)
+        self.assertEqual(response.data['value'],
+                expected_result)
