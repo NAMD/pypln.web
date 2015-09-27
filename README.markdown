@@ -1,5 +1,8 @@
 # PyPLN
 
+[![PyPi version](https://img.shields.io/pypi/v/pypln.web.svg)](https://crate.io/packages/pypln.web/)
+[![PyPi downloads](https://img.shields.io/pypi/dm/pypln.web.svg)](https://crate.io/packages/pypln.web/)
+
 PyPLN is a distributed pipeline for natural language processing, made in
 Python.
 
