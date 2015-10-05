@@ -25,9 +25,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from mongodict import MongoDict
-
-from pypln.backend.mongodict_adapter import MongoDictAdapter
 from pypln.web.core.models import Document, gridfs_storage
 
 class TestWithMongo(TestCase):

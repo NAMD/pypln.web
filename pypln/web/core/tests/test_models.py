@@ -24,8 +24,6 @@ from django.core.files import File
 from django.db import IntegrityError
 from django.test import TestCase
 
-from mongodict import MongoDict
-
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.tests.utils import TestWithMongo
 
