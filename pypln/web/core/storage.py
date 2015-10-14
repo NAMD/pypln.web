@@ -4,11 +4,15 @@
 #   https://github.com/django-nonrel/mongodb-engine
 # License: 2-clause BSD
 
+import base64
+from bson import ObjectId
 import os
 import time
 import urlparse
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 from django.utils.encoding import filepath_to_uri
 from pymongo import Connection
 from gridfs import GridFS, NoFile
@@ -24,6 +28,40 @@ def _get_subcollections(collection):
         if cleaned != collection.name and cleaned.startswith(collection.name):
             yield cleaned
 
+class MongoDBBase64Storage(Storage):
+    """
+    This storage saves the file content as a base64 encoded string in MongoDB.
+    We're not using GridFS because the workers will need the base64 encoded
+    data anyways, and we also have a small file size limit that should make
+    sure the MongoDB document does not exceed the maximum document size.
+    """
+
+    def __init__(self):
+
+        db_config = settings.MONGODB_CONFIG
+        self._connection = Connection(host=db_config['host'],
+            port=db_config['port'])
+        self._db = self._connection[db_config['database']]
+        self.collection = self._db[db_config['analysis_collection']]
+
+    def _open(self, name, mode='rb'):
+        document = self.collection.find_one(ObjectId(name))
+        if document is None:
+            raise ValueError("Document with name {} does not exist".format(name))
+        content = base64.b64decode(document['contents'])
+        return ContentFile(content)
+
+    def _save(self, name, content):
+        content.seek(0)
+        encoded_content = base64.b64encode(content.read())
+        _id = self.collection.insert({'contents': encoded_content})
+        return str(_id)
+
+    def get_available_name(self, name, max_length=None):
+        return "fake_name"
+
+    def __del__(self):
+        self._connection.close()
 
 class GridFSStorage(Storage):
     """
