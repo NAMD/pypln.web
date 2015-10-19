@@ -60,6 +60,12 @@ class MongoDBBase64Storage(Storage):
     def get_available_name(self, name, max_length=None):
         return "fake_name"
 
+    def size(self, path):
+        document = self.collection.find_one({'_id': ObjectId(path)})
+        # when we b64decode 'contents' we get a str (not a unicode obj) so we
+        # can just get it's len() and have it's size.
+        return len(base64.b64decode(document['contents']))
+
     def __del__(self):
         self._connection.close()
 
