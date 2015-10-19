@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from bson import ObjectId
 from celery import group
 from django.conf import settings
 from pypln.backend.workers import *
 from pypln.backend.mongodict_adapter import MongoDictAdapter
+from pypln.web.core.models import mongodb_storage
 
 def call_default_pipeline(doc_id):
     palavras_dependent_tasks = group(
@@ -27,7 +29,7 @@ def call_default_pipeline(doc_id):
         NounPhrase().si(doc_id), SemanticTagger().si(doc_id)
     )
 
-    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) | Tokenizer().si(doc_id) |
+    (Extractor().si(doc_id) | Tokenizer().si(doc_id) |
         group(
             (PalavrasRaw().si(doc_id) | palavras_dependent_tasks),
             (FreqDist().si(doc_id) | group(Statistics().si(doc_id)))
@@ -35,31 +37,13 @@ def call_default_pipeline(doc_id):
     )()
 
 def create_pipeline_from_document(doc):
-    data = {"_id": str(doc.blob.file._id), "id": doc.id}
-    create_pipeline(data)
-
-def create_pipeline(data):
-    # Add file_id as a property to the document before starting
-    # to process it. The first worker will need this property
-    document = MongoDictAdapter(doc_id=data['id'],
-            host=settings.MONGODB_CONFIG['host'],
-            port=settings.MONGODB_CONFIG['port'],
-            database=settings.MONGODB_CONFIG['database'])
-    document['file_id'] = data['_id']
-    call_default_pipeline(data['id'])
+    call_default_pipeline(ObjectId(doc.blob.name))
 
 def create_indexing_pipeline(doc):
-    doc_id = doc.id
-    document = MongoDictAdapter(doc_id=doc_id,
-            host=settings.MONGODB_CONFIG['host'],
-            port=settings.MONGODB_CONFIG['port'],
-            database=settings.MONGODB_CONFIG['database'])
-
-    document["file_id"] = str(doc.blob.file._id)
-    document["index_name"] = doc.index_name
-    document["doc_type"] = doc.doc_type
-    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) |
-            ElasticIndexer().si(doc_id) | GridFSFileDeleter().si(doc_id))()
+    doc_id = ObjectId(doc.blob.name)
+    mongodb_storage.collection.update({'_id': doc_id}, {"$set":
+            {"index_name": doc.index_name, "doc_type": doc.doc_type}})
+    (Extractor().si(doc_id) | ElasticIndexer().si(doc_id))()
 
 def get_config_from_router(api, timeout=5):
     client = Client()
