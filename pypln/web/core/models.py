@@ -87,7 +87,7 @@ class Document(models.Model):
     @property
     def properties(self):
         return mongodb_storage.collection.find_one({"_id":
-            ObjectId(self.blob.name)})
+            ObjectId(self.blob.name)}, {"_id": False})
 
 
 class IndexedDocument(Document):
