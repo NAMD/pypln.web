@@ -27,12 +27,10 @@ def call_default_pipeline(doc_id):
         NounPhrase().si(doc_id), SemanticTagger().si(doc_id)
     )
 
-    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) |
+    (GridFSDataRetriever().si(doc_id) | Extractor().si(doc_id) | Tokenizer().si(doc_id) |
         group(
             (PalavrasRaw().si(doc_id) | palavras_dependent_tasks),
-            (Tokenizer().si(doc_id) | FreqDist().si(doc_id) |
-                group(Statistics().si(doc_id))
-            )
+            (FreqDist().si(doc_id) | group(Statistics().si(doc_id)))
         )
     )()
 
