@@ -50,15 +50,17 @@ class DocumentModelTest(TestWithMongo):
     fixtures = ['users', 'corpora', 'documents']
 
     def test_get_properties_from_store(self):
-        expected_data = ["average_sentence_length", "average_sentence_repertoire",
-            "contents", "file_id", "file_metadata", "filename", "forced_decoding",
-            "freqdist", "language", "length", "md5", "mimetype", "momentum_1",
-            "momentum_2", "momentum_3", "momentum_4", "palavras_raw_ran", "pos",
-            "repertoire", "sentences", "tagset", "text", "tokens", "upload_date"]
+        expected_data = ["_id", "average_sentence_length",
+                "average_sentence_repertoire", "contents", "file_metadata",
+                "forced_decoding", "freqdist", "language", "mimetype",
+                "momentum_1", "momentum_2", "momentum_3", "momentum_4",
+                "palavras_raw_ran", "pos", "repertoire", "sentences", "tagset",
+                "text", "tokens"]
         document = Document.objects.all()[0]
-        self.assertEqual(document.properties.keys(), expected_data)
+        self.assertEqual(sorted(document.properties.keys()),
+                sorted(expected_data))
 
     def test_get_text_from_store(self):
-        expected_data = u'This is a test file.'
+        expected_data = u'Test file with non-ascii char: á.'
         document = Document.objects.all()[0]
         self.assertEqual(document.properties['text'], expected_data)

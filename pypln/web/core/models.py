@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from bson import ObjectId
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
@@ -85,10 +86,8 @@ class Document(models.Model):
 
     @property
     def properties(self):
-        return MongoDictProxy(doc_id=self.id,
-                host=settings.MONGODB_CONFIG['host'],
-                port=settings.MONGODB_CONFIG['port'],
-                database=settings.MONGODB_CONFIG['database'])
+        return mongodb_storage.collection.find_one({"_id":
+            ObjectId(self.blob.name)})
 
 
 class IndexedDocument(Document):
