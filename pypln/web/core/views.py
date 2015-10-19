@@ -237,7 +237,13 @@ class PropertyDetail(generics.RetrieveAPIView):
         return Document.objects.filter(owner=self.request.user)
 
     def get_serializer_class(self, *args, **kwargs):
+        prop = self.kwargs['property']
+        if prop == "all_data":
+            source = "properties"
+        else:
+            source = "properties.{}".format(self.kwargs['property'])
+
         class PropertySerializer(serializers.Serializer):
-            value = serializers.ReadOnlyField(source="properties.{}".format(
-                self.kwargs['property']))
+            value = serializers.ReadOnlyField(source=source)
+
         return PropertySerializer
