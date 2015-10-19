@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from bson import ObjectId
 from mock import patch
 from StringIO import StringIO
 

@@ -27,7 +27,7 @@ from mock import patch
 from pypln.backend.mongodict_adapter import MongoDictAdapter
 
 from pypln.web.backend_adapter.pipelines import (create_pipeline, create_indexing_pipeline)
-from pypln.web.core.models import IndexedDocument, gridfs_storage
+from pypln.web.core.models import IndexedDocument
 from pypln.web.core.tests.utils import TestWithMongo
 
 

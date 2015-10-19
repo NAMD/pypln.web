@@ -1,22 +1,22 @@
 [
 {
-    "pk": 1,
-    "model": "core.document",
-    "fields": {
-        "owner": 2,
-        "corpus": 2,
-        "uploaded_at": "2015-05-27T02:22:42.559Z",
-        "blob": "/test_file.txt_1432693362.3"
-    }
-},
-{
-    "pk": 2,
-    "model": "core.document",
     "fields": {
         "owner": 1,
         "corpus": 1,
-        "uploaded_at": "2015-05-27T02:23:25.547Z",
-        "blob": "/test_file_1.txt_1432693405.55"
-    }
+        "uploaded_at": "2015-10-19T17:22:13.783Z",
+        "blob": "562526c5798ebd4616b23bb0"
+    },
+    "model": "core.document",
+    "pk": 1
+},
+{
+    "fields": {
+        "owner": 2,
+        "corpus": 2,
+        "uploaded_at": "2015-10-19T17:22:33.196Z",
+        "blob": "562526d9798ebd4616b23bb1"
+    },
+    "model": "core.document",
+    "pk": 2
 }
 ]

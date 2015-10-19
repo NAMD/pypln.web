@@ -25,14 +25,10 @@ from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 
 from pypln.backend.mongodict_adapter import MongoDictAdapter
-from pypln.web.core.storage import GridFSStorage
+from pypln.web.core.storage import MongoDBBase64Storage
 
+mongodb_storage = MongoDBBase64Storage()
 
-gridfs_storage = GridFSStorage(location='/',
-                               host=settings.MONGODB_CONFIG['host'],
-                               port=settings.MONGODB_CONFIG['port'],
-                               database=settings.MONGODB_CONFIG['database'],
-                               collection=settings.MONGODB_CONFIG['gridfs_collection'])
 
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
@@ -79,7 +75,7 @@ class MongoDictProxy(MongoDictAdapter):
 
 
 class Document(models.Model):
-    blob = models.FileField(upload_to='/', storage=gridfs_storage)
+    blob = models.FileField(upload_to='/', storage=mongodb_storage)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User')
     corpus = models.ForeignKey(Corpus)
