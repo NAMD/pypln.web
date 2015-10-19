@@ -25,7 +25,6 @@ from django.db import models
 from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 
-from pypln.backend.mongodict_adapter import MongoDictAdapter
 from pypln.web.core.storage import MongoDBBase64Storage
 
 mongodb_storage = MongoDBBase64Storage()
@@ -43,36 +42,6 @@ class Corpus(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class MongoDictProxy(MongoDictAdapter):
-
-    def __getitem__(self, key):
-        if key == "all_data":
-            # This code is here because of the way MongoDict stores its values.
-            # We need to pass all values as unicode strings to the serializer
-            # so it gets rendered correctly. This code will be removed as soon
-            # as MongoDict is not a part of this codebase anymore (this work
-            # has been done in pypln.backend and should be done soon here).
-            result = {}
-
-            decode_list = lambda l: map(lambda s: s.decode('utf-8'), l)
-
-            for k in self.keys():
-                value = self[k]
-                if isinstance(value, str):
-                    value = value.decode('utf-8')
-                elif k == u"lemmas":
-                    value = decode_list(value)
-                elif k == u"semantic_tags":
-                    value = {tag: decode_list(tagged) for tag, tagged in
-                            value.items()}
-                result[k] = value
-            return result
-
-        return super(MongoDictProxy, self).__getitem__(key)
-
-    def __getattr__(self, key):
-        return self[key]
 
 
 class Document(models.Model):

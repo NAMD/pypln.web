@@ -25,8 +25,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from mock import patch
 
-from pypln.backend.mongodict_adapter import MongoDictAdapter
-
 from pypln.web.backend_adapter.pipelines import (create_indexing_pipeline,
         call_default_pipeline, create_pipeline_from_document)
 from pypln.web.core.models import IndexedDocument, Document, mongodb_storage

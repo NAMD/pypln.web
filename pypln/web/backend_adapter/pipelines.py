@@ -20,7 +20,6 @@ from bson import ObjectId
 from celery import group
 from django.conf import settings
 from pypln.backend.workers import *
-from pypln.backend.mongodict_adapter import MongoDictAdapter
 from pypln.web.core.models import mongodb_storage
 
 def call_default_pipeline(doc_id):
