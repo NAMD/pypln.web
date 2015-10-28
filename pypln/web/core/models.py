@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from bson import ObjectId
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
@@ -24,15 +25,10 @@ from django.db import models
 from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
 
-from pypln.backend.mongodict_adapter import MongoDictAdapter
-from pypln.web.core.storage import GridFSStorage
+from pypln.web.core.storage import MongoDBBase64Storage
 
+mongodb_storage = MongoDBBase64Storage()
 
-gridfs_storage = GridFSStorage(location='/',
-                               host=settings.MONGODB_CONFIG['host'],
-                               port=settings.MONGODB_CONFIG['port'],
-                               database=settings.MONGODB_CONFIG['database'],
-                               collection=settings.MONGODB_CONFIG['gridfs_collection'])
 
 class Corpus(models.Model):
     name = models.CharField(max_length=60)
@@ -47,39 +43,9 @@ class Corpus(models.Model):
     def __unicode__(self):
         return self.name
 
-class MongoDictProxy(MongoDictAdapter):
-
-    def __getitem__(self, key):
-        if key == "all_data":
-            # This code is here because of the way MongoDict stores its values.
-            # We need to pass all values as unicode strings to the serializer
-            # so it gets rendered correctly. This code will be removed as soon
-            # as MongoDict is not a part of this codebase anymore (this work
-            # has been done in pypln.backend and should be done soon here).
-            result = {}
-
-            decode_list = lambda l: map(lambda s: s.decode('utf-8'), l)
-
-            for k in self.keys():
-                value = self[k]
-                if isinstance(value, str):
-                    value = value.decode('utf-8')
-                elif k == u"lemmas":
-                    value = decode_list(value)
-                elif k == u"semantic_tags":
-                    value = {tag: decode_list(tagged) for tag, tagged in
-                            value.items()}
-                result[k] = value
-            return result
-
-        return super(MongoDictProxy, self).__getitem__(key)
-
-    def __getattr__(self, key):
-        return self[key]
-
 
 class Document(models.Model):
-    blob = models.FileField(upload_to='/', storage=gridfs_storage)
+    blob = models.FileField(upload_to='/', storage=mongodb_storage)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User')
     corpus = models.ForeignKey(Corpus)
@@ -89,10 +55,8 @@ class Document(models.Model):
 
     @property
     def properties(self):
-        return MongoDictProxy(doc_id=self.id,
-                host=settings.MONGODB_CONFIG['host'],
-                port=settings.MONGODB_CONFIG['port'],
-                database=settings.MONGODB_CONFIG['database'])
+        return mongodb_storage.collection.find_one({"_id":
+            ObjectId(self.blob.name)}, {"_id": False})
 
 
 class IndexedDocument(Document):

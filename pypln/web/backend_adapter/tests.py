@@ -18,40 +18,31 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from StringIO import StringIO
 
+from bson import ObjectId
 from django.core.files import File
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from mock import patch
 
-from pypln.backend.mongodict_adapter import MongoDictAdapter
-
-from pypln.web.backend_adapter.pipelines import (create_pipeline, create_indexing_pipeline)
-from pypln.web.core.models import IndexedDocument, gridfs_storage
+from pypln.web.backend_adapter.pipelines import (create_indexing_pipeline,
+        call_default_pipeline, create_pipeline_from_document)
+from pypln.web.core.models import IndexedDocument, Document, mongodb_storage
 from pypln.web.core.tests.utils import TestWithMongo
 
 
-__all__ = ["CreatePipelineTest", "CreateIndexingPipelineTest"]
+__all__ = ["CreatePipelineTest", "CreateIndexingPipelineTest",
+    "CreatePipelineFromDocumentTest"]
 
 class CreatePipelineTest(TestWithMongo):
 
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
-    def test_should_create_pipelines_for_document(self, gridfs_data_retriever):
-        pipeline_data = {"_id": "123", "id": 1}
-        create_pipeline(pipeline_data)
-        gridfs_data_retriever.assert_called_with()
-        gridfs_data_retriever.return_value.si.assert_called_with(1)
+    @patch('pypln.web.backend_adapter.pipelines.Extractor', autospec=True)
+    def test_should_create_pipelines_for_document(self, extractor):
+        _id = ObjectId("123456789012")
+        call_default_pipeline(_id)
+        extractor.assert_called_with()
+        extractor.return_value.si.assert_called_with(_id)
 
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
-    def test_should_add_file_id_to_the_document_in_mongo(self,
-            gridfs_data_retriever):
-        pipeline_data = {"_id": "123", "id": 1}
-        create_pipeline(pipeline_data)
-        document = MongoDictAdapter(doc_id=pipeline_data['id'],
-                host=settings.MONGODB_CONFIG['host'],
-                port=settings.MONGODB_CONFIG['port'],
-                database=settings.MONGODB_CONFIG['database'])
-        self.assertEqual(document['file_id'], pipeline_data['_id'])
 
 class CreateIndexingPipelineTest(TestWithMongo):
     fixtures = ["users", "corpora"]
@@ -67,36 +58,36 @@ class CreateIndexingPipelineTest(TestWithMongo):
         )
 
 
-    def get_mongo_doc(self, doc_id):
-        return MongoDictAdapter(doc_id=doc_id,
-                host=settings.MONGODB_CONFIG['host'],
-                port=settings.MONGODB_CONFIG['port'],
-                database=settings.MONGODB_CONFIG['database'])
+    def get_mongo_doc(self, doc):
+        return mongodb_storage.collection.find_one({"_id":
+            ObjectId(doc.blob.name)})
 
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
-    def test_should_create_indexing_pipelines_for_document(self,
-            gridfs_data_retriever):
+    @patch('pypln.web.backend_adapter.pipelines.Extractor', autospec=True)
+    def test_should_create_indexing_pipelines_for_document(self, extractor):
         create_indexing_pipeline(self.document)
-        gridfs_data_retriever.assert_called_with()
-        gridfs_data_retriever.return_value.si.assert_called_with(1)
-
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
-    def test_should_add_file_id_to_the_document_in_mongo(self,
-            gridfs_data_retriever):
-        create_indexing_pipeline(self.document)
-        document = self.get_mongo_doc(self.document.id)
-        self.assertEqual(document['file_id'], str(self.document.blob.file._id))
+        extractor.assert_called_with()
+        extractor.return_value.si.assert_called_with(ObjectId(self.document.blob.name))
 
     @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
     def test_should_add_index_name_to_the_document_in_mongo(self,
             gridfs_data_retriever):
         create_indexing_pipeline(self.document)
-        mongo_document = self.get_mongo_doc(self.document.id)
+        mongo_document = self.get_mongo_doc(self.document)
         self.assertEqual(mongo_document['index_name'], self.document.index_name)
 
     @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
     def test_should_add_doc_type_to_the_document_in_mongo(self,
             gridfs_data_retriever):
         create_indexing_pipeline(self.document)
-        mongo_document = self.get_mongo_doc(self.document.id)
+        mongo_document = self.get_mongo_doc(self.document)
         self.assertEqual(mongo_document['doc_type'], self.document.doc_type)
+
+
+class CreatePipelineFromDocumentTest(TestWithMongo):
+    fixtures = ['users', 'corpora', 'documents']
+
+    @patch('pypln.web.backend_adapter.pipelines.call_default_pipeline', autospec=True)
+    def test_create_pipeline_from_document_instantiates_a_document_id(self, fake_call_default_pipeline):
+        doc = Document.objects.all()[0]
+        create_pipeline_from_document(doc)
+        fake_call_default_pipeline.assert_called_with(ObjectId(doc.blob.name))
