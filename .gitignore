@@ -15,3 +15,4 @@ MANIFEST
 pypln/web/index/
 pypln/web/index.pid
 pypln/web/media/
+env/
