@@ -37,7 +37,7 @@ def parse_url(url):
     return {
         'database': path or '',
         'port': url.port or '',
-        'host': url.p or '',
+        'host': url.hostname or '',
     }
 
     return config
