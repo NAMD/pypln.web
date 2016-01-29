@@ -198,8 +198,8 @@ ELASTICSEARCH_CONFIG = {
 
 SERVE_MEDIA = config('SERVE_MEDIA', default=False, cast=bool)
 
-ROUTER_API = config('ROUTER_API')
-ROUTER_BROADCAST = config('ROUTER_BROADCAST')
+ROUTER_API = config('ROUTER_API', default='tcp://127.0.0.1:5555')
+ROUTER_BROADCAST = config('ROUTER_BROADCAST', default='tcp://127.0.0.1:5556')
 ROUTER_TIMEOUT = 5
 
 if not settings.DEBUG:
