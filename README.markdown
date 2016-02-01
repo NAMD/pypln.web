@@ -24,6 +24,7 @@ To install dependencies (on a Debian-like GNU/Linux distribution), execute:
     pip install virtualenv virtualenvwrapper
     mkvirtualenv pypln.web
     pip install -r requirements/production.txt
+    cp pypln/web/settings.ini{.sample,}
 
 
 ## Developing
