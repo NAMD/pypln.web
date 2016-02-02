@@ -199,7 +199,7 @@ ELASTICSEARCH_CONFIG = {
 
 SERVE_MEDIA = config('SERVE_MEDIA', default=False, cast=bool)
 
-if not settings.DEBUG:
+if not DEBUG:
     from django.core.exceptions import SuspiciousOperation
 
     def skip_suspicious_operations(record):
