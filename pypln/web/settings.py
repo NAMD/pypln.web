@@ -62,7 +62,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': config('DATABASE_URL', default='sqlite://dev.db', cast=db_url)
+    'default': config('DATABASE_URL', default='sqlite:///dev.db', cast=db_url)
 }
 
 MONGODB_CONFIG = config('MONGODB_CONFIG', default='mongodb://localhost:27017/pypln', cast=parse_url)
