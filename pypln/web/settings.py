@@ -194,7 +194,7 @@ REST_FRAMEWORK = {
 
 
 ELASTICSEARCH_CONFIG = {
-    'hosts': config('ELASTICSEARCH_HOSTS', cast=Csv()),
+    'hosts': config('ELASTICSEARCH_HOSTS', default='127.0.0.1', cast=Csv()),
 }
 
 SERVE_MEDIA = config('SERVE_MEDIA', default=False, cast=bool)
