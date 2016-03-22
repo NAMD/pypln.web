@@ -26,8 +26,6 @@ ACCESS_LOG="$PYPLN_HOME/logs/wsgi_server.access"
 SETTINGS="settings.production"
 
 source "$PYPLN_HOME/project/bin/activate"
-# For some reason gunicorn_django won't work with settings.production
-export DJANGO_SETTINGS_MODULE=$SETTINGS
 
 # Supervisord is not passing $HOME to this script, and because of that we get
 # errors like trying to use "//.python-eggs" as PYTHON_EGG_CACHE

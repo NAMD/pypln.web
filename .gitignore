@@ -15,3 +15,5 @@ MANIFEST
 pypln/web/index/
 pypln/web/index.pid
 pypln/web/media/
+pypln/web/settings.ini
+env/

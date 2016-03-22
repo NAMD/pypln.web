@@ -1,0 +1,5 @@
+[settings]
+ALLOWED_HOSTS=*
+DEBUG=True
+ADMIN=Eduardo Carvalho,eduardo@example.com
+SECRET_KEY=my_secret_key
