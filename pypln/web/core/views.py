@@ -33,7 +33,7 @@ from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 from pypln.web.core.serializers import PropertyListSerializer
 
-@api_view(['GET'])
+@api_view(['GET', 'HEAD'])
 def api_root(request, format=None):
     return Response({
         'corpora': reverse('corpus-list', request=request),
