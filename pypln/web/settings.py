@@ -42,8 +42,7 @@ def parse_url(url):
 
     return config
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
-    os.path.pardir))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 TEMPLATE_DEBUG = DEBUG
