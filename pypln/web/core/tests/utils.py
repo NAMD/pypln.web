@@ -37,7 +37,7 @@ class TestWithMongo(TestCase):
             filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/analysis.json')
             with open(filename, 'r') as mongo_fixture:
                 for obj in json_util.loads(mongo_fixture.read()):
-                    mongodb_storage._connection[settings.MONGODB_CONFIG['database']][settings.MONGODB_CONFIG['analysis_collection']].insert(obj)
+                    mongodb_storage._connection[settings.MONGODB_DBNAME][settings.MONGODB_COLLECTION].insert(obj)
             for doc in Document.objects.all():
                 mongodb_storage.save(os.path.basename(doc.blob.name),
                     StringIO(u"Test file with non-ascii char: á.".encode('utf-8')))

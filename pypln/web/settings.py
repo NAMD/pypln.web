@@ -27,20 +27,8 @@ except ImportError:
     import urllib.parse as urlparse
 
 
-def parse_url(url):
-    urlparse.uses_netloc.append('mongodb')
-    url = urlparse.urlparse(url)
-
-    path = url.path[1:]
-    path = path.split('?', 2)[0]
-
-    return {
-        'database': path or '',
-        'port': url.port or '',
-        'host': url.hostname or '',
-    }
-
-    return config
+def split_uris(uri):
+    return uri.split(';')
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
@@ -64,12 +52,11 @@ DATABASES = {
     'default': config('DATABASE_URL', default='sqlite:///dev.db', cast=db_url)
 }
 
-MONGODB_CONFIG = config('MONGODB_CONFIG', default='mongodb://localhost:27017/pypln', cast=parse_url)
+MONGODB_URIS = config('MONGODB_URIS', default='mongodb://localhost:27017',
+        cast=split_uris)
 
-
-MONGODB_CONFIG.update({
-    'analysis_collection': config('ANALYSIS_COLLECTION', default='analysis'),
-})
+MONGODB_DBNAME = config('MONGODB_DBNAME', default='pypln')
+MONGODB_COLLECTION = config('MONGODB_COLLECTION', default='analysis')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 

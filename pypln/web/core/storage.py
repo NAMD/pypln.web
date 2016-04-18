@@ -41,11 +41,9 @@ class MongoDBBase64Storage(Storage):
 
     def __init__(self):
 
-        db_config = settings.MONGODB_CONFIG
-        self._connection = Connection(host=db_config['host'],
-            port=db_config['port'])
-        self._db = self._connection[db_config['database']]
-        self.collection = self._db[db_config['analysis_collection']]
+        self._connection = Connection(host=settings.MONGODB_URIS)
+        self._db = self._connection[settings.MONGODB_DBNAME]
+        self.collection = self._db[settings.MONGODB_COLLECTION]
 
     def _open(self, name, mode='rb'):
         document = self.collection.find_one(ObjectId(name))
