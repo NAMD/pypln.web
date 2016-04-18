@@ -69,8 +69,6 @@ MONGODB_CONFIG = config('MONGODB_CONFIG', default='mongodb://localhost:27017/pyp
 
 MONGODB_CONFIG.update({
     'analysis_collection': config('ANALYSIS_COLLECTION', default='analysis'),
-    'gridfs_collection': config('GRIDFS_COLLECTION', default='files'),
-    'monitoring_collection': config('MONITORING_COLLECTION', default='monitoring'),
 })
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
