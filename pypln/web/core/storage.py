@@ -28,7 +28,6 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.utils.encoding import filepath_to_uri
 from pymongo import Connection
-from gridfs import GridFS, NoFile
 
 
 class MongoDBBase64Storage(Storage):

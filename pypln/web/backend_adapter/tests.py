@@ -68,14 +68,14 @@ class CreateIndexingPipelineTest(TestWithMongo):
         extractor.assert_called_with()
         extractor.return_value.si.assert_called_with(ObjectId(self.document.blob.name))
 
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
+    @patch('pypln.web.backend_adapter.pipelines.Extractor', autospec=True)
     def test_should_add_index_name_to_the_document_in_mongo(self,
             gridfs_data_retriever):
         create_indexing_pipeline(self.document)
         mongo_document = self.get_mongo_doc(self.document)
         self.assertEqual(mongo_document['index_name'], self.document.index_name)
 
-    @patch('pypln.web.backend_adapter.pipelines.GridFSDataRetriever', autospec=True)
+    @patch('pypln.web.backend_adapter.pipelines.Extractor', autospec=True)
     def test_should_add_doc_type_to_the_document_in_mongo(self,
             gridfs_data_retriever):
         create_indexing_pipeline(self.document)
