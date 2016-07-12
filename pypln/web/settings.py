@@ -58,6 +58,7 @@ MONGODB_URIS = config('MONGODB_URIS', default='mongodb://localhost:27017',
 
 MONGODB_DBNAME = config('MONGODB_DBNAME', default='pypln')
 MONGODB_COLLECTION = config('MONGODB_COLLECTION', default='analysis')
+MONGODB_CORPORA_COLLECTION = config('MONGODB_CORPORA_COLLECTION', default='corpora_analysis')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 

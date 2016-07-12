@@ -27,7 +27,7 @@ from django.test import TestCase
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.tests.utils import TestWithMongo
 
-__all__ = ["CorpusModelTest", "DocumentModelTest"]
+__all__ = ["CorpusModelTest", "CorpusPropertiesTest", "DocumentModelTest"]
 
 class CorpusModelTest(TestCase):
     fixtures = ['users']
@@ -44,6 +44,25 @@ class CorpusModelTest(TestCase):
         corpus_1 = Corpus.objects.create(owner=user, name="Corpus")
         corpus_2 = Corpus.objects.create(owner=admin, name="Corpus")
         self.assertEqual(corpus_1.name, corpus_2.name)
+
+
+class CorpusPropertiesTest(TestWithMongo):
+    fixtures = ['users', 'corpora', 'corpora_analysis']
+
+    def test_returns_keyerror_when_key_does_not_exist(self):
+        expected_data = u'Test file with non-ascii char: á.'
+        corpus = Corpus.objects.all()[0]
+        with self.assertRaises(KeyError):
+            corpus.properties['analysis_that_does_not_exist']
+
+    def test_get_freqdist_from_store(self):
+        expected_data = [
+            [u"á", 1], [u"non-ascii", 1], [u".", 1],
+            [u"char", 1], [u"file", 1], [u"test", 1], [u":", 1],
+            [u"with", 1 ]
+        ]
+        corpus = Corpus.objects.all()[0]
+        self.assertEqual(corpus.properties['freqdist'], expected_data)
 
 
 class DocumentModelTest(TestWithMongo):

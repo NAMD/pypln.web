@@ -21,6 +21,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db import models
+import pymongo
 
 from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
@@ -28,6 +29,7 @@ from rest_framework.authtoken.models import Token
 from pypln.web.core.storage import MongoDBBase64Storage
 
 mongodb_storage = MongoDBBase64Storage()
+corpus_collection = pymongo.Connection(host=settings.MONGODB_URIS)[settings.MONGODB_DBNAME][settings.MONGODB_CORPORA_COLLECTION]
 
 
 class Corpus(models.Model):
@@ -42,6 +44,13 @@ class Corpus(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def properties(self):
+        corpus_analysis = corpus_collection.find_one({"corpus_id": self.id})
+        if corpus_analysis is None:
+            return {}
+        return corpus_analysis
 
 
 class Document(models.Model):

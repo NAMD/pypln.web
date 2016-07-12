@@ -42,6 +42,13 @@ class TestWithMongo(TestCase):
                 mongodb_storage.save(os.path.basename(doc.blob.name),
                     StringIO(u"Test file with non-ascii char: á.".encode('utf-8')))
 
+        if hasattr(self, 'fixtures') and self.fixtures is not None and 'corpora_analysis' in self.fixtures:
+            filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/corpora_analysis.json')
+            with open(filename, 'r') as mongo_fixture:
+                for obj in json_util.loads(mongo_fixture.read()):
+                    mongodb_storage._connection[settings.MONGODB_DBNAME][settings.MONGODB_CORPORA_COLLECTION].insert(obj)
+
+
     def _post_teardown(self, *args, **kwargs):
         mongodb_storage._connection.drop_database(mongodb_storage._db.name)
         super(TestWithMongo, self)._post_teardown(*args, **kwargs)
