@@ -29,6 +29,10 @@ function manage_with_settings() {
 	 PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" python "$PYPLN_ROOT"/manage.py $* --settings=pypln.web.settings.$SETTINGS;
 }
 
+function manage() {
+	 PYTHONPATH="$PYPLN_ROOT:$PYTHONPATH" python "$PYPLN_ROOT"/manage.py $*
+}
+
 alias manage_dev="manage_with_settings development"
 alias manage_test="manage_with_settings test"
 alias run_tests="manage_test test pypln.web.core.tests"
