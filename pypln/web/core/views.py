@@ -116,6 +116,20 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         instance = serializer.save(owner=self.request.user)
 
+class CorpusFreqDist(generics.RetrieveUpdateAPIView):
+    """
+    """
+    model = Corpus
+    permission_classes = (permissions.IsAuthenticated, )
+
+    class CorpusFreqDistSerializer(serializers.Serializer):
+        value = serializers.ReadOnlyField(source="properties.freqdist")
+
+    serializer_class = CorpusFreqDistSerializer
+
+    def get_queryset(self):
+        return Corpus.objects.filter(owner=self.request.user)
+
 class DocumentList(generics.ListCreateAPIView):
     """
     Lists all documents available to the current user and creates new documents.

@@ -20,6 +20,7 @@
 from django.conf.urls import patterns, url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from pypln.web.core.views import CorpusList, CorpusDetail, CorpusDocumentList
+from pypln.web.core.views import CorpusFreqDist
 from pypln.web.core.views import DocumentList, DocumentDetail
 from pypln.web.core.views import PropertyList, PropertyDetail
 
@@ -28,6 +29,8 @@ urlpatterns = patterns('pypln.web.core.views',
     url(r'^user/api-token/$', 'auth_token', name='auth_token'),
     url(r'^corpora/$', CorpusList.as_view(), name='corpus-list'),
     url(r'^corpora/(?P<pk>\d+)/$', CorpusDetail.as_view(), name='corpus-detail'),
+    url(r'^corpora/(?P<pk>\d+)/freqdist/$', CorpusFreqDist.as_view(),
+                name='corpus-freqdist'),
     url(r'^corpora/(?P<pk>\d+)/documents/$', CorpusDocumentList.as_view(),
                 name='corpus-document-list'),
     url(r'^documents/$', DocumentList.as_view(), name='document-list'),
