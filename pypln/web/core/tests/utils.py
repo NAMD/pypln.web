@@ -46,7 +46,7 @@ class TestWithMongo(TestCase):
             filename = os.path.join(settings.PROJECT_ROOT, 'core/fixtures/mongodb/corpora_analysis.json')
             with open(filename, 'r') as mongo_fixture:
                 for obj in json_util.loads(mongo_fixture.read()):
-                    mongodb_storage._connection[settings.MONGODB_DBNAME][settings.MONGODB_CORPORA_COLLECTION].insert(obj)
+                    mongodb_storage._connection[settings.MONGODB_DBNAME][settings.MONGODB_CORPORA_COLLECTION].insert(obj, w=1)
 
 
     def _post_teardown(self, *args, **kwargs):
