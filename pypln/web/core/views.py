@@ -130,6 +130,13 @@ class CorpusFreqDist(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         return Corpus.objects.filter(owner=self.request.user)
 
+    def get_object(self, *args, **kwargs):
+        corpus = super(CorpusFreqDist, self).get_object(*args, **kwargs)
+        if corpus.properties.has_key("freqdist"):
+            return corpus
+        else:
+            raise Http404("FreqDist for Corpus {} is not yet available".format(corpus))
+
 class DocumentList(generics.ListCreateAPIView):
     """
     Lists all documents available to the current user and creates new documents.

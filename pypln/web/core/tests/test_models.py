@@ -61,7 +61,7 @@ class CorpusPropertiesTest(TestWithMongo):
             [u"char", 1], [u"file", 1], [u"test", 1], [u":", 1],
             [u"with", 1 ]
         ]
-        corpus = Corpus.objects.all()[0]
+        corpus = Corpus.objects.get(pk=2)
         self.assertEqual(corpus.properties['freqdist'], expected_data)
 
 

@@ -1,7 +1,7 @@
 [
     {
 	"_id" : { "$oid": "5785005257bc3a1070d8cdbf" },
-	"corpus_id" : 1,
+	"corpus_id" : 2,
 	"freqdist" : [
 	    [ "á", 1 ],
 	    [ "non-ascii", 1 ],

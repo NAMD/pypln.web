@@ -36,16 +36,6 @@ class CorpusFreqDistViewTest(TestWithMongo):
             kwargs={'pk': 2}))
         self.assertEqual(response.status_code, 403)
 
-#    def test_shows_corpus_correctly(self):
-#        self.client.login(username="user", password="user")
-#        corpus = Corpus.objects.filter(owner__username="user")[0]
-#        response = self.client.get(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}))
-#
-#        self.assertEqual(response.status_code, 200)
-#        self.assertEqual(response.renderer_context['view'].get_object(), corpus)
-
-
     def test_returns_404_for_inexistent_corpus(self):
         self.client.login(username="user", password="user")
         response = self.client.get(reverse('corpus-freqdist',
@@ -59,9 +49,16 @@ class CorpusFreqDistViewTest(TestWithMongo):
             kwargs={'pk': corpus.id}))
         self.assertEqual(response.status_code, 404)
 
-    def test_shows_corpus_freqdist_correctly(self):
+    def test_returns_404_if_corpus_has_no_freqdist_yet(self):
         self.client.login(username="admin", password="admin")
         corpus = Corpus.objects.filter(owner__username="admin")[0]
+        response = self.client.get(reverse('corpus-freqdist',
+            kwargs={'pk': corpus.id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_shows_corpus_freqdist_correctly(self):
+        self.client.login(username="user", password="user")
+        corpus = Corpus.objects.filter(owner__username="user")[0]
         response = self.client.get(reverse('corpus-freqdist',
             kwargs={'pk': corpus.id}))
 
