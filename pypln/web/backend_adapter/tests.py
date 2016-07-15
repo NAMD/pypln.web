@@ -26,13 +26,13 @@ from django.test import TestCase
 from mock import patch
 
 from pypln.web.backend_adapter.pipelines import (create_indexing_pipeline,
-        call_default_pipeline, create_pipeline_from_document)
-from pypln.web.core.models import IndexedDocument, Document, mongodb_storage
+    call_default_pipeline, create_pipeline_from_document, corpus_freqdist)
+from pypln.web.core.models import IndexedDocument, Document, mongodb_storage, Corpus
 from pypln.web.core.tests.utils import TestWithMongo
 
 
 __all__ = ["CreatePipelineTest", "CreateIndexingPipelineTest",
-    "CreatePipelineFromDocumentTest"]
+    "CreatePipelineFromDocumentTest", "CorpusFreqDistTest"]
 
 class CreatePipelineTest(TestWithMongo):
 
@@ -91,3 +91,16 @@ class CreatePipelineFromDocumentTest(TestWithMongo):
         doc = Document.objects.all()[0]
         create_pipeline_from_document(doc)
         fake_call_default_pipeline.assert_called_with(ObjectId(doc.blob.name))
+
+
+class CorpusFreqDistTest(TestWithMongo):
+    fixtures = ['users', 'corpora', 'documents']
+
+    @patch('pypln.web.backend_adapter.pipelines.CorpusFreqDist', autospec=True)
+    def test_should_call_CorpusFreqDist_with_document_ids(self,
+            corpus_freqdist_worker):
+        corpus = Corpus.objects.get(pk=2)
+        ids = [u"562526d9798ebd4616b23bb1"]
+        corpus_freqdist(corpus)
+        corpus_freqdist_worker.assert_called_with()
+        corpus_freqdist_worker.return_value.si.assert_called_with(corpus.pk, ids)

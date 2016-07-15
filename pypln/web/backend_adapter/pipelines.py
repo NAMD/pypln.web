@@ -44,6 +44,10 @@ def create_indexing_pipeline(doc):
             {"index_name": doc.index_name, "doc_type": doc.doc_type}})
     (Extractor().si(doc_id) | ElasticIndexer().si(doc_id))()
 
+def corpus_freqdist(corpus):
+    blob_ids = list(corpus.document_set.values_list('blob', flat=True))
+    CorpusFreqDist().si(corpus.pk, blob_ids)
+
 def get_config_from_router(api, timeout=5):
     client = Client()
     client.connect(api)
