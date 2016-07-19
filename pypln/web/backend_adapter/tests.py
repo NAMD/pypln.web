@@ -100,7 +100,7 @@ class CorpusFreqDistTest(TestWithMongo):
     def test_should_call_CorpusFreqDist_with_document_ids(self,
             corpus_freqdist_worker):
         corpus = Corpus.objects.get(pk=2)
-        ids = [u"562526d9798ebd4616b23bb1"]
+        ids = [ObjectId("562526d9798ebd4616b23bb1")]
         corpus_freqdist(corpus)
         corpus_freqdist_worker.assert_called_with()
-        corpus_freqdist_worker.return_value.si.assert_called_with(corpus.pk, ids)
+        corpus_freqdist_worker.return_value.delay.assert_called_with(corpus.pk, ids)
