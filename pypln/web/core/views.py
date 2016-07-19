@@ -28,7 +28,7 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework import serializers
 
-from pypln.web.backend_adapter.pipelines import create_pipeline_from_document
+from pypln.web.backend_adapter.pipelines import create_pipeline_from_document, corpus_freqdist
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 from pypln.web.core.serializers import PropertyListSerializer
@@ -118,6 +118,13 @@ class CorpusDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class CorpusFreqDist(generics.RetrieveUpdateAPIView):
     """
+    Shows FreqDist for the corpus
+
+    `GET` requests will show the last calculated FreqDist for the corpus
+
+    `PUT` requests will queue a new task for calculating the Corpus
+    FreqDist using the documents currently contained in the corpus
+
     """
     model = Corpus
     permission_classes = (permissions.IsAuthenticated, )
@@ -130,12 +137,16 @@ class CorpusFreqDist(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         return Corpus.objects.filter(owner=self.request.user)
 
-    def get_object(self, *args, **kwargs):
-        corpus = super(CorpusFreqDist, self).get_object(*args, **kwargs)
+    def retrieve(self, *args, **kwargs):
+        corpus = self.get_object()
         if corpus.properties.has_key("freqdist"):
-            return corpus
+            return super(CorpusFreqDist, self).retrieve(self, *args, **kwargs)
         else:
             raise Http404("FreqDist for Corpus {} is not yet available".format(corpus))
+
+    def perform_update(self, serializer):
+        corpus_freqdist(serializer.instance)
+
 
 class DocumentList(generics.ListCreateAPIView):
     """

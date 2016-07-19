@@ -68,102 +68,37 @@ class CorpusFreqDistViewTest(TestWithMongo):
         expected_data = corpus.properties['freqdist']
         self.assertEqual(response.data['value'], expected_data)
 
+    @patch('pypln.web.core.views.corpus_freqdist')
+    def test_queue_freqdist_analysis_for_a_corpus_that_still_does_not_have_one(self,corpus_freqdist):
+        """
+        This is a regression test. There used to be a bug that returned 404
+        before queueing the analysis if the corpus didn't have a freqdist
+        analysis yet.
+        """
+        self.user = User.objects.get(username="admin")
+        self.client.login(username="admin", password="admin")
 
-    @patch('pypln.web.backend_adapter.pipelines.corpus_freqdist')
-    def _test_queue_freqdist_analysis_for_a_corpus_that_didnt_have_one(self,
-            corpus_freqdist):
+        corpus = self.user.corpus_set.all()[0]
+        response = self.client.put(reverse('corpus-freqdist',
+            kwargs={"pk": corpus.id}))
+
+        self.assertFalse(corpus.properties.has_key("freqdist"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(corpus_freqdist.called)
+        corpus_freqdist.assert_called_with(corpus)
+
+    @patch('pypln.web.core.views.corpus_freqdist')
+    def test_queue_freqdist_analysis_for_a_corpus_that_has_one(self,corpus_freqdist):
         self.user = User.objects.get(username="user")
-        self.assertEqual(len(self.user.document_set.all()), 1)
         self.client.login(username="user", password="user")
 
         corpus = self.user.corpus_set.all()[0]
         response = self.client.put(reverse('corpus-freqdist',
             kwargs={"pk": corpus.id}))
 
-        self.assertEqual(response.status_code, 201)
+        self.assertTrue(corpus.properties.has_key("freqdist"))
+
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(corpus_freqdist.called)
-
-        document_ids = corpus.document_set.all()
-
-        corpus_freqdist.assert_called_with(corpus.id, document_ids)
-
-#    def test_edit_corpus(self):
-#        self.client.login(username="user", password="user")
-#        corpus = Corpus.objects.filter(owner__username="user")[0]
-#        response = self.client.put(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
-#            "description": "New description"}), content_type="application/json")
-#
-#        self.assertEqual(response.status_code, 200)
-#        updated_corpus = Corpus.objects.filter(owner__username="user")[0]
-#        self.assertEqual(updated_corpus.name, "New name")
-#        self.assertEqual(updated_corpus.description, "New description")
-#
-#    def test_cant_change_name_to_one_that_already_exists_for_this_user(self):
-#        self.client.login(username="user", password="user")
-#        user = User.objects.get(username="user")
-#        conflicting_corpus = Corpus.objects.create(name="Conflicting name",
-#                owner=user, description="This corpus is here to create a conflict")
-#
-#        corpus = Corpus.objects.filter(owner__username="user")[0]
-#        response = self.client.put(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}), json.dumps({"name": "Conflicting name",
-#            "description": "New description"}), content_type="application/json")
-#
-#        self.assertEqual(response.status_code, 400)
-#        not_updated_corpus = Corpus.objects.filter(owner__username="user")[0]
-#        self.assertEqual(not_updated_corpus.name, "User Test Corpus")
-#        self.assertEqual(not_updated_corpus.description, "This corpus belongs to the user 'user'")
-#
-#    def test_cant_edit_other_peoples_corpora(self):
-#        """
-#        A PUT request to another person's corpus actually raises Http404, as
-#        if the document did not exist. Since rest_framework uses PUT-as-create,
-#        this means a new object is created with the provided information.
-#        """
-#        self.client.login(username="user", password="user")
-#        corpus = Corpus.objects.filter(owner__username="admin")[0]
-#        response = self.client.put(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}), json.dumps({"name": "New name",
-#            "description": "New description"}), content_type="application/json")
-#        self.assertEqual(response.status_code, 404)
-#
-#        reloaded_corpus = Corpus.objects.filter(owner__username="admin")[0]
-#        self.assertNotEqual(reloaded_corpus.name, "New name")
-#        self.assertNotEqual(reloaded_corpus.description, "New description")
-#
-#    def test_cant_change_the_owner_of_a_corpus(self):
-#        self.client.login(username="user", password="user")
-#        corpus = Corpus.objects.filter(owner__username="user")[0]
-#        # We try to set 'admin' as the owner (id=1)
-#        response = self.client.put(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}), json.dumps({"name": "Corpus",
-#            "description": "description", "owner": 1}),
-#            content_type="application/json")
-#
-#        self.assertEqual(response.status_code, 200)
-#        # but the view sets the request user as the owner anyway
-#        self.assertEqual(response.data["owner"], "user")
-#
-#    def test_delete_a_corpus(self):
-#        self.client.login(username="user", password="user")
-#        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
-#
-#        corpus = Corpus.objects.filter(owner__username="user")[0]
-#        response = self.client.delete(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}))
-#
-#        self.assertEqual(response.status_code, 204)
-#        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 0)
-#
-#    def test_cant_delete_other_peoples_corpora(self):
-#        self.client.login(username="user", password="user")
-#        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
-#
-#        corpus = Corpus.objects.filter(owner__username="admin")[0]
-#        response = self.client.delete(reverse('corpus-detail',
-#            kwargs={'pk': corpus.id}))
-#
-#        self.assertEqual(response.status_code, 404)
-#        self.assertEqual(len(Corpus.objects.filter(owner__username="user")), 1)
-#"""
+        corpus_freqdist.assert_called_with(corpus)
