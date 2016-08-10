@@ -26,7 +26,7 @@ from django.test import TestCase
 from mock import patch
 
 from pypln.web.backend_adapter.pipelines import (create_indexing_pipeline,
-    call_default_pipeline, create_pipeline_from_document, corpus_freqdist)
+    call_default_pipeline, create_pipeline_from_document, calculate_corpus_freqdist)
 from pypln.web.core.models import IndexedDocument, Document, mongodb_storage, Corpus
 from pypln.web.core.tests.utils import TestWithMongo
 
@@ -101,6 +101,6 @@ class CorpusFreqDistTest(TestWithMongo):
             corpus_freqdist_worker):
         corpus = Corpus.objects.get(pk=2)
         ids = [ObjectId("562526d9798ebd4616b23bb1")]
-        corpus_freqdist(corpus)
+        calculate_corpus_freqdist(corpus)
         corpus_freqdist_worker.assert_called_with()
         corpus_freqdist_worker.return_value.delay.assert_called_with(corpus.pk, ids)

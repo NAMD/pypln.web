@@ -28,7 +28,8 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework import serializers
 
-from pypln.web.backend_adapter.pipelines import create_pipeline_from_document, corpus_freqdist
+from pypln.web.backend_adapter.pipelines import (create_pipeline_from_document,
+        calculate_corpus_freqdist)
 from pypln.web.core.models import Corpus, Document
 from pypln.web.core.serializers import CorpusSerializer, DocumentSerializer
 from pypln.web.core.serializers import PropertyListSerializer
@@ -145,7 +146,7 @@ class CorpusFreqDist(generics.RetrieveUpdateAPIView):
             raise Http404("FreqDist for Corpus {} is not yet available".format(corpus))
 
     def perform_update(self, serializer):
-        corpus_freqdist(serializer.instance)
+        calculate_corpus_freqdist(serializer.instance)
 
 
 class DocumentList(generics.ListCreateAPIView):

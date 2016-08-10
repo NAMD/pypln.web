@@ -68,8 +68,9 @@ class CorpusFreqDistViewTest(TestWithMongo):
         expected_data = corpus.properties['freqdist']
         self.assertEqual(response.data['value'], expected_data)
 
-    @patch('pypln.web.core.views.corpus_freqdist')
-    def test_queue_freqdist_analysis_for_a_corpus_that_still_does_not_have_one(self,corpus_freqdist):
+    @patch('pypln.web.core.views.calculate_corpus_freqdist')
+    def test_queue_freqdist_analysis_for_a_corpus_that_still_does_not_have_one(self,
+            calculate_corpus_freqdist):
         """
         This is a regression test. There used to be a bug that returned 404
         before queueing the analysis if the corpus didn't have a freqdist
@@ -85,11 +86,12 @@ class CorpusFreqDistViewTest(TestWithMongo):
         self.assertFalse(corpus.properties.has_key("freqdist"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(corpus_freqdist.called)
-        corpus_freqdist.assert_called_with(corpus)
+        self.assertTrue(calculate_corpus_freqdist.called)
+        calculate_corpus_freqdist.assert_called_with(corpus)
 
-    @patch('pypln.web.core.views.corpus_freqdist')
-    def test_queue_freqdist_analysis_for_a_corpus_that_has_one(self,corpus_freqdist):
+    @patch('pypln.web.core.views.calculate_corpus_freqdist')
+    def test_queue_freqdist_analysis_for_a_corpus_that_has_one(self,
+            calculate_corpus_freqdist):
         self.user = User.objects.get(username="user")
         self.client.login(username="user", password="user")
 
@@ -100,5 +102,5 @@ class CorpusFreqDistViewTest(TestWithMongo):
         self.assertTrue(corpus.properties.has_key("freqdist"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(corpus_freqdist.called)
-        corpus_freqdist.assert_called_with(corpus)
+        self.assertTrue(calculate_corpus_freqdist.called)
+        calculate_corpus_freqdist.assert_called_with(corpus)
